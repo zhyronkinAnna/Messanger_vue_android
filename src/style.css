@@ -1,12 +1,12 @@
 .n-form-item-label__text {
     display: block;
     width: 100% !important;
-  }
-  
-  body {
+}
+
+body {
     background-color: #F9F9F9;
     background-image:
-      linear-gradient(to right, #F5F5F5 1px, transparent 1px),
-      linear-gradient(to bottom, #F5F5F5 1px, transparent 1px);
+    linear-gradient(to right, #F5F5F5 1px, transparent 1px),
+    linear-gradient(to bottom, #F5F5F5 1px, transparent 1px);
     background-size: 20px 20px;
-  }
+}
