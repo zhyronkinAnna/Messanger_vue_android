@@ -1,24 +1,25 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import { NConfigProvider, NGlobalStyle, NNotificationProvider, NThemeEditor } from 'naive-ui';
+import { themeOverrides } from '../src/theme/theme';
+import { useRouter } from 'vue-router';
+import { onMounted } from 'vue';
+
+const router = useRouter();
+
+onMounted(() => {
+  console.log(`Current route: ${router.currentRoute.value.fullPath}`);
+});
 </script>
 
 <template>
-  <div>
-    <a href="https://www.electronjs.org/" target="_blank">
-      <img src="./assets/electron.svg" class="logo electron" alt="Electron logo" />
-    </a>
-    <a href="https://vitejs.dev/" target="_blank">
-      <img src="./assets/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Electron + Vite + Vue" />
-  <div class="flex-center">
-    Place static files into the <code>/public</code> folder
-    <img style="width: 2.4em; margin-left: .4em;" src="/logo.svg" alt="Logo">
-  </div>
+  <NThemeEditor>
+    <NConfigProvider :theme-overrides="themeOverrides">
+      <NGlobalStyle />
+      <n-notification-provider>
+        <router-view />
+      </n-notification-provider>
+    </NConfigProvider>
+  </NThemeEditor>
 </template>
 
 <style>
