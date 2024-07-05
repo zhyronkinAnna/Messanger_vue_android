@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import { NInput, NButton, NCard, NForm, NGrid, NFormItemGi, NText, NFlex } from 'naive-ui';
-
+import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex } from 'naive-ui';
+import CenteredAuthContainer from "../components/CenteredAuthContainer.vue" 
 </script>
 
 <template>
-    <NCard title="Welcome Back" class="p-24px max-w-400px mx-auto mt-15%">
-        <NForm>
+    <CenteredAuthContainer container-name="Welcome Back">
+        <NForm class="m-t-24px">
             <NGrid :cols="24">
-                <NFormItemGi :span="24">
-                    <template #label>
-                        <NText>Email</NText>
-                    </template>
-                    <NInput placeholder="examle@email.com"></NInput>
+                <NFormItemGi :span="24" label="Email">
+                    <NInput placeholder="example@email.com"></NInput>
                 </NFormItemGi>
+
                 <NFormItemGi :span="24">
                     <template #label>
                         <NFlex justify="space-between" class="w-full">
@@ -24,11 +22,13 @@ import { NInput, NButton, NCard, NForm, NGrid, NFormItemGi, NText, NFlex } from 
                     </template>
                     <NInput type="password" placeholder=""></NInput>
                 </NFormItemGi>
+
                 <NFormItemGi :span="24" :show-feedback="false" :show-label="false" class="mt-6px">
                     <NButton type="primary" block strong >
                         Login
                     </NButton>
                 </NFormItemGi>
+
                 <NFormItemGi :span="24" class="mx-auto" :show-feedback="false" :show-label="false">
                     <NText>Don't have account?&nbsp;</NText>
                     <NButton text tag="a" text-color="#007AFFFF">
@@ -37,7 +37,7 @@ import { NInput, NButton, NCard, NForm, NGrid, NFormItemGi, NText, NFlex } from 
                 </NFormItemGi>
             </NGrid>
         </NForm>
-    </NCard>  
+    </CenteredAuthContainer>
 </template>
 
 <style scoped>
