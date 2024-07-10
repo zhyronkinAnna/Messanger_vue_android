@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router';
+import { createPinia } from 'pinia';
 
 import './style.css'
 import 'virtual:uno.css'
@@ -10,6 +11,7 @@ import './demos/ipc'
 // import './demos/node'
 
 createApp(App)
+  .use(createPinia())
   .use(router)
   .mount('#app')
   .$nextTick(() => {

@@ -39,6 +39,7 @@
   "dependencies": {
     "glob": "7.2.3 inflight@1.0.6",
     "naive-ui": "^2.38.2",
+    "pinia": "^2.1.7",
     "vue-router": "^4.3.3"
   }
 }
