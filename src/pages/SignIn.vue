@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex } from 'naive-ui';
+import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex, useNotification } from 'naive-ui';
 import AuthContainer from "../components/AuthContainer.vue" 
 import { useRouter } from 'vue-router';
 import { useStore } from '../stores/store';
 import { User, Error } from '../interfaces/index';
-import { validateEmail } from "../helper/validateEmail"
 import { ref } from 'vue';
+import { isSecurePassword, validateEmail } from '../helper';
 
 const user = ref<User>({});
-const error = ref<Error>({});
+const error = ref<Error>();
 
 const router = useRouter();
 const store = useStore();
+const notification = useNotification();
 
 function onCreateNewAccountButtonClick() {
     console.debug("onCreateNewAccountButtonClick");
@@ -23,23 +24,44 @@ function onForgotPasswordButtonClick() {
     router.push({ name: 'ForgotPassword' });
 }
 
+function handleLoginError(): Boolean {
+    if (error && error.value !== undefined && error.value !== null) {
+        console.debug("onLoginButtonClick_Error", error.value);
+        notification.error({
+            title: error.value?.subject,
+            content: error.value?.body,
+            duration: 1500
+        });
+        error.value = undefined;
+        return true;
+    }
+    return false;
+}
+
 function validation() {
     if (!validateEmail(user.value?.email || "")) {
-        console.debug("validation_Email");
+        console.debug("validation_Email", user.value?.email);
         error.value = {subject: "Email", body: "Email"};
+    }
+    else if (!isSecurePassword(user.value?.password || "")) {
+        console.debug("isSecurePassword_Password");
+        error.value = {subject: "Password", body: "Password"};
     }
 }
 
 function onLoginButtonClick() {
     validation();
 
-    if (error?.value) {
-        console.debug("onLoginButtonClick_Error");
-        //PUT LOGIC TO SHOW ERROR
+    if (handleLoginError()) {
+        return;
+    }
+    store.user = user.value;
+    //Send request to server and wait fot response
+
+    if (handleLoginError()) {
         return;
     }
 
-    store.user = user.value;
     console.debug("onLoginButtonClick");
 }
 
