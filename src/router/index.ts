@@ -3,6 +3,7 @@ import SignIn from '../pages/SignIn.vue';
 import SignUp from '../pages/SignUp.vue';
 import ForgotPassword from '../pages/ForgotPassword.vue';
 import EmailConfirmation from '../pages/EmailConfirmation.vue';
+import SetNewPassword from '../pages/SetNewPassword.vue';
 
 const routes = [
 {
@@ -24,6 +25,11 @@ const routes = [
     path: '/EmailConfirmation',
     name: 'EmailConfirmation',
     component: EmailConfirmation
+},
+{
+    path: '/SetNewPassword',
+    name: 'SetNewPassword',
+    component: SetNewPassword
 },
 ];
 
