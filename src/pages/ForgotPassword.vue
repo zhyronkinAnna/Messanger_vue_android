@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex } from 'naive-ui';
+import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex, useNotification } from 'naive-ui';
 import AuthContainer from "../components/AuthContainer.vue" 
 import { useRouter } from 'vue-router';
 import { useStore } from '../stores/store';
@@ -8,19 +8,31 @@ import { validateEmail } from "../helper/validateEmail"
 import { ref } from 'vue';
 
 const user = ref<User>({});
-const error = ref<Error>({});
+const error = ref<Error>();
 
 const router = useRouter();
 const store = useStore();
+const notification = useNotification();
 
 function onBackToLoginButtonClick() {
-    console.debug("onBackToLoginButtonClick");
     router.push({ name: 'SignIn' });
+}
+
+function handleLoginError(): Boolean {
+    if (error.value && error.value !== undefined && error.value !== null) {
+        notification.error({
+            title: error.value?.subject,
+            content: error.value?.body,
+            duration: 1500
+        });
+        error.value = undefined;
+        return true;
+    }
+    return false;
 }
 
 function validation() {
     if (!validateEmail(user.value?.email || "")) {
-        console.debug("validation_Email");
         error.value = {subject: "Email", body: "Email"};
     }
 }
@@ -28,14 +40,13 @@ function validation() {
 function onConfirmButtonClick() {
     validation();
 
-    if (error?.value) {
-        console.debug("onConfirmButtonClick_Error");
-        //PUT LOGIC TO SHOW ERROR
+    if (handleLoginError()) {
         return;
     }
 
     store.user = user.value;
-    console.debug("onConfirmButtonClick");
+    store.previousRouteName = "ForgotPassword";
+    router.push({ name: 'EmailConfirmation' });
 }
 
 </script>
@@ -51,7 +62,7 @@ function onConfirmButtonClick() {
             <NForm class="m-t-24px">
                 <NGrid :cols="24">
                     <NFormItemGi :span="24" label="Email">
-                        <NInput placeholder="example@email.com"></NInput>
+                        <NInput placeholder="example@email.com" v-model:value="user.email"></NInput>
                     </NFormItemGi>
 
                     <NFormItemGi :span="24" :show-feedback="false" :show-label="false" class="mt-6px">

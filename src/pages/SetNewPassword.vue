@@ -15,13 +15,11 @@ const store = useStore();
 const notification = useNotification();
 
 function onBackToLoginButtonClick() {
-    console.debug("onBackToLoginButtonClick");
     router.push({ name: 'SignIn' });
 }
 
 function handleLoginError(): Boolean {
     if (error && error.value !== undefined && error.value !== null) {
-        console.debug("onLoginButtonClick_Error", error.value);
         notification.error({
             title: error.value?.subject,
             content: error.value?.body,
@@ -35,11 +33,9 @@ function handleLoginError(): Boolean {
 
 function validation() {
     if (!isSecurePassword(user.value?.password || "")) {
-        console.debug("isSecurePassword_Password");
         error.value = {subject: "Password", body: "Password"};
     }
-    else if (user.value?.password === user.value.retype_password) {
-        console.debug("validation_Password");
+    else if (user.value?.password !== user.value.retype_password) {
         error.value = {subject: "Password", body: "Password"};
     }
 }
@@ -51,8 +47,7 @@ function onSetNewPasswordClick() {
         return;
     }
 
-    store.user = user.value;
-    console.debug("onSetNewPasswordClick");
+    router.push({ name: 'SignIn' });
 }
 
 </script>

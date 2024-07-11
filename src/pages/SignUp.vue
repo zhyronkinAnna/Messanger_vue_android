@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NInput, NButton, NForm, NGrid, NFormItemGi, NFlex } from 'naive-ui';
+import { NInput, NButton, NForm, NGrid, NFormItemGi, NFlex, useNotification } from 'naive-ui';
 import AuthContainer from "../components/AuthContainer.vue";
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
@@ -8,38 +8,48 @@ import { validateEmail } from "../helper/validateEmail"
 import { useStore } from '../stores/store';
 
 const user = ref<SignUpForm>({});
-const error = ref<Error>({});
+const error = ref<Error>();
 
 const router = useRouter();
 const store = useStore();
+const notification = useNotification();
 
 function onBackToLoginButtonClick() {
-    console.debug("onBackToLoginButtonClick");
     router.push({ name: 'SignIn' });
+}
+
+function handleLoginError(): Boolean {
+    if (error.value && error.value !== undefined && error.value !== null) {
+        notification.error({
+            title: error.value?.subject,
+            content: error.value?.body,
+            duration: 1500
+        });
+        error.value = undefined;
+        return true;
+    }
+    return false;
 }
 
 function validation() {
     if (!validateEmail(user.value?.email || "")) {
-        console.debug("validation_Email");
         error.value = {subject: "Email", body: "Email"};
     }
-
-    else if (user.value?.password === user.value.retype_password) {
-        console.debug("validation_Password");
+    else if (user.value?.password !== user.value.retype_password) {
         error.value = {subject: "Password", body: "Password"};
     }
 }
 
 function onRegisterClick() {
     validation();
-    if (error?.value) {
-        console.debug("onRegisterClick_Error");
-        //PUT LOGIC TO SHOW ERROR
+    
+    if (handleLoginError()) {
         return;
     }
+
     store.user = user.value;
-    //GO TO PAGE FOR AUTH
-    console.debug("onRegisterClick");
+    store.previousRouteName = "SinUp";
+    router.push({ name: 'EmailConfirmation' });
 }
 
 </script>

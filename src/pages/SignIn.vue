@@ -15,18 +15,16 @@ const store = useStore();
 const notification = useNotification();
 
 function onCreateNewAccountButtonClick() {
-    console.debug("onCreateNewAccountButtonClick");
     router.push({ name: 'SignUp' });
 }
 
 function onForgotPasswordButtonClick() {
-    console.debug("onForgotPasswordButtonClick");
     router.push({ name: 'ForgotPassword' });
 }
 
 function handleLoginError(): Boolean {
-    if (error && error.value !== undefined && error.value !== null) {
-        console.debug("onLoginButtonClick_Error", error.value);
+    if (error.value && error.value !== undefined && error.value !== null) {
+
         notification.error({
             title: error.value?.subject,
             content: error.value?.body,
@@ -40,11 +38,9 @@ function handleLoginError(): Boolean {
 
 function validation() {
     if (!validateEmail(user.value?.email || "")) {
-        console.debug("validation_Email", user.value?.email);
         error.value = {subject: "Email", body: "Email"};
     }
     else if (!isSecurePassword(user.value?.password || "")) {
-        console.debug("isSecurePassword_Password");
         error.value = {subject: "Password", body: "Password"};
     }
 }
@@ -61,8 +57,6 @@ function onLoginButtonClick() {
     if (handleLoginError()) {
         return;
     }
-
-    console.debug("onLoginButtonClick");
 }
 
 </script>

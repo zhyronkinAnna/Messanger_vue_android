@@ -3,24 +3,43 @@ import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex, useNotificati
 import AuthContainer from "../components/AuthContainer.vue" 
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
+import { Error } from '../interfaces/index';
+import { useStore } from '../stores/store';
 
-
+const error = ref<Error>();
 const code = ref<string>();
+
 const router = useRouter();
+const store = useStore();
 const notification = useNotification();
 
 function onClickToResendButtonClick() {
-    console.debug("onCreateNewAccountButtonClick");
-    router.push({ name: 'SignUp' });
+}
+
+function handleLoginError(): Boolean {
+    if (error.value && error.value !== undefined && error.value !== null) {
+        notification.error({
+            title: error.value?.subject,
+            content: error.value?.body,
+            duration: 1500
+        });
+        error.value = undefined;
+        return true;
+    }
+    return false;
 }
 
 function onBackToLoginButtonClick() {
-    console.debug("onBackToLoginButtonClick");
     router.push({ name: 'SignIn' });
 }
 
 function onConfirmButtonClick() {
-    console.debug("onConfirmButtonClick");
+    if(store.previousRouteName === "ForgotPassword"){
+        router.push({ name: 'SetNewPassword' });
+    }
+    else if(store.previousRouteName === "SignUp"){
+        router.push({ name: 'SignIn' });
+    }
 }
 
 </script>
