@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex, useNotification } from 'naive-ui';
-import AuthContainer from "../components/AuthContainer.vue" 
+import AuthContainer from "../components/AuthContainer.vue";
 import { useRouter } from 'vue-router';
 import { useStore } from '../stores/store';
 import { User, Error } from '../interfaces/index';
 import { ref } from 'vue';
-import { isSecurePassword, validateEmail } from '../helper';
+import { isSecurePassword, validateEmail, generateSHA256 } from '../helper';
+import { useWsService } from '../services/wsServiceManager';
 
 const user = ref<User>({});
 const error = ref<Error>();
@@ -13,6 +14,7 @@ const error = ref<Error>();
 const router = useRouter();
 const store = useStore();
 const notification = useNotification();
+const wsService = useWsService();
 
 function onCreateNewAccountButtonClick() {
     router.push({ name: 'SignUp' });
@@ -24,7 +26,6 @@ function onForgotPasswordButtonClick() {
 
 function handleLoginError(): Boolean {
     if (error.value && error.value !== undefined && error.value !== null) {
-
         notification.error({
             title: error.value?.subject,
             content: error.value?.body,
@@ -38,21 +39,31 @@ function handleLoginError(): Boolean {
 
 function validation() {
     if (!validateEmail(user.value?.email || "")) {
-        error.value = {subject: "Email", body: "Email"};
-    }
-    else if (!isSecurePassword(user.value?.password || "")) {
-        error.value = {subject: "Password", body: "Password"};
+        error.value = { subject: "Email", body: "Email" };
+    } else if (!isSecurePassword(user.value?.password || "")) {
+        error.value = { subject: "Password", body: "Password" };
     }
 }
 
-function onLoginButtonClick() {
+async function onLoginButtonClick() {
     validation();
 
     if (handleLoginError()) {
         return;
     }
-    store.user = user.value;
-    //Send request to server and wait fot response
+
+    const hashedPassword = generateSHA256(user.value.password || "");
+    console.log(user.value.password);
+
+    store.user = { ...user.value };
+    store.user.password = hashedPassword;
+    
+    try {
+        const respond = await wsService?.send(store.user);
+        console.log("LALLAALALALALLALALAALLALALALALALALLALALALL", respond);
+    } catch (error) {
+        console.error('Error in WebSocket communication:', error);
+    }
 
     if (handleLoginError()) {
         return;
@@ -101,5 +112,4 @@ function onLoginButtonClick() {
 </template>
 
 <style scoped>
-
 </style>

@@ -54,5 +54,8 @@ export const themeOverrides = {
     "rippleColorWarning": "#f0a020",
     "rippleColorInfo": "#2080f0",
     "rippleDuration": "0"
+  },
+  "Spin": {
+    "color": "#007AFFFF"
   }
 };
