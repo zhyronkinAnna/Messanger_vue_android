@@ -9,7 +9,7 @@ import { useWsService, initializeWebSocketService } from './services/wsServiceMa
 const router = useRouter();
 const store = useStore();
 const wsService = useWsService();
-initializeWebSocketService(store);
+// initializeWebSocketService(store);
 
 onMounted(() => {
   console.log(`Current route: ${router.currentRoute.value.fullPath}`);

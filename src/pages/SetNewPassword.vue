@@ -3,12 +3,12 @@ import { NInput, NButton, NForm, NGrid, NFormItemGi, NFlex, useNotification } fr
 import AuthContainer from "../components/AuthContainer.vue";
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
-import { SignUpForm, Error } from "../interfaces/index"
+import { ISignUpForm, IError } from "../models/index"
 import { useStore } from '../stores/store';
 import { isSecurePassword } from '../helper';
 
-const user = ref<SignUpForm>({});
-const error = ref<Error>();
+const user = ref<ISignUpForm>({});
+const error = ref<IError>();
 
 const router = useRouter();
 const store = useStore();

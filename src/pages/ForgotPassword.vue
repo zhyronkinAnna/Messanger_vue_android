@@ -3,12 +3,12 @@ import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex, useNotificati
 import AuthContainer from "../components/AuthContainer.vue" 
 import { useRouter } from 'vue-router';
 import { useStore } from '../stores/store';
-import { User, Error } from '../interfaces/index';
+import { IUser, IError } from '../models/index';
 import { validateEmail } from "../helper/validateEmail"
 import { ref } from 'vue';
 
-const user = ref<User>({});
-const error = ref<Error>();
+const user = ref<IUser>({});
+const error = ref<IError>();
 
 const router = useRouter();
 const store = useStore();

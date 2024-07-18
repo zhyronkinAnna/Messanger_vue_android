@@ -1,20 +1,24 @@
 <script setup lang="ts">
-import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex, useNotification } from 'naive-ui';
+import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex, useNotification, FormInst } from 'naive-ui';
 import AuthContainer from "../components/AuthContainer.vue";
 import { useRouter } from 'vue-router';
 import { useStore } from '../stores/store';
-import { User, Error } from '../interfaces/index';
+import { IUser, IError, IRequest } from '../models';
 import { ref } from 'vue';
-import { isSecurePassword, validateEmail, generateSHA256 } from '../helper';
+import { generateSHA256, showErrorNotification, isSecurePassword } from '../helper';
 import { useWsService } from '../services/wsServiceManager';
+import { useRules } from '../rules/rules';
 
-const user = ref<User>({});
-const error = ref<Error>();
+const user = ref<IUser>({});
+const error = ref<IError | undefined>(undefined);
 
 const router = useRouter();
 const store = useStore();
-const notification = useNotification();
 const wsService = useWsService();
+const signInFormRef = ref<FormInst | null>(null);
+const notification = useNotification();
+
+const rules = useRules();
 
 function onCreateNewAccountButtonClick() {
     router.push({ name: 'SignUp' });
@@ -26,47 +30,49 @@ function onForgotPasswordButtonClick() {
 
 function handleLoginError(): Boolean {
     if (error.value && error.value !== undefined && error.value !== null) {
-        notification.error({
-            title: error.value?.subject,
-            content: error.value?.body,
-            duration: 1500
-        });
+        showErrorNotification(notification, error.value);
         error.value = undefined;
         return true;
     }
     return false;
 }
 
-function validation() {
-    if (!validateEmail(user.value?.email || "")) {
-        error.value = { subject: "Email", body: "Email" };
-    } else if (!isSecurePassword(user.value?.password || "")) {
-        error.value = { subject: "Password", body: "Password" };
+async function validation() {
+    await signInFormRef.value?.validate((errors) => {
+        if (errors) {
+            error.value = { subject: "Login Error", body: "Please ensure all fields are filled out correctly" };
+            showErrorNotification(notification, error.value);
+        }
+    });
+
+    if(!isSecurePassword(user.value.password || "")) {
+        error.value = { subject: "Invalid email or password", body: "We couldn't find a user with the provided email and password. Please check your credentials and try again." };
     }
 }
 
 async function onLoginButtonClick() {
-    validation();
-
-    if (handleLoginError()) {
-        return;
-    }
-
-    const hashedPassword = generateSHA256(user.value.password || "");
-    console.log(user.value.password);
-
-    store.user = { ...user.value };
-    store.user.password = hashedPassword;
-    
     try {
-        const respond = await wsService?.send(store.user);
-        console.log("LALLAALALALALLALALAALLALALALALALALLALALALL", respond);
-    } catch (error) {
-        console.error('Error in WebSocket communication:', error);
-    }
+        await validation();
 
-    if (handleLoginError()) {
-        return;
+        if (handleLoginError()) {
+            return;
+        }
+
+        const hashedPassword = generateSHA256(user.value.password || "");
+
+        store.user = { ...user.value };
+        store.user.password = hashedPassword;
+
+        const request: IRequest  = {
+            command: "SignIn", 
+            data: store.user
+        };
+
+        const respond = await wsService?.send(request);
+        console.debug("respond", respond);
+    }
+    catch (error) {
+        console.error(error);
     }
 }
 
@@ -75,13 +81,13 @@ async function onLoginButtonClick() {
 <template>
     <NFlex vertical justify="center" align="center" class="w-screen h-screen">
         <AuthContainer container-name="Welcome Back">
-            <NForm class="m-t-24px">
+            <NForm class="m-t-24px" :rules="rules.SignIn" :model="user" ref="signInFormRef">
                 <NGrid :cols="24">
-                    <NFormItemGi :span="24" label="Email">
+                    <NFormItemGi :span="24" label="Email" path="email">
                         <NInput placeholder="example@email.com" v-model:value="user.email"></NInput>
                     </NFormItemGi>
 
-                    <NFormItemGi :span="24">
+                    <NFormItemGi :span="24" path="password">
                         <template #label>
                             <NFlex justify="space-between" class="w-full">
                                 <NText>Password</NText>
@@ -90,7 +96,7 @@ async function onLoginButtonClick() {
                                 </NButton>
                             </NFlex>
                         </template>
-                        <NInput type="password" placeholder="" v-model:value="user.password"></NInput>
+                        <NInput type="password" show-password-on="click" placeholder="" v-model:value="user.password"></NInput>
                     </NFormItemGi>
 
                     <NFormItemGi :span="24" :show-feedback="false" :show-label="false" class="mt-6px">

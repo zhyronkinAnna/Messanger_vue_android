@@ -3,10 +3,10 @@ import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex, useNotificati
 import AuthContainer from "../components/AuthContainer.vue" 
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
-import { Error } from '../interfaces/index';
+import { IError } from '../models/index';
 import { useStore } from '../stores/store';
 
-const error = ref<Error>();
+const error = ref<IError>();
 const code = ref<string>();
 
 const router = useRouter();

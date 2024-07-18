@@ -1,13 +1,14 @@
-import { useStore } from '../stores/store';  // путь до вашего store
+import { MessageTypeEnum, IMessage, IRequest, IRespond, INotification,  } from '../models';
+import { useStore } from '../stores/store';
 
 class WebSocketService {
     private ws: WebSocket | null = null;
     private url: string;
-    private responseResolvers: { [key: string]: (value: any) => void } = {};
+    private responseResolvers: { [key: string]: (value: IRespond) => void } = {};
     private reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
     private store: ReturnType<typeof useStore>;
 
-    constructor(url: string, store: ReturnType<typeof useStore>, private reconnectInterval: number = 5000) {
+    constructor(url: string, store: ReturnType<typeof useStore>, private reconnectInterval: number = 15000) {
         this.url = url;
         this.store = store;
     }
@@ -15,7 +16,7 @@ class WebSocketService {
     connect(): Promise<void> {
         return new Promise((resolve, reject) => {
             this.ws = new WebSocket(this.url);
-    
+
             this.ws.onopen = () => {
                 console.log('Connected to the server');
                 this.store.isConected = true;
@@ -25,17 +26,17 @@ class WebSocketService {
                 }
                 resolve();
             };
-    
+
             this.ws.onmessage = (event) => {
                 this.handleMessage(event.data);
             };
-    
+
             this.ws.onclose = () => {
                 console.log('Disconnected from the server');
                 this.store.isConected = false;
                 this.scheduleReconnect();
             };
-    
+
             this.ws.onerror = (err) => {
                 console.error('WebSocket error:', err);
                 reject(err);
@@ -54,21 +55,18 @@ class WebSocketService {
         }, this.reconnectInterval);
     }
 
-    send(data: any): Promise<any> {
+    send(data: IRequest, waitForRequest: Boolean = true): Promise<IRespond> {
         return new Promise((resolve, reject) => {
-            const requestId = Date.now().toString();
-            this.responseResolvers[requestId] = resolve;
-            const command = "SignIn";
-    
-            const message = {
-                requestId,
-                data,
-                command,
-            };
-    
+
+            if(waitForRequest) {
+                const requestId = Date.now().toString();
+                this.responseResolvers[requestId] = resolve;
+                data.requestId = requestId;
+            }
+
             if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-                console.log('Sending message:', message);
-                this.ws.send(JSON.stringify(message));
+                console.log('Sending message:', data);
+                this.ws.send(JSON.stringify(data));
             } else {
                 reject('WebSocket is not open');
             }
@@ -78,22 +76,31 @@ class WebSocketService {
 
     private handleMessage(data: any) {
         console.log('Received message from server:', data);
-        let parsedData;
+        
+        let message: IMessage;
         try {
-            parsedData = JSON.parse(data);
+            message = JSON.parse(data);
         } catch (e) {
             console.error('Error parsing JSON:', e);
             return;
         }
 
-        const { requestId, response } = parsedData;
 
-        if (requestId && this.responseResolvers[requestId]) {
-            console.log('Resolving response for requestId:', requestId, 'with response:', response);
-            this.responseResolvers[requestId](response);
-            delete this.responseResolvers[requestId];
-        } else {
-            console.log('No resolver found for requestId:', requestId);
+        if (message?.type === MessageTypeEnum.Response) {
+            let respond: IRespond;
+            respond = JSON.parse(data);
+            
+            if (respond.requestId && this.responseResolvers[respond.requestId]) {
+                console.log('Resolving response for requestId:', respond.requestId, 'with response:', respond.data);
+                this.responseResolvers[respond.requestId](respond);
+                delete this.responseResolvers[respond.requestId];
+            } else {
+                console.log('No resolver found for requestId:', respond.requestId);
+            }
+        }
+        else if (message?.type === MessageTypeEnum.Notification) {
+            let notification: INotification;
+            notification = JSON.parse(data);
         }
     }
 
