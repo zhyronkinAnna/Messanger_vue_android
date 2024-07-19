@@ -13,7 +13,8 @@ export function useRules() {
             },
             password: {
                 validator(rule: FormItemRule, value: string) {
-                    return value != null;
+                    console.log("asasasas", value, value != null);
+                    return value != null && value != '';
                 },
                 trigger: 'blur',
                 message: 'Please entry this field'
@@ -22,7 +23,7 @@ export function useRules() {
         SignUp: {
             username: {
                 validator(rule: FormItemRule, value: string) {
-                    return value != null;
+                    return value != null && value != '';
                 },
                 trigger: 'blur',
                 message: 'Please entry this field'
@@ -36,18 +37,27 @@ export function useRules() {
             },
             password: {
                 validator(rule: FormItemRule, value: string) {
-                    return value != null;
+                    return value != null && value != '';
                 },
                 trigger: 'blur',
                 message: 'Please entry this field'
             },
             retype_password: {
                 validator(rule: FormItemRule, value: string) {
-                    return value != null;
+                    return value != null && value != '';
                 },
                 trigger: 'blur',
                 message: 'Please entry this field'
             }
-        }
+        },
+        EmailConfirmation: {
+            code: {
+                validator(rule: FormItemRule, value: string) {
+                    return value != null && value != '';
+                },
+                trigger: 'blur',
+                message: 'Please entry this field'
+            }
+        },
     }
 }

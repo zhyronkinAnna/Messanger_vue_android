@@ -4,7 +4,6 @@ import AuthContainer from "../components/AuthContainer.vue";
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
 import { ISignUpForm, IError, IRequest } from "../models/index"
-import { validateEmail } from "../helper/validateEmail"
 import { useStore } from '../stores/store';
 import { useRules } from '../rules/rules';
 import { useWsService } from '../services/wsServiceManager';
@@ -14,7 +13,7 @@ const user = ref<ISignUpForm>({});
 const error = ref<IError>();
 
 const router = useRouter();
-const store = useStore();   
+const store = useStore();
 const wsService = useWsService();
 const signUpFormRef = ref<FormInst | null>(null);
 const notification = useNotification();
@@ -27,11 +26,7 @@ function onBackToLoginButtonClick() {
 
 function handleLoginError(): Boolean {
     if (error.value && error.value !== undefined && error.value !== null) {
-        notification.error({
-            title: error.value?.subject,
-            content: error.value?.body,
-            duration: 1500
-        });
+        showErrorNotification(notification, error.value);
         error.value = undefined;
         return true;
     }
@@ -41,7 +36,7 @@ function handleLoginError(): Boolean {
 async function validation() {
     await signUpFormRef.value?.validate((errors) => {
         if (errors) {
-            error.value = { subject: "Login Error", body: "Please ensure all fields are filled out correctly" };
+            error.value = { subject: "Sign up form", body: "Please ensure all fields are filled out correctly" };
             showErrorNotification(notification, error.value);
         }
     });
@@ -92,7 +87,7 @@ async function onRegisterClick() {
             </NButton>
         </NFlex>
         <AuthContainer container-name="Create account">
-            <NForm class="m-t-24px" :rules="rules.SignUp" :model="user" ref="signUpFormRef">
+            <NForm class="m-t-24px" :rules="rules.EmailConfirmation" :model="user" ref="signUpFormRef">
                 <NGrid :cols="24">
                     <NFormItemGi :span="24" label="Username" path="username">
                         <NInput placeholder="ex. Don Juan" v-model:value="user.username"></NInput>
