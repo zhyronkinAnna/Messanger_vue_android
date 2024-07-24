@@ -1,20 +1,16 @@
 <script setup lang="ts">
-import { NInput, NButton, NForm, NGrid, NFormItemGi, NFlex, useNotification } from 'naive-ui';
+import { NInput, NButton, NForm, NGrid, NFormItemGi, NFlex } from 'naive-ui';
 import AuthContainer from "../components/AuthContainer.vue";
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
-import { ISignUpForm, IError } from "../models/index"
-import { validateEmail } from "../helper/validateEmail"
-import { useStore } from '../stores/store';
+import { ISignUpForm } from "../models/index"
 import type { FormItemRule } from 'naive-ui'
 
 const user = ref<ISignUpForm>({});
-const error = ref<IError>();
 
 const rules = {
     email: {
         validator(rule: FormItemRule, value: string) {
-            console.log("value", value);
             return value === "Dimi1@gmail.com"
         },
         trigger: ['blur', 'input'],

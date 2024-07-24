@@ -5,6 +5,7 @@ import ForgotPassword from '../pages/ForgotPassword.vue';
 import EmailConfirmation from '../pages/EmailConfirmation.vue';
 import SetNewPassword from '../pages/SetNewPassword.vue';
 import test from '../pages/test.vue';
+import { useStore } from '../stores/store';
 
 const routes = [
 {
@@ -39,9 +40,33 @@ const routes = [
 },
 ];
 
+
 const router = createRouter({
     history: createWebHistory(),
     routes
+});
+
+router.beforeEach((to, from, next) => {
+    const store = useStore();
+    store.previousRoute = from.name ? String(from.name) : null;
+
+    const previousRoute = store.previousRoute;
+
+    if (to.name === 'SignUp' && previousRoute !== 'SignIn') {
+        next({ name: 'SignIn' });
+    }
+    else if (to.name === 'ForgotPassword' && previousRoute !== 'SignIn') {
+        next({ name: 'SignIn' });
+    }
+    else if (to.name === 'EmailConfirmation' && (!previousRoute || !['ForgotPassword', 'SignUp'].includes(previousRoute))) {
+        next({ name: 'SignIn' });
+    }
+    else if (to.name === 'SetNewPassword' && previousRoute !== 'EmailConfirmation') {
+        next({ name: 'SignIn' });
+    }
+    else {
+        next();
+    }
 });
 
 export default router;

@@ -13,7 +13,6 @@ export function useRules() {
             },
             password: {
                 validator(rule: FormItemRule, value: string) {
-                    console.log("asasasas", value, value != null);
                     return value != null && value != '';
                 },
                 trigger: 'blur',
@@ -59,5 +58,30 @@ export function useRules() {
                 message: 'Please entry this field'
             }
         },
+        ForgotPassword: {
+            email: {
+                validator(rule: FormItemRule, value: string) {
+                    return  validateEmail(value || "")
+                },
+                trigger: 'blur',
+                message: 'Please enter a valid email address'
+            }
+        },
+        SetNewPassword: {
+            password: {
+                validator(rule: FormItemRule, value: string) {
+                    return value != null && value != '';
+                },
+                trigger: 'blur',
+                message: 'Please entry this field'
+            },
+            retype_password: {
+                validator(rule: FormItemRule, value: string) {
+                    return value != null && value != '';
+                },
+                trigger: 'blur',
+                message: 'Please entry this field'
+            }
+        }
     }
 }

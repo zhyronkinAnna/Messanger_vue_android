@@ -2,7 +2,7 @@ import { NotificationApiInjection } from "naive-ui/es/notification/src/Notificat
 import { IError } from "../models";
 
 export function showErrorNotification(notification: NotificationApiInjection, error: IError) {
-    console.log(error.body, error.subject)
+    console.error(error.body, error.subject)
     notification.error({
         title: error.subject,
         content: error.body,

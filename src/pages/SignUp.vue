@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NInput, NButton, NForm, NGrid, NFormItemGi, NFlex, useNotification, FormInst } from 'naive-ui';
+import { NInput, NButton, NForm, NGrid, NFormItemGi, NFlex, useNotification, FormInst,NModal, NCard, NText, NSpin } from 'naive-ui';
 import AuthContainer from "../components/AuthContainer.vue";
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
@@ -38,8 +38,10 @@ async function validation() {
         if (errors) {
             error.value = { subject: "Sign up form", body: "Please ensure all fields are filled out correctly" };
             showErrorNotification(notification, error.value);
+            error.value = undefined;
         }
     });
+
     if (user.value?.password !== user.value.retype_password) {
         error.value = {subject: "Passwords do not match", body: "Please ensure that both password fields contain the same password."};
     }
@@ -68,8 +70,6 @@ async function onRegisterClick() {
 
         const respond = await wsService?.send(request);
         console.debug("respond", respond);
-
-        store.previousRouteName = "SignUp";
         router.push({ name: 'EmailConfirmation' });
     }
     catch (error) {
@@ -87,7 +87,7 @@ async function onRegisterClick() {
             </NButton>
         </NFlex>
         <AuthContainer container-name="Create account">
-            <NForm class="m-t-24px" :rules="rules.EmailConfirmation" :model="user" ref="signUpFormRef">
+            <NForm class="m-t-24px" :rules="rules.SignUp" :model="user" ref="signUpFormRef">
                 <NGrid :cols="24">
                     <NFormItemGi :span="24" label="Username" path="username">
                         <NInput placeholder="ex. Don Juan" v-model:value="user.username"></NInput>

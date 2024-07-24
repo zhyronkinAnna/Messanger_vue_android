@@ -10,7 +10,7 @@ import { useWsService } from '../services/wsServiceManager';
 import { useRules } from '../rules/rules';
 
 const error = ref<IError>();
-const formModel = ref({ code: '' });
+const emailConfirmationFormModel = ref({ code: '' });
 
 const router = useRouter();
 const store = useStore();
@@ -38,6 +38,7 @@ async function validation() {
         if (errors) {
             error.value = { subject: "Email Authentication", body: "Please ensure all fields are filled out correctly" };
             showErrorNotification(notification, error.value);
+            error.value = undefined;
         }
     });
 }
@@ -57,10 +58,10 @@ async function onConfirmButtonClick() {
     const respond = await wsService?.send(request);
     console.debug("respond", respond);
 
-    if(store.previousRouteName === "ForgotPassword"){
+    if (store.previousRoute === 'ForgotPassword') {
         router.push({ name: 'SetNewPassword' });
     }
-    else if(store.previousRouteName === "SignUp"){
+    else if (store.previousRoute === 'SignUp') {
         router.push({ name: 'SignIn' });
     }
 }
@@ -75,10 +76,10 @@ async function onConfirmButtonClick() {
             </NButton>
         </NFlex>
         <AuthContainer container-name="Email Authentication">
-            <NForm class="m-t-24px" :rules="rules.EmailConfirmation" :model="formModel" ref="emailConfirmationFormRef">
+            <NForm class="m-t-24px" :rules="rules.EmailConfirmation" :model="emailConfirmationFormModel" ref="emailConfirmationFormRef">
                 <NGrid :cols="24">
                     <NFormItemGi :span="24" label="Code" path="code">
-                        <NInput placeholder="" v-model:value="formModel.code"></NInput>
+                        <NInput placeholder="" v-model:value="emailConfirmationFormModel.code"></NInput>
                     </NFormItemGi>
 
                     <NFormItemGi :span="24" :show-feedback="false" :show-label="false" class="mt-6px">

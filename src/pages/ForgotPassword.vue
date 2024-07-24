@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex, useNotification } from 'naive-ui';
+import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex, useNotification, FormInst } from 'naive-ui';
 import AuthContainer from "../components/AuthContainer.vue" 
 import { useRouter } from 'vue-router';
 import { useStore } from '../stores/store';
 import { IUser, IError } from '../models/index';
-import { validateEmail } from "../helper/validateEmail"
 import { ref } from 'vue';
+import { showErrorNotification } from '../helper';
+import { useRules } from '../rules/rules';
 
 const user = ref<IUser>({});
 const error = ref<IError>();
@@ -13,6 +14,9 @@ const error = ref<IError>();
 const router = useRouter();
 const store = useStore();
 const notification = useNotification();
+const forgotPasswordFormRef = ref<FormInst | null>(null);
+
+const rules = useRules();
 
 function onBackToLoginButtonClick() {
     router.push({ name: 'SignIn' });
@@ -31,21 +35,24 @@ function handleLoginError(): Boolean {
     return false;
 }
 
-function validation() {
-    if (!validateEmail(user.value?.email || "")) {
-        error.value = {subject: "Email", body: "Email"};
-    }
+async function validation() {
+    await forgotPasswordFormRef.value?.validate((errors) => {
+        if (errors) {
+            error.value = { subject: "Email Authentication", body: "Please ensure all fields are filled out correctly" };
+            showErrorNotification(notification, error.value);
+            error.value = undefined;
+        }
+    });
 }
 
-function onConfirmButtonClick() {
-    validation();
+async function onConfirmButtonClick() {
+    await validation();
 
     if (handleLoginError()) {
         return;
     }
 
     store.user = user.value;
-    store.previousRouteName = "ForgotPassword";
     router.push({ name: 'EmailConfirmation' });
 }
 
@@ -59,9 +66,9 @@ function onConfirmButtonClick() {
             </NButton>
         </NFlex>
         <AuthContainer container-name="Forgot password">
-            <NForm class="m-t-24px">
+            <NForm class="m-t-24px" :rules="rules.ForgotPassword" :model="user" ref="forgotPasswordFormRef">
                 <NGrid :cols="24">
-                    <NFormItemGi :span="24" label="Email">
+                    <NFormItemGi :span="24" label="Email" path="email">
                         <NInput placeholder="example@email.com" v-model:value="user.email"></NInput>
                     </NFormItemGi>
 

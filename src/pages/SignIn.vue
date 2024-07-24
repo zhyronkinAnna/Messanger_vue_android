@@ -42,6 +42,7 @@ async function validation() {
         if (errors) {
             error.value = { subject: "Login Error", body: "Please ensure all fields are filled out correctly" };
             showErrorNotification(notification, error.value);
+            error.value = undefined;
         }
     });
 
@@ -68,7 +69,15 @@ async function onLoginButtonClick() {
             data: store.user
         };
 
+        store.loading = true;
         const respond = await wsService?.send(request);
+        if (respond?.errorMessage) {
+            error.value = { subject: "Login Error", body: respond?.errorMessage };
+        }
+        store.loading = false;
+
+        handleLoginError()
+
         console.debug("respond", respond);
     }
     catch (error) {
