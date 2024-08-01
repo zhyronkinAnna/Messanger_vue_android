@@ -3,14 +3,15 @@ import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex, useNotificati
 import AuthContainer from "../components/AuthContainer.vue" 
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
-import { IError, IRequest } from '../models/index';
+import { IError, IRequest, IInfo } from '../models';
 import { useStore } from '../stores/store';
-import { showErrorNotification } from '../helper';
+import { showErrorNotification, showInfoNotification } from '../helper';
 import { useWsService } from '../services/wsServiceManager';
 import { useRules } from '../rules/rules';
 
 const error = ref<IError>();
-const emailConfirmationFormModel = ref({ code: '' });
+const info = ref<IInfo>();
+const emailConfirmationFormModel = ref({ user: null, code: '' });
 
 const router = useRouter();
 const store = useStore();
@@ -48,23 +49,54 @@ function onBackToLoginButtonClick() {
 }
 
 async function onConfirmButtonClick() {
-    await validation()
+    await validation();
 
-    const request: IRequest  = {
-            command: "SignUp", 
-            data: store.user
-        };
+    const requestConfig: Record<string, { insertUserToDatabase: boolean, nextRoute: string }> = {
+        ForgotPassword: { insertUserToDatabase: false, nextRoute: 'SetNewPassword' },
+        SignUp: { insertUserToDatabase: true, nextRoute: 'SignIn' }
+    };
 
-    const respond = await wsService?.send(request);
-    console.debug("respond", respond);
+    const previousRoute = store.previousRoute ?? '';
+    const routeConfig = requestConfig[previousRoute];
+    
+    if (!routeConfig) return; // early return if the route is not supported
 
-    if (store.previousRoute === 'ForgotPassword') {
-        router.push({ name: 'SetNewPassword' });
-    }
-    else if (store.previousRoute === 'SignUp') {
-        router.push({ name: 'SignIn' });
+    const request = {
+        command: "IsCodeRight",
+        data: {
+            user: store.user,
+            authenticationCode: emailConfirmationFormModel.value.code,
+            insertUserToDatabase: routeConfig.insertUserToDatabase
+        }
+    };
+
+    try {
+        store.loading = true;
+        const respond = await wsService?.send(request);
+
+        if (respond?.errorMessage) {
+            error.value = { subject: "Email Confirmation Error", body: respond.errorMessage };
+        }
+
+        if (handleLoginError()) {
+            return;
+        }
+
+        if (previousRoute === 'SignUp') {
+            showInfoNotification(notification, { subject: "Success", body: "User was successfully created" });
+        }
+
+        console.debug("respond", respond);
+
+        router.push({ name: routeConfig.nextRoute });
+    } catch (e) {
+        console.error("Error in onConfirmButtonClick:", e);
+        error.value = { subject: "Unexpected Error", body: "Something went wrong. Please try again later." };
+    } finally {
+        store.loading = false;
     }
 }
+
 
 </script>
 

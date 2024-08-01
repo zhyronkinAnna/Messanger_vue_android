@@ -76,7 +76,7 @@ async function onLoginButtonClick() {
         }
         store.loading = false;
 
-        handleLoginError()
+        handleLoginError();
 
         console.debug("respond", respond);
     }

@@ -3,16 +3,18 @@ import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex, useNotificati
 import AuthContainer from "../components/AuthContainer.vue" 
 import { useRouter } from 'vue-router';
 import { useStore } from '../stores/store';
-import { IUser, IError } from '../models/index';
+import { IUser, IError, IRequest } from '../models/index';
 import { ref } from 'vue';
 import { showErrorNotification } from '../helper';
 import { useRules } from '../rules/rules';
+import { useWsService } from '../services/wsServiceManager';
 
 const user = ref<IUser>({});
 const error = ref<IError>();
 
 const router = useRouter();
 const store = useStore();
+const wsService = useWsService();
 const notification = useNotification();
 const forgotPasswordFormRef = ref<FormInst | null>(null);
 
@@ -52,7 +54,24 @@ async function onConfirmButtonClick() {
         return;
     }
 
-    store.user = user.value;
+    store.user = { ...user.value };
+
+    const request: IRequest  = {
+        command: "ForgotPassword", 
+        data: store.user
+    };
+
+    store.loading = true;
+    const respond = await wsService?.send(request);
+    if (respond?.errorMessage) {
+        error.value = { subject: "Login Error", body: respond?.errorMessage };
+    }
+    store.loading = false;
+
+    handleLoginError();
+
+    console.debug("respond", respond);
+
     router.push({ name: 'EmailConfirmation' });
 }
 

@@ -1,4 +1,4 @@
-export interface IError {
-    subject?: string;
-    body?: string;
+import { IAlert } from "./IAlert";
+
+export interface IError extends IAlert  {
 }

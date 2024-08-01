@@ -1,6 +1,7 @@
 export type { IUser } from './IUser';
 export type { ISignUpForm } from './ISignUpForm';
 export type { IError } from './IError';
+export type { IInfo } from './IInfo';
 export type { IMessage } from './IMessage';
 export type { IRespond } from './IRespond';
 export type { IRequest } from './IRequest';

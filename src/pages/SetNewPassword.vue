@@ -3,16 +3,18 @@ import { NInput, NButton, NForm, NGrid, NFormItemGi, NFlex, useNotification, For
 import AuthContainer from "../components/AuthContainer.vue";
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
-import { ISignUpForm, IError } from "../models/index"
+import { ISignUpForm, IError, IRequest } from "../models/index"
 import { useStore } from '../stores/store';
-import { isSecurePassword, showErrorNotification } from '../helper';
+import { generateSHA256, isSecurePassword, showErrorNotification } from '../helper';
 import { useRules } from '../rules/rules';
+import { useWsService } from '../services/wsServiceManager';
 
 const user = ref<ISignUpForm>({});
 const error = ref<IError>();
 
 const router = useRouter();
 const store = useStore();
+const wsService = useWsService();
 const notification = useNotification();
 const setNewPasswordFormRef = ref<FormInst | null>(null);
 
@@ -52,13 +54,40 @@ async function validation() {
 }
 
 async function onSetNewPasswordClick() {
-    await validation();
+    try {
+        await validation();
 
-    if (handleLoginError()) {
-        return;
+        if (handleLoginError()) {
+            return;
+        }
+
+        const hashedPassword = generateSHA256(user.value.password || "");
+        
+        store.user!.password = hashedPassword;
+
+        const request: IRequest  = {
+            command: "SetNewPassword", 
+            data: store.user
+        };
+
+        store.loading = true;
+        const respond = await wsService?.send(request);
+        if (respond?.errorMessage) {
+            error.value = { subject: "Login Error", body: respond?.errorMessage };
+        }
+        store.loading = false;
+
+        if (handleLoginError()) {
+            return;
+        }
+
+        console.debug("respond", respond);
+
+        router.push({ name: 'SignIn' });
     }
-
-    router.push({ name: 'SignIn' });
+    catch (error) {
+        console.error(error);
+    }
 }
 
 </script>

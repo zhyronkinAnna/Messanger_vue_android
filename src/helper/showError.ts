@@ -9,3 +9,12 @@ export function showErrorNotification(notification: NotificationApiInjection, er
         duration: 2000
     });
 }
+
+export function showInfoNotification(notification: NotificationApiInjection, error: IError) {
+    console.error(error.body, error.subject)
+    notification.info({
+        title: error.subject,
+        content: error.body,
+        duration: 2000
+    });
+}

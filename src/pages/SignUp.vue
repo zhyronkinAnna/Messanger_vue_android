@@ -68,8 +68,19 @@ async function onRegisterClick() {
             data: store.user
         };
 
+        store.loading = true;
         const respond = await wsService?.send(request);
+        if (respond?.errorMessage) {
+            error.value = { subject: "SignUp Error", body: respond?.errorMessage };
+        }
+        store.loading = false;
+
         console.debug("respond", respond);
+        
+        if (handleLoginError()) {
+            return;
+        }
+
         router.push({ name: 'EmailConfirmation' });
     }
     catch (error) {
