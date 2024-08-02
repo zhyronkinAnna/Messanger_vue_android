@@ -3,45 +3,33 @@ import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex, useNotificati
 import AuthContainer from "../components/AuthContainer.vue" 
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
-import { IError, IRequest, IInfo } from '../models';
+import { IError } from '../models';
 import { useStore } from '../stores/store';
-import { showErrorNotification, showInfoNotification } from '../helper';
+import { formValidation, handleError, handleRequest, showErrorNotification, showInfoNotification } from '../helper';
 import { useWsService } from '../services/wsServiceManager';
 import { useRules } from '../rules/rules';
 
 const error = ref<IError>();
-const info = ref<IInfo>();
 const emailConfirmationFormModel = ref({ user: null, code: '' });
+const emailConfirmationFormRef = ref<FormInst | null>(null);
 
 const router = useRouter();
 const store = useStore();
 const notification = useNotification();
 const wsService = useWsService();
-const emailConfirmationFormRef = ref<FormInst | null>(null);
-
 const rules = useRules();
 
 function onClickToResendButtonClick() {
 }
 
-function handleLoginError(): Boolean {
-    if (error.value && error.value !== undefined && error.value !== null) {
-        showErrorNotification(notification, error.value);
-        error.value = undefined;
-        return true;
-    }
+function handleLoginError(): boolean {
+    const result = handleError(error.value, notification);
     error.value = undefined;
-    return false;
+    return result;
 }
 
 async function validation() {
-    await emailConfirmationFormRef.value?.validate((errors) => {
-        if (errors) {
-            error.value = { subject: "Email Authentication", body: "Please ensure all fields are filled out correctly" };
-            showErrorNotification(notification, error.value);
-            error.value = undefined;
-        }
-    });
+    await formValidation(emailConfirmationFormRef.value!, notification);
 }
 
 function onBackToLoginButtonClick() {
@@ -72,14 +60,13 @@ async function onConfirmButtonClick() {
 
     try {
         store.loading = true;
-        const respond = await wsService?.send(request);
-
+        const respond = await handleRequest(wsService!, request);
+        
         if (respond?.errorMessage) {
-            error.value = { subject: "Email Confirmation Error", body: respond.errorMessage };
-        }
-
-        if (handleLoginError()) {
-            return;
+            error.value = { subject: "Email confirmation Error", body: respond?.errorMessage };
+            if (handleLoginError()) {
+                return;
+            }
         }
 
         if (previousRoute === 'SignUp') {
@@ -91,12 +78,10 @@ async function onConfirmButtonClick() {
         router.push({ name: routeConfig.nextRoute });
     } catch (e) {
         console.error("Error in onConfirmButtonClick:", e);
-        error.value = { subject: "Unexpected Error", body: "Something went wrong. Please try again later." };
     } finally {
         store.loading = false;
     }
 }
-
 
 </script>
 

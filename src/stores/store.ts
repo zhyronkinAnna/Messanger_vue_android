@@ -1,17 +1,17 @@
-import { IUser } from "../models/index";
+import { IUser } from "../models/index"; // Убедитесь, что путь правильный
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
 export const useStore = defineStore("store", () => {
-    const user = ref<IUser>();
+    const user = ref<IUser | undefined>(undefined);
     const previousRoute = ref<string | undefined | null>(undefined);
-    const isConected = ref<Boolean>(false);
-    const loading = ref<Boolean>(false);
+    const isConnected = ref<boolean>(false);
+    const loading = ref<boolean>(false);
     
-    return{
+    return {
         user,
         previousRoute,
-        isConected,
+        isConnected,
         loading
-    }
+    };
 });

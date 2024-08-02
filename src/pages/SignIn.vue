@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router';
 import { useStore } from '../stores/store';
 import { IUser, IError, IRequest } from '../models';
 import { ref } from 'vue';
-import { generateSHA256, showErrorNotification, isSecurePassword } from '../helper';
+import { generateSHA256, isSecurePassword, formValidation, handleError, handleRequest } from '../helper';
 import { useWsService } from '../services/wsServiceManager';
 import { useRules } from '../rules/rules';
 
@@ -15,7 +15,7 @@ const error = ref<IError | undefined>(undefined);
 const router = useRouter();
 const store = useStore();
 const wsService = useWsService();
-const signInFormRef = ref<FormInst | null>(null);
+const signInFormRef = ref<FormInst | undefined>(undefined);
 const notification = useNotification();
 
 const rules = useRules();
@@ -28,23 +28,14 @@ function onForgotPasswordButtonClick() {
     router.push({ name: 'ForgotPassword' });
 }
 
-function handleLoginError(): Boolean {
-    if (error.value && error.value !== undefined && error.value !== null) {
-        showErrorNotification(notification, error.value);
-        error.value = undefined;
-        return true;
-    }
-    return false;
+function handleLoginError(): boolean {
+    const result = handleError(error.value, notification);
+    error.value = undefined;
+    return result;
 }
 
 async function validation() {
-    await signInFormRef.value?.validate((errors) => {
-        if (errors) {
-            error.value = { subject: "Login Error", body: "Please ensure all fields are filled out correctly" };
-            showErrorNotification(notification, error.value);
-            error.value = undefined;
-        }
-    });
+    await formValidation(signInFormRef.value!, notification);
 
     if(!isSecurePassword(user.value.password || "")) {
         error.value = { subject: "Invalid email or password", body: "We couldn't find a user with the provided email and password. Please check your credentials and try again." };
@@ -70,18 +61,22 @@ async function onLoginButtonClick() {
         };
 
         store.loading = true;
-        const respond = await wsService?.send(request);
-        if (respond?.errorMessage) {
-            error.value = { subject: "Login Error", body: respond?.errorMessage };
-        }
-        store.loading = false;
+        const respond = await handleRequest(wsService!, request);
 
-        handleLoginError();
+        if (respond?.errorMessage) {
+            error.value = { subject: "Sign in Error", body: respond?.errorMessage };
+            if (handleLoginError()) {
+                return;
+            }
+        }
 
         console.debug("respond", respond);
     }
     catch (error) {
         console.error(error);
+    }
+    finally {
+        store.loading = false;
     }
 }
 

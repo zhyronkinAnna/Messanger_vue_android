@@ -3,9 +3,9 @@ import { NInput, NButton, NForm, NGrid, NFormItemGi, NFlex, useNotification, For
 import AuthContainer from "../components/AuthContainer.vue";
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
-import { ISignUpForm, IError, IRequest } from "../models/index"
+import { ISignUpForm, IError, IRequest } from "../models"
 import { useStore } from '../stores/store';
-import { generateSHA256, isSecurePassword, showErrorNotification } from '../helper';
+import { formValidation, generateSHA256, handleError, handleRequest, isSecurePassword } from '../helper';
 import { useRules } from '../rules/rules';
 import { useWsService } from '../services/wsServiceManager';
 
@@ -24,27 +24,15 @@ function onBackToLoginButtonClick() {
     router.push({ name: 'SignIn' });
 }
 
-function handleLoginError(): Boolean {
-    if (error && error.value !== undefined && error.value !== null) {
-        notification.error({
-            title: error.value?.subject,
-            content: error.value?.body,
-            duration: 1500
-        });
-        error.value = undefined;
-        return true;
-    }
-    return false;
+function handleLoginError(): boolean {
+    const result = handleError(error.value, notification);
+    error.value = undefined;
+    return result;
 }
 
 async function validation() {
-    await setNewPasswordFormRef.value?.validate((errors) => {
-        if (errors) {
-            error.value = { subject: "Email Authentication", body: "Please ensure all fields are filled out correctly" };
-            showErrorNotification(notification, error.value);
-            error.value = undefined;
-        }
-    });
+    await formValidation(setNewPasswordFormRef.value!, notification);
+
     if (!isSecurePassword(user.value?.password || "")) {
         error.value = {subject: "Password", body: "Password"};
     }
@@ -71,14 +59,13 @@ async function onSetNewPasswordClick() {
         };
 
         store.loading = true;
-        const respond = await wsService?.send(request);
+        const respond = await handleRequest(wsService!, request);
+        
         if (respond?.errorMessage) {
-            error.value = { subject: "Login Error", body: respond?.errorMessage };
-        }
-        store.loading = false;
-
-        if (handleLoginError()) {
-            return;
+            error.value = { subject: "Set new password Error", body: respond?.errorMessage };
+            if (handleLoginError()) {
+                return;
+            }
         }
 
         console.debug("respond", respond);
@@ -87,6 +74,9 @@ async function onSetNewPasswordClick() {
     }
     catch (error) {
         console.error(error);
+    }
+    finally {
+        store.loading = false;
     }
 }
 

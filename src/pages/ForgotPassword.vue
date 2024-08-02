@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex, useNotification, FormInst } from 'naive-ui';
+import { NInput, NButton, NForm, NGrid, NFormItemGi, NFlex, useNotification, FormInst } from 'naive-ui';
 import AuthContainer from "../components/AuthContainer.vue" 
 import { useRouter } from 'vue-router';
 import { useStore } from '../stores/store';
-import { IUser, IError, IRequest } from '../models/index';
+import { IUser, IError, IRequest } from '../models';
 import { ref } from 'vue';
-import { showErrorNotification } from '../helper';
+import { formValidation, handleError, handleRequest } from '../helper';
 import { useRules } from '../rules/rules';
 import { useWsService } from '../services/wsServiceManager';
 
@@ -24,55 +24,51 @@ function onBackToLoginButtonClick() {
     router.push({ name: 'SignIn' });
 }
 
-function handleLoginError(): Boolean {
-    if (error.value && error.value !== undefined && error.value !== null) {
-        notification.error({
-            title: error.value?.subject,
-            content: error.value?.body,
-            duration: 1500
-        });
-        error.value = undefined;
-        return true;
-    }
-    return false;
+function handleLoginError(): boolean {
+    const result = handleError(error.value, notification);
+    error.value = undefined;
+    return result;
 }
 
 async function validation() {
-    await forgotPasswordFormRef.value?.validate((errors) => {
-        if (errors) {
-            error.value = { subject: "Email Authentication", body: "Please ensure all fields are filled out correctly" };
-            showErrorNotification(notification, error.value);
-            error.value = undefined;
-        }
-    });
+    await formValidation(forgotPasswordFormRef.value!, notification);
 }
 
 async function onConfirmButtonClick() {
-    await validation();
+    try {
+        await validation();
 
-    if (handleLoginError()) {
-        return;
+        if (handleLoginError()) {
+            return;
+        }
+
+        store.user = { ...user.value };
+
+        const request: IRequest  = {
+            command: "ForgotPassword", 
+            data: store.user
+        };
+
+        store.loading = true;
+        const respond = await handleRequest(wsService!, request);
+            
+        if (respond?.errorMessage) {
+            error.value = { subject: "Forgot password Error", body: respond?.errorMessage };
+            if (handleLoginError()) {
+                return;
+            }
+        }
+
+        console.debug("respond", respond);
+
+        router.push({ name: 'EmailConfirmation' });
     }
-
-    store.user = { ...user.value };
-
-    const request: IRequest  = {
-        command: "ForgotPassword", 
-        data: store.user
-    };
-
-    store.loading = true;
-    const respond = await wsService?.send(request);
-    if (respond?.errorMessage) {
-        error.value = { subject: "Login Error", body: respond?.errorMessage };
+    catch (error) {
+        console.error(error);
     }
-    store.loading = false;
-
-    handleLoginError();
-
-    console.debug("respond", respond);
-
-    router.push({ name: 'EmailConfirmation' });
+    finally {
+        store.loading = false;
+    }
 }
 
 </script>

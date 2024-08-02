@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { NInput, NButton, NForm, NGrid, NFormItemGi, NFlex, useNotification, FormInst,NModal, NCard, NText, NSpin } from 'naive-ui';
+import { NInput, NButton, NForm, NGrid, NFormItemGi, NFlex, useNotification, FormInst } from 'naive-ui';
 import AuthContainer from "../components/AuthContainer.vue";
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
-import { ISignUpForm, IError, IRequest } from "../models/index"
+import { ISignUpForm, IError, IRequest } from "../models"
 import { useStore } from '../stores/store';
 import { useRules } from '../rules/rules';
 import { useWsService } from '../services/wsServiceManager';
-import { generateSHA256, isSecurePassword, showErrorNotification } from '../helper';
+import { formValidation, generateSHA256, handleError, handleRequest, isSecurePassword } from '../helper';
 
 const user = ref<ISignUpForm>({});
 const error = ref<IError>();
@@ -24,23 +24,14 @@ function onBackToLoginButtonClick() {
     router.push({ name: 'SignIn' });
 }
 
-function handleLoginError(): Boolean {
-    if (error.value && error.value !== undefined && error.value !== null) {
-        showErrorNotification(notification, error.value);
-        error.value = undefined;
-        return true;
-    }
-    return false;
+function handleLoginError(): boolean {
+    const result = handleError(error.value, notification);
+    error.value = undefined;
+    return result;
 }
 
 async function validation() {
-    await signUpFormRef.value?.validate((errors) => {
-        if (errors) {
-            error.value = { subject: "Sign up form", body: "Please ensure all fields are filled out correctly" };
-            showErrorNotification(notification, error.value);
-            error.value = undefined;
-        }
-    });
+    await formValidation(signUpFormRef.value!, notification);
 
     if (user.value?.password !== user.value.retype_password) {
         error.value = {subject: "Passwords do not match", body: "Please ensure that both password fields contain the same password."};
@@ -69,22 +60,24 @@ async function onRegisterClick() {
         };
 
         store.loading = true;
-        const respond = await wsService?.send(request);
+        const respond = await handleRequest(wsService!, request);
+        
         if (respond?.errorMessage) {
-            error.value = { subject: "SignUp Error", body: respond?.errorMessage };
+            error.value = { subject: "Sign up Error", body: respond?.errorMessage };
+            if (handleLoginError()) {
+                return;
+            }
         }
-        store.loading = false;
 
         console.debug("respond", respond);
-        
-        if (handleLoginError()) {
-            return;
-        }
 
         router.push({ name: 'EmailConfirmation' });
     }
     catch (error) {
         console.error(error);
+    }
+    finally {
+        store.loading = false;
     }
 }
 

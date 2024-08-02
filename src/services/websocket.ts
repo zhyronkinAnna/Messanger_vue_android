@@ -19,7 +19,7 @@ class WebSocketService {
 
             this.ws.onopen = () => {
                 console.log('Connected to the server');
-                this.store.isConected = true;
+                this.store.isConnected = true;
                 if (this.reconnectTimeout) {
                     clearTimeout(this.reconnectTimeout);
                     this.reconnectTimeout = null;
@@ -33,7 +33,7 @@ class WebSocketService {
 
             this.ws.onclose = () => {
                 console.log('Disconnected from the server');
-                this.store.isConected = false;
+                this.store.isConnected = false;
                 this.scheduleReconnect();
             };
 
@@ -55,7 +55,7 @@ class WebSocketService {
         }, this.reconnectInterval);
     }
 
-    send(data: IRequest, waitForRequest: Boolean = true): Promise<IRespond> {
+    send(data: IRequest, waitForRequest: boolean = true): Promise<IRespond> {
         return new Promise((resolve, reject) => {
 
             if(waitForRequest) {
