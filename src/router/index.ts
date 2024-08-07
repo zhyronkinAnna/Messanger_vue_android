@@ -6,6 +6,7 @@ import EmailConfirmation from '../pages/EmailConfirmation.vue';
 import SetNewPassword from '../pages/SetNewPassword.vue';
 import test from '../pages/test.vue';
 import { useStore } from '../stores/store';
+import Messanger from '../pages/Messanger.vue';
 
 const routes = [
 {
@@ -32,6 +33,11 @@ const routes = [
     path: '/SetNewPassword',
     name: 'SetNewPassword',
     component: SetNewPassword
+},
+{
+    path: '/Messanger',
+    name: 'Messanger',
+    component: Messanger
 },
 {
     path: '/test',

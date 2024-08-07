@@ -10,7 +10,7 @@ import Loader from './components/Loader.vue'
 const router = useRouter();
 const store = useStore();
 const wsService = useWsService();
-initializeWebSocketService(store);
+// initializeWebSocketService(store);
 
 onMounted(() => {
   console.log(`Current route: ${router.currentRoute.value.fullPath}`);
@@ -29,7 +29,7 @@ onUnmounted(() => {
       <NNotificationProvider>
         <router-view />
         <Loader v-if="store.loading"/>
-        <NFlex v-if="!store.isConnected" style="position: absolute; bottom: 20px; z-index: 1000; left: 20px; padding: 10px">
+        <NFlex v-if="store.isConnected" style="position: absolute; bottom: 20px; z-index: 1000; left: 20px; padding: 10px">
           <NSpin size="Tiny"/>
           <NText strong>Connecting to the server</NText>
         </NFlex>

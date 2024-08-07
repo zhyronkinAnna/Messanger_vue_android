@@ -57,5 +57,8 @@ export const themeOverrides = {
   },
   "Spin": {
     "color": "#007AFFFF"
+  },
+  "Typography": {
+    "headerMargin2": "0"
   }
 };

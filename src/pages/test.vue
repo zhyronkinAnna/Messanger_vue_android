@@ -1,54 +1,28 @@
 <script setup lang="ts">
-import { NInput, NButton, NForm, NGrid, NFormItemGi, NFlex } from 'naive-ui';
-import AuthContainer from "../components/AuthContainer.vue";
-import { useRouter } from 'vue-router';
-import { ref } from 'vue';
-import { ISignUpForm } from "../models/index"
-import type { FormItemRule } from 'naive-ui'
-
-const user = ref<ISignUpForm>({});
-
-const rules = {
-    email: {
-        validator(rule: FormItemRule, value: string) {
-            return value === "Dimi1@gmail.com"
-        },
-        trigger: ['blur', 'input'],
-        message: 'Please input username'
-    }
-};
-
-const router = useRouter();
-
-function onBackToLoginButtonClick() {
-    router.push({ name: 'SignIn' });
-}
-
+import { NGridItem, NGrid, NH2, NVirtualList, NAvatar, NText, NFlex, useNotification, NIcon, NMenu, NButton } from 'naive-ui';
+import { LogOutOutline, SettingsOutline } from '@vicons/ionicons5'
 </script>
 
 <template>
-    <NFlex vertical justify="center" align="center" class="w-screen h-screen">
-        <NFlex class="w-full max-w-400px">
-            <NButton text tag="a" text-color="#6B6B6B" @click="onBackToLoginButtonClick">
-                < Back to login
-            </NButton>
-        </NFlex>
-        <AuthContainer container-name="Create account">
-            <NForm class="m-t-24px" :model="user" :rules="rules">
-                <NGrid :cols="24">
-                    <NFormItemGi :span="24" label="Email" path="email">
-                        <NInput placeholder="example@email.com" v-model:value="user.email"></NInput>
-                    </NFormItemGi>
-                </NGrid>
-                <NGrid :cols="24">
-                    <NFormItemGi :span="24" label="Username" path="username">
-                        <NInput placeholder="ex. Don Juan" v-model:value="user.username"></NInput>
-                    </NFormItemGi>
-                </NGrid>
-            </NForm>
-        </AuthContainer>
-    </NFlex>
+  <NFlex vertical class="h-100vh b-r-solid b-r-1px w-40px justify-center flex items-center">
+    <n-avatar
+      class="m-t-10px"
+      round
+      size="medium"
+      src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
+    />
+    <NButton :bordered="false" circle size="medium" class="m-t-auto" ghost color="#007AFFFF">
+      <template #icon>
+        <NIcon :size="30"><SettingsOutline/></NIcon>
+      </template>
+    </NButton>
+    <NButton :bordered="false" circle size="medium" class="m-b-10px" ghost color="#007AFFFF">
+      <template #icon>
+        <NIcon :size="30"><LogOutOutline/></NIcon>
+      </template>
+    </NButton>
+  </NFlex>
 </template>
 
-<style scoped>
+<style>
 </style>
