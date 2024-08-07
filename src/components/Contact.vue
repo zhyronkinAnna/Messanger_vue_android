@@ -17,7 +17,7 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <NFlex vertical class="m-l-15px w-250px h-50px bg-white hover-bg rounded-2 overflow-hidden">
+    <NFlex vertical class="m-l-5px w-250px h-50px bg-white hover-bg rounded-2 overflow-hidden p-l-10px p-r-10px">
         <NGrid :cols="5" :x-gap="5" class="h-50px">
             <NGridItem class="justify-center flex items-center">
                 <NAvatar 
