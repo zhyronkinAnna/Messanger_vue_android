@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { NAvatar, NButton, NFlex, NGrid, NGridItem, NIcon, NText } from 'naive-ui';
-import { CallOutline, InformationCircleOutline } from '@vicons/ionicons5'
+import { PhoneIcon, InformationCircleIcon } from '@heroicons/vue/24/outline';
+import { useStore } from '../stores/store';
+
+const store = useStore();
+
+function onInfoButtonClick()
+{
+    store.showUserInfo = !store.showUserInfo;
+}
+
 </script>
 
 <template>
@@ -27,12 +36,12 @@ import { CallOutline, InformationCircleOutline } from '@vicons/ionicons5'
                 <NGridItem class="justify-right flex">
                     <NButton :bordered="false" circle size="medium" ghost color="#007AFF">
                         <template #icon>
-                            <NIcon :size="23"><CallOutline/></NIcon>
+                            <NIcon :size="23"><PhoneIcon/></NIcon>
                         </template>
                     </NButton>
-                    <NButton :bordered="false" circle size="medium" ghost color="#898989">
+                    <NButton @click="onInfoButtonClick" :bordered="false" circle size="medium" ghost color="#898989">
                         <template #icon>
-                            <NIcon :size="25"><InformationCircleOutline/></NIcon>
+                            <NIcon :size="25"><InformationCircleIcon/></NIcon>
                         </template>
                     </NButton>
                 </NGridItem>

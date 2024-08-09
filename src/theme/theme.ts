@@ -1,7 +1,10 @@
 export const themeOverrides = {
-    "Card": {
+  "Card": {
+    "closeColorHover": "rgba(0, 0, 0, 0)",
+    "closeColorPressed": "rgba(0, 0, 0, 0)",
     "paddingMedium": "0",
-    "titleFontSizeMedium": "24px"
+    "titleFontSizeMedium": "24px",
+    "borderRadius": "15px"
   },
   "Button": {
     "rippleColorPrimary": "#18a058",

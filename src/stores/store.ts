@@ -7,11 +7,15 @@ export const useStore = defineStore("store", () => {
     const previousRoute = ref<string | undefined | null>(undefined);
     const isConnected = ref<boolean>(false);
     const loading = ref<boolean>(false);
+    const showSettings = ref<boolean>(false);
+    const showUserInfo = ref<boolean>(false);
     
     return {
         user,
         previousRoute,
         isConnected,
-        loading
+        loading,
+        showSettings,
+        showUserInfo
     };
 });

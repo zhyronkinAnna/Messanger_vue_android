@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { NAvatar, NFlex, NIcon, NButton } from 'naive-ui';
-import { LogOutOutline, SettingsOutline } from '@vicons/ionicons5'
+import { useStore } from '../stores/store';
+import { ArrowLeftEndOnRectangleIcon, Cog6ToothIcon } from '@heroicons/vue/24/outline';
+
+const store = useStore();
+
+function onSettingsButtonClick()
+{
+    store.showSettings = true;
+}
+
 </script>
 
 <template>
@@ -11,14 +20,14 @@ import { LogOutOutline, SettingsOutline } from '@vicons/ionicons5'
             size="medium"
             src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
         />
-        <NButton :bordered="false" circle size="medium" class="m-t-auto" ghost color="#898989">
+        <NButton @click="onSettingsButtonClick" :bordered="false" circle size="medium" class="m-t-auto" ghost color="#898989">
             <template #icon>
-                <NIcon :size="25"><SettingsOutline/></NIcon>
+                <NIcon :size="25"><Cog6ToothIcon/></NIcon>
             </template>
         </NButton>
         <NButton :bordered="false" circle size="medium" class="m-b-10px" ghost color="#898989">
             <template #icon>
-                <NIcon :size="25"><LogOutOutline/></NIcon>
+                <NIcon :size="25"><ArrowLeftEndOnRectangleIcon/></NIcon>
             </template>
         </NButton>
     </NFlex>

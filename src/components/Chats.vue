@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { NIcon, NInput, NVirtualList, NH2, NFlex } from 'naive-ui';
-import { SearchOutline } from '@vicons/ionicons5'
 import Chat from './Chat.vue';
+import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
+
 
 interface Props {
     items: {
@@ -16,13 +17,13 @@ const props = defineProps<Props>();
 
 <template>
     <NFlex class="flex flex-col h-100vh" :size="0" vertical>
-        <NFlex class="p-l-15px p-r-15px m-b-5px">
+        <NFlex class="p-l-15px p-r-15px m-b-5px m-t-8px">
             <NH2>Chats</NH2>
         </NFlex>
         <NFlex class="p-l-15px p-r-15px m-b-15px">
             <NInput round placeholder="Search chat">
                 <template #suffix>
-                    <NIcon :component="SearchOutline" />
+                    <NIcon :component="MagnifyingGlassIcon" />
                 </template>
             </NInput>
         </NFlex>

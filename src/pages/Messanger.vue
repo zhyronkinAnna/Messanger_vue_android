@@ -3,6 +3,11 @@ import { NLayout, NLayoutSider, NFlex } from 'naive-ui';
 import Menu from '../components/Menu.vue';  
 import Chats from '../components/Chats.vue';
 import ChatInterface from '../components/ChatInterface.vue';
+import { useStore } from '../stores/store';
+import Settings from '../components/Settings.vue';
+import UserInfo from '../components/UserInfo.vue';
+
+const store = useStore();
 
 const avatars = [
       'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
@@ -22,7 +27,7 @@ const avatars = [
 
 <template>
   <NFlex :size="0">
-    <Menu></Menu>
+    <Menu/>
     <NLayout class="h-100vh">
       <NLayout position="absolute" has-sider>
         <NLayoutSider
@@ -38,7 +43,9 @@ const avatars = [
         </NFlex>
       </NLayout>
     </NLayout>
+    <UserInfo v-if="store.showUserInfo"/>
   </NFlex>
+  <Settings/>
 </template>
 
 <style scoped>
