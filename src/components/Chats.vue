@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { NIcon, NCard, NText, NInput, NVirtualList, NFlex, NGrid, NGridItem, NH1, NH2 } from 'naive-ui';
+import { NIcon, NInput, NVirtualList, NH2, NFlex } from 'naive-ui';
 import { SearchOutline } from '@vicons/ionicons5'
-import Contact from './Contact.vue';
+import Chat from './Chat.vue';
 
 interface Props {
     items: {
@@ -15,25 +15,25 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <NGrid cols="1" class="flex flex-col h-100vh" xGap="12">
-        <NGridItem class="p-l-15px p-r-15px m-b-5px">
+    <NFlex class="flex flex-col h-100vh" :size="0" vertical>
+        <NFlex class="p-l-15px p-r-15px m-b-5px">
             <NH2>Chats</NH2>
-        </NGridItem>
-        <NGridItem class="p-l-15px p-r-15px m-b-15px">
+        </NFlex>
+        <NFlex class="p-l-15px p-r-15px m-b-15px">
             <NInput round placeholder="Search chat">
                 <template #suffix>
                     <NIcon :component="SearchOutline" />
                 </template>
             </NInput>
-        </NGridItem>
-        <NGridItem class="overflow-hidden flex-grow-1">
-            <NVirtualList :item-size="50" :items="items">
+        </NFlex>
+        <NFlex class="flex-1 overflow-y-auto">
+            <NVirtualList :item-size="50" :items="props.items">
                 <template #default="{ item }">
-                    <Contact :id="item.key"/>
+                    <Chat :id="item.key"/>
                 </template>
             </NVirtualList>
-        </NGridItem>
-    </NGrid>
+        </NFlex>
+    </NFlex>
 </template>
 
 <style>

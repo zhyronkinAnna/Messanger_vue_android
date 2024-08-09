@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { NLayout, NLayoutSider, NH2, NVirtualList, NAvatar, NText, NFlex, useNotification, FormInst, NGrid, NCard, NInput, NIcon, NGridItem } from 'naive-ui';
+import { NLayout, NLayoutSider, NFlex } from 'naive-ui';
 import Menu from '../components/Menu.vue';  
-import Contacts from '../components/Contacts.vue';
+import Chats from '../components/Chats.vue';
+import ChatInterface from '../components/ChatInterface.vue';
 
 const avatars = [
       'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
@@ -11,7 +12,7 @@ const avatars = [
       'https://avatars.githubusercontent.com/u/19239641?s=60&v=4'
     ]
 
-    const items = Array.from({ length: 100 }, (_, i) => ({
+    const items = Array.from({ length: 1000 }, (_, i) => ({
       key: `${i}`,
       value: "",
       avatar: avatars[i % avatars.length]
@@ -30,13 +31,11 @@ const avatars = [
           :collapsed-width="50"
           :width="280"
         >
-          <Contacts :items="items"/>
-      </NLayoutSider>
-        <NVirtualList :item-size="50" :items="items">
-            <template #default="{ item }">
-                wefwef
-            </template>
-        </NVirtualList>
+          <Chats :items="items"/>
+        </NLayoutSider>
+        <NFlex class="flex flex-col flex-grow-1">
+          <ChatInterface :items="items" class="flex-grow-1"></ChatInterface>
+        </NFlex>
       </NLayout>
     </NLayout>
   </NFlex>

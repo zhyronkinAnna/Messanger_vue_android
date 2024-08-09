@@ -60,5 +60,9 @@ export const themeOverrides = {
   },
   "Typography": {
     "headerMargin2": "0"
+  },
+  "Input": {
+    "color": "rgba(250, 250, 250, 1)",
+    "colorFocus": "rgba(250, 250, 250, 1)"
   }
 };

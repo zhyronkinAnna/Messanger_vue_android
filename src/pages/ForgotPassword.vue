@@ -70,7 +70,6 @@ async function onConfirmButtonClick() {
         store.loading = false;
     }
 }
-
 </script>
 
 <template>

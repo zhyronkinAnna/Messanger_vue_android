@@ -89,7 +89,8 @@ const props = defineProps<Props>();
                         </NGridItem>
                         <NGridItem class="justify-right flex items-center">
                             <ReadIcon v-if="status"/>
-                            <UnreadIcon v-else/>
+                            <UnreadIcon v-else-if="status"/>
+                            <NText class="bg-#007AFF rounded-full text-white p-l-1 p-r-1 items-center justify-center flex ">99</NText>
                         </NGridItem>
                     </NGrid>
                 </NFlex>

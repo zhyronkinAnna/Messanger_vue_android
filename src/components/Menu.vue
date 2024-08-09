@@ -5,7 +5,7 @@ import { LogOutOutline, SettingsOutline } from '@vicons/ionicons5'
 
 <template>
     <NFlex vertical class="h-100vh w-60px justify-center flex items-center bg-#FAFAFA">
-        <n-avatar
+        <NAvatar
             class="m-t-10px"
             round
             size="medium"
