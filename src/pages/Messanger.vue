@@ -6,6 +6,7 @@ import ChatInterface from '../components/ChatInterface.vue';
 import { useStore } from '../stores/store';
 import Settings from '../components/Settings.vue';
 import UserInfo from '../components/UserInfo.vue';
+import SetAvatar from '../components/SetAvatar.vue';
 
 const store = useStore();
 
@@ -17,7 +18,7 @@ const avatars = [
       'https://avatars.githubusercontent.com/u/19239641?s=60&v=4'
     ]
 
-    const items = Array.from({ length: 1000 }, (_, i) => ({
+    const items = Array.from({ length: 100 }, (_, i) => ({
       key: `${i}`,
       value: "",
       avatar: avatars[i % avatars.length]
@@ -46,6 +47,7 @@ const avatars = [
     <UserInfo v-if="store.showUserInfo"/>
   </NFlex>
   <Settings/>
+  <SetAvatar/>
 </template>
 
 <style scoped>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NGridItem, NGrid, NH2, NAvatar, NText, NFlex, NIcon, NButton, NInput, NCard, NForm, NFormItemGi, NDivider } from 'naive-ui';
+import { NGridItem, NGrid, NH2, NAvatar, NText, NFlex, NIcon, NButton, NInput, NCard, NForm, NFormItemGi, NDivider, NSwitch } from 'naive-ui';
 import { PhoneIcon, EnvelopeIcon } from '@heroicons/vue/24/solid';
 import { TrashIcon, NoSymbolIcon } from '@heroicons/vue/24/outline';
 import { useStore } from '../stores/store';
@@ -93,16 +93,22 @@ function handleClose()
                         <NFormItemGi :span="24" :show-feedback="false" :show-label="false">
                             <NDivider/>
                         </NFormItemGi>
+                        <NFormItemGi :span="24" :show-feedback="false" :show-label="false">
+                            <NFlex justify="space-between" class="w-full">
+                                <NText>Notifications</NText>
+                                <NSwitch size="medium"/>
+                            </NFlex>
+                        </NFormItemGi>
                     </NGrid>
                 </NForm>
                 <NFlex justify="space-between" class="w-full p-4 mt-auto">
-                    <NButton strong text type="primary" text-color="#FF0000" size="large">
+                    <NButton text type="primary" text-color="#FF0000" size="large">
                         <template #icon>
                             <NIcon><TrashIcon/></NIcon>
                         </template>
                         Delete chat
                     </NButton>
-                    <NButton strong text type="primary" text-color="#FF0000" size="large">
+                    <NButton text type="primary" text-color="#FF0000" size="large">
                         <template #icon>
                             <NIcon><NoSymbolIcon/></NIcon>
                         </template>

@@ -1,13 +1,54 @@
 <script setup lang="ts">
-import { NAvatar, NButton, NCard, NDivider, NFlex, NForm, NFormItemGi, NGrid, NGridItem, NH2, NIcon, NInput, NModal, NText } from 'naive-ui';
+import { NAvatar, NButton, NCard, NDivider, NFlex, NFloatButton, NForm, NFormItemGi, NGrid, NGridItem, NH2, NIcon, NInput, NModal, NText, NUpload, UploadFileInfo, useMessage } from 'naive-ui';
 import { useStore } from '../stores/store';
-import { PowerIcon } from '@heroicons/vue/24/outline';
+import { PowerIcon, CameraIcon } from '@heroicons/vue/24/outline';
+import { ref } from 'vue';
 
 const store = useStore();
+const message = useMessage();
+const showFloatButton = ref<boolean>(false);
 
-function onCloseButtonClick()
-{
+function onCloseButtonClick() {
     store.showSettings = false;
+}
+
+const localUploadRef = ref<InstanceType<typeof NUpload> | null>(null);
+
+async function onChange(options: { file: UploadFileInfo; fileList: Array<UploadFileInfo> }) {
+    if (options.file.status === "pending") {
+        const file = options.file.file;
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                const result = event.target?.result;
+
+                if (!result || typeof result !== 'string') {
+                    console.error('Error reading file or result is not a string');
+                    return;
+                }
+
+                localUploadRef.value?.clear();
+                store.cropperSrc = result;
+                store.showSetAvatar = !store.showSetAvatar;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            console.error('File is null or undefined');
+        }
+    }
+}
+
+
+async function beforeUpload(data: { file: UploadFileInfo, fileList: UploadFileInfo[] }) {
+    if (data.file.file?.type !== 'image/png' && data.file.file?.type !== 'image/jpeg' && data.file.file?.type !== 'image/jpg') {
+        message.error(
+            'Only upload picture files, please re-upload.'
+        );
+        return false
+    }
+    return true
 }
 
 </script>
@@ -30,12 +71,38 @@ function onCloseButtonClick()
                 <NGrid :cols="24" :x-gap="10">
                     <NFormItemGi :span="24" :show-label="false">
                         <NFlex class="w-full items-center">
-                            <NFlex>
-                                <NAvatar 
-                                    round
-                                    :size="60"
-                                    src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
-                                />
+                            <NFlex 
+                                @mouseover="showFloatButton = true"
+                                @mouseleave="showFloatButton = false"
+                            >
+                                <NUpload
+                                    :max="1"
+                                    ref="localUploadRef"
+                                    @before-upload="beforeUpload"
+                                    @change="onChange"
+                                >
+                                    <NFlex>
+                                        <NAvatar
+                                            class="avatar-upload"
+                                            round
+                                            :size="60"
+                                            src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
+                                        />
+                                        <NFloatButton 
+                                            v-if="showFloatButton"
+                                            position="absolute" 
+                                            :width="60" 
+                                            :height="60" 
+                                            :theme-overrides="{ 
+                                                color: '#00000070'
+                                            }
+                                        ">
+                                            <NIcon :size="40" color="white">
+                                                <CameraIcon/>
+                                            </NIcon>
+                                        </NFloatButton>
+                                    </NFlex>
+                                </NUpload>
                             </NFlex>
                             <NFlex>
                                 <NGrid :cols="1">
@@ -110,4 +177,10 @@ function onCloseButtonClick()
 </template>
 
 <style>
+.n-upload-file-list{
+    display: none !important
+}
+.avatar-upload {
+    cursor: pointer;
+}
 </style>

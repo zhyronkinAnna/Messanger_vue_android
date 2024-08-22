@@ -1,10 +1,10 @@
-import { MessageTypeEnum, IMessage, IRequest, IRespond, INotification,  } from '../models';
+import { MessageTypeEnum, IMessage, IRequest, IResponse, INotification,  } from '../models';
 import { useStore } from '../stores/store';
 
 class WebSocketService {
     private ws: WebSocket | null = null;
     private url: string;
-    private responseResolvers: { [key: string]: (value: IRespond) => void } = {};
+    private responseResolvers: { [key: string]: (value: IResponse) => void } = {};
     private reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
     private store: ReturnType<typeof useStore>;
 
@@ -55,7 +55,7 @@ class WebSocketService {
         }, this.reconnectInterval);
     }
 
-    send(data: IRequest, waitForRequest: boolean = true): Promise<IRespond> {
+    send(data: IRequest, waitForRequest: boolean = true): Promise<IResponse | null> {
         return new Promise((resolve, reject) => {
 
             if(waitForRequest) {
@@ -87,7 +87,7 @@ class WebSocketService {
 
 
         if (message?.type === MessageTypeEnum.Response) {
-            let respond: IRespond;
+            let respond: IResponse;
             respond = JSON.parse(data);
             
             if (respond.requestId && this.responseResolvers[respond.requestId]) {

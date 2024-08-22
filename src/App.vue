@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NConfigProvider, NGlobalStyle, NNotificationProvider, NThemeEditor, NText, NSpin, NFlex } from 'naive-ui';
+import { NConfigProvider, NGlobalStyle, NNotificationProvider, NThemeEditor, NText, NSpin, NFlex, NMessageProvider } from 'naive-ui';
 import { themeOverrides } from '../src/theme/theme';
 import { useRouter } from 'vue-router';
 import { onMounted, onUnmounted } from 'vue';
@@ -26,18 +26,19 @@ onUnmounted(() => {
   <NThemeEditor>
     <NConfigProvider :theme-overrides="themeOverrides">
       <NGlobalStyle />
-      <NNotificationProvider>
-        <router-view />
-        <Loader v-if="store.loading"/>
-        <NFlex v-if="store.isConnected" style="position: absolute; bottom: 20px; z-index: 1000; left: 20px; padding: 10px">
-          <NSpin size="Tiny"/>
-          <NText strong>Connecting to the server</NText>
-        </NFlex>
-      </NNotificationProvider>
+      <NMessageProvider>
+        <NNotificationProvider>
+          <router-view />
+          <Loader v-if="store.loading"/>
+          <NFlex v-if="store.isConnected" style="position: absolute; bottom: 20px; z-index: 1000; left: 20px; padding: 10px">
+            <NSpin size="Tiny"/>
+            <NText strong>Connecting to the server</NText>
+          </NFlex>
+        </NNotificationProvider>
+      </NMessageProvider>
     </NConfigProvider>
   </NThemeEditor>
 </template>
 
 <style>
-
 </style>

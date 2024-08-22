@@ -67,5 +67,12 @@ export const themeOverrides = {
   "Input": {
     "color": "rgba(250, 250, 250, 1)",
     "colorFocus": "rgba(250, 250, 250, 1)"
+  },
+  "Switch": {
+    "railColorActive": "#000000FF",
+    "loadingColor": "#000000FF"
+  },
+  "Upload": {
+    "itemDisabledOpacity": "1"
   }
 };

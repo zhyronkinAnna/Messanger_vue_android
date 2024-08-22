@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { NButton, NFlex, NIcon, NInput } from 'naive-ui';
 import { PaperClipIcon, FaceSmileIcon, PaperAirplaneIcon } from '@heroicons/vue/24/outline';
+import { useStore } from '../stores/store';
+
+const store = useStore();
+
+function onShowEmojiPickerButtonClick() {
+    store.showEmojiPicker = !store.showEmojiPicker; 
+}
+
 </script>
 
 <template>
@@ -13,7 +21,7 @@ import { PaperClipIcon, FaceSmileIcon, PaperAirplaneIcon } from '@heroicons/vue/
             </NButton>
         </NFlex>
         <NFlex>
-            <NButton :bordered="false" circle size="medium" ghost color="#898989">
+            <NButton @click="onShowEmojiPickerButtonClick" :bordered="false" circle size="medium" ghost color="#898989">
                 <template #icon>
                     <NIcon :size="25"><FaceSmileIcon/></NIcon>
                 </template>

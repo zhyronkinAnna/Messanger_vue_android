@@ -3,6 +3,10 @@ import { NFlex } from 'naive-ui';
 import ChatHeader from './ChatHeader.vue';
 import MessageHistory from './MessageHistory.vue';
 import MessageInput from './MessageInput.vue';
+import EmojiPicker from './EmojiPicker.vue';
+import { useStore } from '../stores/store';
+
+const store = useStore();
 
 interface Props {
     items: {
@@ -22,6 +26,7 @@ const props = defineProps<Props>();
         </NFlex>
         <NFlex class="flex-1 overflow-y-auto">
             <MessageHistory :items="props.items"/>
+            <EmojiPicker v-if="store.showEmojiPicker" class="absolute bottom-15 m-l-5px"/>
         </NFlex>
         <NFlex>
             <MessageInput/>

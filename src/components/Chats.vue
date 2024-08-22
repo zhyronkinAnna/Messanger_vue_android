@@ -3,13 +3,12 @@ import { NIcon, NInput, NVirtualList, NH2, NFlex } from 'naive-ui';
 import Chat from './Chat.vue';
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
 
-
 interface Props {
     items: {
-    key: string;
-    value: string;
-    avatar: string;
-}[];
+        key: string;
+        value: string;
+        avatar: string;
+    }[];
 }
 
 const props = defineProps<Props>();
@@ -23,7 +22,7 @@ const props = defineProps<Props>();
         <NFlex class="p-l-15px p-r-15px m-b-15px">
             <NInput round placeholder="Search chat">
                 <template #suffix>
-                    <NIcon :component="MagnifyingGlassIcon" />
+                    <NIcon><MagnifyingGlassIcon/></NIcon>
                 </template>
             </NInput>
         </NFlex>

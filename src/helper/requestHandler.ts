@@ -1,8 +1,8 @@
-import { IRequest, IRespond } from '../models';
+import { IRequest, IResponse } from '../models';
 import { WebSocketService } from '../services/websocket';
 
-export async function handleRequest(wsService: WebSocketService, request: IRequest): Promise<IRespond | null> {
-    let response: IRespond | null = null;
+export async function handleRequest(wsService: WebSocketService, request: IRequest): Promise<IResponse | null> {
+    let response: IResponse | null = null;
 
     try {
         response = await wsService.send(request);

@@ -1,31 +1,21 @@
 <script setup lang="ts">
-import { NGridItem, NGrid, NH2, NVirtualList, NAvatar, NText, NFlex, useNotification, NIcon, NMenu, NButton, NInput } from 'naive-ui';
+import { NFlex } from 'naive-ui';
+import EmojiPicker, { EmojiExt } from 'vue3-emoji-picker'
+import 'vue3-emoji-picker/css'
+
+function onSelectEmoji(emoji: EmojiExt) {
+    console.log(emoji);
+}
 </script>
 
 <template>
-  <NFlex class="flex flex-row p-10px b-t-#EFEFF5 b-t-solid b-t-1px w-full" :size="0" >
-        <NFlex>
-            <NButton :bordered="false" circle size="medium" class="m-b-10px" ghost color="#898989">
-                <template #icon>
-                    <NIcon ><CallOutline/></NIcon>
-                </template>
-            </NButton>
-        </NFlex>
-        <NFlex>
-            <NButton :bordered="false" circle size="medium" class="m-b-10px" ghost color="#898989">
-                
-            </NButton>
-        </NFlex>
-        <NFlex class="flex-1">
-            <NInput :bordered="false" round placeholder="Type your message here.." class="bg-#FAFAFA h-35px">
-                <template #suffix>
-                    <NIcon/>
-                </template>
-            </NInput>
-        </NFlex>
-        
+    <NFlex>
+        <EmojiPicker @select="onSelectEmoji" class="h-300px" :disableSkinTones="true"/>
     </NFlex>
 </template>
 
 <style>
+.v3-emoji-picker .v3-footer{
+    display: none;
+}
 </style>
