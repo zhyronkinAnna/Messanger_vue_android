@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex, useNotification, FormInst } from 'naive-ui';
+import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex, useNotification, FormInst, c } from 'naive-ui';
 import AuthContainer from "../components/AuthContainer.vue";
 import { useRouter } from 'vue-router';
 import { useStore } from '../stores/store';
-import { IUser, IError, IRequest } from '../models';
+import { IUser, IError, IRequest, convertToIUser } from '../models';
 import { ref } from 'vue';
 import { generateSHA256, isSecurePassword, formValidation, handleError, handleRequest } from '../helper';
 import { useWsService } from '../services/wsServiceManager';
@@ -70,7 +70,10 @@ async function onLoginButtonClick() {
             }
         }
 
-        console.debug("respond", respond);
+        console.debug("respond", respond?.data);
+        store.user = convertToIUser(respond?.data);
+
+        router.push({ name: 'Messanger' });
     }
     catch (error) {
         console.error(error);

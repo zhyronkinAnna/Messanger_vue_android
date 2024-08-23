@@ -3,18 +3,17 @@ import { NGridItem, NGrid, NAvatar, NText, NFlex, NDropdown } from 'naive-ui';
 import ReadIcon from '../assets/read.svg';
 import UnreadIcon from '../assets/unread.svg';
 import { nextTick, ref } from 'vue';
+import { IChat, ReadTypes } from '../models';
 
 const status = ref<boolean>(false);
-const message = ref<string>('last message');
-const username = ref<string>('User name');
 
 const showDropdownRef = ref(false)
 const xRef = ref(0)
 const yRef = ref(0)
 
-const activeDropdownId = ref<string | null>(null);
+const activeDropdownId = ref<number | null>(null);
 
-function handleContextMenu(e: MouseEvent, id: string) {
+function handleContextMenu(e: MouseEvent, id: number) {
     e.preventDefault();
     activeDropdownId.value = id;
     showDropdownRef.value = false;
@@ -34,7 +33,6 @@ function handleSelect(key: string | number) {
     showDropdownRef.value = false
 }
 
-
 const options = [
     {
         label: 'Jay Gatsby',
@@ -43,19 +41,18 @@ const options = [
 ]
 
 interface Props {
-    id: string;
+    chat: IChat;
 }
 
 const props = defineProps<Props>();
-
 </script>
 
 <template>
     <NFlex 
         vertical 
         class="m-l-5px w-250px h-50px bg-white rounded-2 overflow-hidden p-l-10px p-r-10px"
-        :class="{ 'hover-bg': !showDropdownRef, 'active-bg': activeDropdownId === props.id }" 
-        @contextmenu="(e) => handleContextMenu(e, props.id)"
+        :class="{ 'hover-bg': !showDropdownRef, 'active-bg': activeDropdownId === props.chat.chat_id }" 
+        @contextmenu="(e) => handleContextMenu(e, props.chat.chat_id)"
     >
         <NDropdown
             placement="bottom-start"
@@ -79,18 +76,24 @@ const props = defineProps<Props>();
                 <NFlex>
                     <NGrid :cols="8">
                         <NGridItem :span="5">
-                            <NText strong>{{ username }}{{ props.id }}</NText>
+                            <NText strong>{{ props.chat.chat_title }}</NText>
                         </NGridItem>
                         <NGridItem class="justify-right flex items-center" :span="3">
-                            <NText>22.12.2023</NText>
+                            <NText>{{ new Date(props.chat.sent_time)
+                                    .toLocaleDateString('ru-RU', {
+                                        day: '2-digit',
+                                        month: '2-digit',
+                                        year: 'numeric',
+                                    })}}
+                            </NText>
                         </NGridItem>
                         <NGridItem :span="7">
-                            <NText>{{ message }}</NText>
+                            <NText>{{ props.chat.last_message }}</NText>
                         </NGridItem>
                         <NGridItem class="justify-right flex items-center">
-                            <ReadIcon v-if="status"/>
-                            <UnreadIcon v-else-if="status"/>
-                            <NText class="bg-#007AFF rounded-full text-white p-l-1 p-r-1 items-center justify-center flex ">99</NText>
+                            <NText v-if="props.chat.unread_messages_count > 0" class="bg-#007AFF rounded-full text-white p-l-1 p-r-1 items-center justify-center flex ">{{props.chat.unread_messages_count}}</NText>
+                            <UnreadIcon v-else-if="props.chat.is_read === ReadTypes.Unread"/>
+                            <ReadIcon v-else-if="props.chat.is_read === ReadTypes.Read"/>
                         </NGridItem>
                     </NGrid>
                 </NFlex>

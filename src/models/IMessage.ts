@@ -1,6 +1,6 @@
 import { MessageTypeEnum } from "./MessageTypeEnum";
 
 export interface IMessage {
-    data: string;
+    data: JSON;
     type: MessageTypeEnum;
 }

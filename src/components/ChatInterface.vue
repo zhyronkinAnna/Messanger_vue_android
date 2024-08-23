@@ -5,6 +5,7 @@ import MessageHistory from './MessageHistory.vue';
 import MessageInput from './MessageInput.vue';
 import EmojiPicker from './EmojiPicker.vue';
 import { useStore } from '../stores/store';
+import NotSelectedChat from './NotSelectedChat.vue';
 
 const store = useStore();
 
@@ -20,7 +21,8 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <NFlex class="flex flex-col h-100vh" :size="0" vertical>
+    <NotSelectedChat v-if="!store.selectedChat"/>
+    <NFlex v-if="store.selectedChat" class="flex flex-col h-100vh" :size="0" vertical>
         <NFlex>
             <ChatHeader/>
         </NFlex>

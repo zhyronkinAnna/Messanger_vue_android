@@ -3,10 +3,17 @@ import { NAvatar, NButton, NCard, NDivider, NFlex, NFloatButton, NForm, NFormIte
 import { useStore } from '../stores/store';
 import { PowerIcon, CameraIcon } from '@heroicons/vue/24/outline';
 import { ref } from 'vue';
+import { IUser } from '../models';
 
 const store = useStore();
 const message = useMessage();
 const showFloatButton = ref<boolean>(false);
+const user = ref<IUser>({
+    id: store.user?.id ?? 0,
+    email: store.user?.email ?? '',
+    username: store.user?.username ?? '',
+    description: store.user?.description ?? '',
+});
 
 function onCloseButtonClick() {
     store.showSettings = false;
@@ -107,10 +114,10 @@ async function beforeUpload(data: { file: UploadFileInfo, fileList: UploadFileIn
                             <NFlex>
                                 <NGrid :cols="1">
                                     <NGridItem>
-                                        <NText strong>User Name</NText>
+                                        <NText strong>{{ user.username }}</NText>
                                     </NGridItem>
                                     <NGridItem>
-                                        <NText class="text-#007AFF text-12px">email</NText>
+                                        <NText class="text-#007AFF text-12px">{{ user.email }}</NText>
                                     </NGridItem>
                                 </NGrid>
                             </NFlex>
@@ -128,12 +135,13 @@ async function beforeUpload(data: { file: UploadFileInfo, fileList: UploadFileIn
                             placeholder="ex. Pizza lover" 
                             :bordered="false" 
                             class="rounded-7px"
+                            v-model:value="user.description"
                         />
                     </NFormItemGi>
                     <NFormItemGi :span="24" :show-feedback="false" :show-label="false">
                         <NDivider />
                     </NFormItemGi>
-                    <NFormItemGi :span="12" label="First name">
+                    <!-- <NFormItemGi :span="12" label="First name">
                         <NInput
                             placeholder="ex. Ryan"
                             class="rounded-7px"
@@ -144,17 +152,19 @@ async function beforeUpload(data: { file: UploadFileInfo, fileList: UploadFileIn
                             placeholder="ex. Gosling" 
                             class="rounded-7px"
                         />
-                    </NFormItemGi>
+                    </NFormItemGi> -->
                     <NFormItemGi :span="24" label="Username">
                         <NInput 
                             placeholder="ex. Don Juan" 
                             class="rounded-7px"
+                            v-model:value="user.username"
                         />
                     </NFormItemGi>
-                    <NFormItemGi :span="24" label="Username">
+                    <NFormItemGi :span="24" label="Email">
                         <NInput 
                             placeholder="example@email.com" 
                             class="rounded-7px"
+                            v-model:value="user.email"
                         />
                     </NFormItemGi>
                     <NFormItemGi :span="24" :show-label="false">

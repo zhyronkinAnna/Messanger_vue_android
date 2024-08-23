@@ -2,16 +2,14 @@
 import { NIcon, NInput, NVirtualList, NH2, NFlex } from 'naive-ui';
 import Chat from './Chat.vue';
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
+import { IChat } from '../models';
 
 interface Props {
-    items: {
-        key: string;
-        value: string;
-        avatar: string;
-    }[];
+    chats: IChat[];
 }
-
 const props = defineProps<Props>();
+console.log("apappapa", props.chats);
+
 </script>
 
 <template>
@@ -27,9 +25,9 @@ const props = defineProps<Props>();
             </NInput>
         </NFlex>
         <NFlex class="flex-1 overflow-y-auto">
-            <NVirtualList :item-size="50" :items="props.items">
+            <NVirtualList :item-size="50" :items="props.chats">
                 <template #default="{ item }">
-                    <Chat :id="item.key"/>
+                    <Chat :chat="item"/>
                 </template>
             </NVirtualList>
         </NFlex>
