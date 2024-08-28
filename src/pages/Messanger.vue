@@ -8,9 +8,10 @@ import Settings from '../components/Settings.vue';
 import UserInfo from '../components/UserInfo.vue';
 import SetAvatar from '../components/SetAvatar.vue';
 import { onBeforeMount, ref } from 'vue';
-import { convertToIChat, IChat, IRequest } from '../models';
+import { IChat, IRequest } from '../models';
 import { handleError, handleRequest } from '../helper';
 import { useWsService } from '../services/wsServiceManager';
+import { convertToChat } from '../models/ChatConverter';
 
 const store = useStore();
 const wsService = useWsService();
@@ -47,7 +48,7 @@ onBeforeMount(async ()=>{
 
         console.debug("respond", respond);
         chats.value = (respond?.data as unknown as any[])?.map(item => 
-          convertToIChat(item)
+          convertToChat(item)
         );
         console.debug("respond", chats.value);
     } 

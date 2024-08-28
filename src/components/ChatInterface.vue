@@ -22,7 +22,7 @@ const props = defineProps<Props>();
 
 <template>
     <NotSelectedChat v-if="!store.selectedChat"/>
-    <NFlex v-if="store.selectedChat" class="flex flex-col h-100vh" :size="0" vertical>
+    <NFlex v-if="store.selectedChat" class="flex flex-col h-100vh w-full" :size="0" vertical>
         <NFlex>
             <ChatHeader/>
         </NFlex>

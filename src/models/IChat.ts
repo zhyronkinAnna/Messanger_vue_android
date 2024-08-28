@@ -1,31 +1,23 @@
-import { ReadTypes } from "./ReadTypesEnum";
+import { ChatType } from "./ChatTypeEnum";
+import { convertToIChatMessage, IChatMessage } from "./IChatMessage";
 
 export interface IChat {
-    avatar_path: string;
     chat_id: number;
-    chat_title: string;
-    created_at: Date;
-    description: string;
     id_of_user_chat: number;
-    last_message: string;
-    sent_time: Date;
-    type_id: number; //TODO
+    last_message: IChatMessage;
+    type_id: ChatType;
     unread_messages_count: number;
-    is_read: ReadTypes;
+    is_muted: boolean;
 }
 
 export function convertToIChat(data: any): IChat {
+    const last_message = convertToIChatMessage({text: data.last_message, sent_at: data.sent_time, is_read: data.is_read});
     return {
-        avatar_path: data.avatar_path,
         chat_id: data.chat_id,
-        chat_title: data.chat_title,
-        created_at: data.created_at,
-        description: data.description,
         id_of_user_chat: data.id_of_user_chat,
-        last_message: data.last_message,
-        sent_time: data.sent_time,
+        last_message: last_message,
         type_id: data.type_id,
         unread_messages_count: data.unread_messages_count,
-        is_read: data.is_read,
+        is_muted: data.is_muted
     };
 }

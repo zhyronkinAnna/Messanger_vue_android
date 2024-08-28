@@ -3,6 +3,8 @@ import { NGridItem, NGrid, NH2, NAvatar, NText, NFlex, NIcon, NButton, NInput, N
 import { PhoneIcon, EnvelopeIcon } from '@heroicons/vue/24/solid';
 import { TrashIcon, NoSymbolIcon } from '@heroicons/vue/24/outline';
 import { useStore } from '../stores/store';
+import { onMounted } from 'vue';
+import { ChatType, IGroupChat, IPrivateChat } from '../models';
 
 const store = useStore();
 
@@ -10,6 +12,10 @@ function handleClose()
 {
     store.showUserInfo = false;
 }
+
+onMounted(() => {
+    
+});
 
 </script>
 
@@ -45,7 +51,15 @@ function handleClose()
                                 <NFlex>
                                     <NGrid :cols="1">
                                         <NGridItem>
-                                            <NText strong>User Name</NText>
+                                            <NText strong>
+                                            {{ 
+                                                store.selectedChat?.type_id === ChatType.Group ? 
+                                                (store.selectedChat as IGroupChat).chat_title : 
+                                                store.selectedChat?.type_id === ChatType.Private ? 
+                                                (store.selectedChat as IPrivateChat).user.username : 
+                                                '' 
+                                            }}
+                                    </NText>
                                         </NGridItem>
                                         <NGridItem>
                                             <NText class="text-#007AFF text-14px">online</NText>
@@ -62,6 +76,13 @@ function handleClose()
                                 placeholder="ex. Pizza lover" 
                                 class="rounded-7px"
                                 :disabled="true"
+                                :value="
+                                        store.selectedChat?.type_id === ChatType.Group ? 
+                                        (store.selectedChat as IGroupChat).description : 
+                                        store.selectedChat?.type_id === ChatType.Private ? 
+                                        (store.selectedChat as IPrivateChat).user.description : 
+                                        ''
+                                "
                             />
                         </NFormItemGi>
                         <NFormItemGi :span="24">
@@ -72,6 +93,11 @@ function handleClose()
                                 placeholder="example@email.com" 
                                 class="rounded-7px"
                                 :disabled="true"
+                                :value="
+                                    store.selectedChat?.type_id === ChatType.Private ? 
+                                    (store.selectedChat as IPrivateChat).user.email : 
+                                    ''
+                                "
                             />
                         </NFormItemGi>
                         <NFormItemGi :span="12"  :show-feedback="false" :show-label="false">
@@ -96,7 +122,7 @@ function handleClose()
                         <NFormItemGi :span="24" :show-feedback="false" :show-label="false">
                             <NFlex justify="space-between" class="w-full">
                                 <NText>Notifications</NText>
-                                <NSwitch size="medium"/>
+                                <NSwitch :value="store.selectedChat?.is_muted" size="medium"/>
                             </NFlex>
                         </NFormItemGi>
                     </NGrid>

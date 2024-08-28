@@ -2,6 +2,8 @@
 import { NAvatar, NButton, NFlex, NGrid, NGridItem, NIcon, NText } from 'naive-ui';
 import { PhoneIcon, InformationCircleIcon } from '@heroicons/vue/24/outline';
 import { useStore } from '../stores/store';
+import { ChatType, IGroupChat, IPrivateChat } from '../models';
+
 
 const store = useStore();
 
@@ -24,7 +26,15 @@ function onInfoButtonClick()
         <NFlex>
             <NGrid :cols="1">
                 <NGridItem>
-                    <NText strong>User Name</NText>
+                    <NText strong>
+                        {{
+                            store.selectedChat?.type_id === ChatType.Group ? 
+                            (store.selectedChat as IGroupChat).chat_title : 
+                            store.selectedChat?.type_id === ChatType.Private ? 
+                            (store.selectedChat as IPrivateChat).user.username : 
+                            ''
+                        }}
+                    </NText>
                 </NGridItem>
                 <NGridItem>
                     <NText>lastSeenOnline</NText>
