@@ -1,5 +1,4 @@
 export enum ReadTypes {
-    DoNotShow,
-    Unread,
-    Read,
+    Unread = 1,
+    Read = 2,
 }

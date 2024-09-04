@@ -9,15 +9,6 @@ import NotSelectedChat from './NotSelectedChat.vue';
 
 const store = useStore();
 
-interface Props {
-    items: {
-    key: string;
-    value: string;
-    avatar: string;
-}[];
-}
-
-const props = defineProps<Props>();
 </script>
 
 <template>
@@ -27,7 +18,7 @@ const props = defineProps<Props>();
             <ChatHeader/>
         </NFlex>
         <NFlex class="flex-1 overflow-y-auto">
-            <MessageHistory :items="props.items"/>
+            <MessageHistory/>
             <EmojiPicker v-if="store.showEmojiPicker" class="absolute bottom-15 m-l-5px"/>
         </NFlex>
         <NFlex>

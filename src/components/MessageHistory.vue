@@ -2,31 +2,27 @@
 import { NFlex, NVirtualList, VirtualListInst } from 'naive-ui';
 import TextMessage from './TextMessage.vue';
 import { onMounted, ref } from 'vue';
+import { useStore } from '../stores/store';
+import { ChatMessageTypes } from '../models/ChatMessageTypesEnum';
+import FileMessage from './FileMessage.vue';
 
-interface Props {
-    items: {
-        key: string;
-        value: string;
-        avatar: string;
-}[];
-}
+const store = useStore();
 
 const virtualListInst = ref<VirtualListInst>()
 
 onMounted(() => {
-    virtualListInst.value?.scrollTo({ index: props.items.length - 1 });
+    virtualListInst.value?.scrollTo({ index: store.selectedChat!.messages.length - 1 });
 });
-
-const props = defineProps<Props>();
 </script>
 
 <template>
-    <NVirtualList :item-size="90" :items="props.items" ref="virtualListInst" class="bg-#FAFAFA">
+    <NVirtualList :item-size="90" :items="store.selectedChat?.messages" ref="virtualListInst" class="bg-#FAFAFA">
         <template #default="{ item }">
             <NFlex class="h-70px p-10px">
-                <TextMessage 
-                    :id="item.key" 
-                    :class="item.key % 2 === 0 
+                <TextMessage
+                    v-if="item.type === ChatMessageTypes.Text" 
+                    :message="item"
+                    :class="item.username !== store.user?.username
                         ? 'm-r-auto rounded-br-20px rounded-tr-20px rounded-bl-20px' 
                         : 'm-l-auto rounded-br-20px rounded-tl-20px rounded-bl-20px'"
                 />

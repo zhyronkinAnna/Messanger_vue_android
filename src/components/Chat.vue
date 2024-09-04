@@ -1,15 +1,19 @@
 <script setup lang="ts">
-import { NGridItem, NGrid, NAvatar, NText, NFlex, NDropdown } from 'naive-ui';
+import { NGridItem, NGrid, NAvatar, NText, NFlex, NDropdown, useNotification } from 'naive-ui';
 import ReadIcon from '../assets/read.svg';
 import UnreadIcon from '../assets/unread.svg';
 import { nextTick, ref } from 'vue';
-import { ChatType, IChat, IGroupChat, IPrivateChat, ReadTypes } from '../models';
+import { ChatType, convertToIChatMessage, IChat, IGroupChat, IPrivateChat, IRequest, ReadTypes } from '../models';
 import { useStore } from '../stores/store';
+import { handleError, handleRequest } from '../helper';
+import { useWsService } from '../services/wsServiceManager';
 
 const store = useStore();
 const showDropdownRef = ref(false)
 const xRef = ref(0)
 const yRef = ref(0)
+const wsService = useWsService();
+const notification = useNotification();
 
 const activeDropdownId = ref<number | null>(null);
 
@@ -33,9 +37,37 @@ function handleSelect(key: string | number) {
     showDropdownRef.value = false
 }
 
-function onSelectChat()
+async function onSelectChat()
 {
-    store.selectedChat = props.chat;
+ 
+    try {
+        const request: IRequest  = {
+            command: "GetMessages", 
+            data: {
+                id: props.chat?.id_of_user_chat,
+            }
+        };
+
+        const respond = await handleRequest(wsService!, request);
+
+        if (respond?.errorMessage) {
+            handleError({ subject: "Sign in Error", body: respond?.errorMessage }, notification)
+        }
+
+        console.debug("respond", respond);
+        
+        props.chat.messages = (respond?.data as unknown as any[])?.map(item => 
+          convertToIChatMessage(item)
+        );
+
+        store.selectedChat = props.chat;
+        console.log("alalalalallalalalall", store.selectedChat.messages);
+    } 
+    catch (error) {
+        console.error(error);
+    }
+    finally {
+    }
 }
 
 const options = [

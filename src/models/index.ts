@@ -18,3 +18,6 @@ export type { IGroupChat } from './IGroupChat';
 export type { IPrivateChat } from './IPrivateChat';
 export { ChatType } from './ChatTypeEnum';
 export { convertToChat } from './ChatConverter';
+export type { IChatInfo } from './IChatInfo';
+export { convertToIChatInfo } from './IChatInfo';
+export { ChatMessageTypes } from './ChatMessageTypesEnum'

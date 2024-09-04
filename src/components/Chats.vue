@@ -8,7 +8,6 @@ interface Props {
     chats: IChat[];
 }
 const props = defineProps<Props>();
-console.log("apappapa", props.chats);
 
 </script>
 

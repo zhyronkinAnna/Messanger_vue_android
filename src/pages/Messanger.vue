@@ -18,20 +18,6 @@ const wsService = useWsService();
 const notification = useNotification();
 const chats = ref<IChat[]>([]);
 
-const avatars = [
-      'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
-      'https://avatars.githubusercontent.com/u/20943608?s=60&v=4',
-      'https://avatars.githubusercontent.com/u/46394163?s=60&v=4',
-      'https://avatars.githubusercontent.com/u/39197136?s=60&v=4',
-      'https://avatars.githubusercontent.com/u/19239641?s=60&v=4'
-    ]
-
-    const items = Array.from({ length: 100 }, (_, i) => ({
-      key: `${i}`,
-      value: "",
-      avatar: avatars[i % avatars.length]
-    }))
-
 onBeforeMount(async ()=>{
   try {
         const request: IRequest  = {
@@ -76,7 +62,7 @@ onBeforeMount(async ()=>{
           <Chats :chats="chats"/>
         </NLayoutSider>
         <NFlex class="flex flex-col flex-grow-1">
-          <ChatInterface :items="items" class="flex-grow-1"></ChatInterface>
+          <ChatInterface class="flex-grow-1"></ChatInterface>
         </NFlex>
       </NLayout>
     </NLayout>

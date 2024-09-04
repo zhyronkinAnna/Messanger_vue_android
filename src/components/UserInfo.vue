@@ -1,21 +1,51 @@
 <script setup lang="ts">
-import { NGridItem, NGrid, NH2, NAvatar, NText, NFlex, NIcon, NButton, NInput, NCard, NForm, NFormItemGi, NDivider, NSwitch } from 'naive-ui';
+import { NGridItem, NGrid, NH2, NAvatar, NText, NFlex, NIcon, NButton, NInput, NCard, NForm, NFormItemGi, NDivider, NSwitch, useNotification } from 'naive-ui';
 import { PhoneIcon, EnvelopeIcon } from '@heroicons/vue/24/solid';
 import { TrashIcon, NoSymbolIcon } from '@heroicons/vue/24/outline';
 import { useStore } from '../stores/store';
-import { onMounted } from 'vue';
-import { ChatType, IGroupChat, IPrivateChat } from '../models';
+import { onBeforeMount } from 'vue';
+import { ChatType, convertToChat, convertToIChatInfo, IGroupChat, IPrivateChat, IRequest } from '../models';
+import { handleError, handleRequest } from '../helper';
+import { useWsService } from '../services/wsServiceManager';
 
 const store = useStore();
+const wsService = useWsService();
+const notification = useNotification();
 
 function handleClose()
 {
     store.showUserInfo = false;
 }
 
-onMounted(() => {
-    
-});
+onBeforeMount(async ()=>{
+  try {
+        const request: IRequest  = {
+            command: "GetChatInfo", 
+            data: {
+                chat_id: store.selectedChat?.chat_id,
+                user_id: store.user?.id
+            }
+        };
+
+        const respond = await handleRequest(wsService!, request);
+
+        if (respond?.errorMessage) {
+            handleError({ subject: "Sign in Error", body: respond?.errorMessage }, notification)
+        }
+
+        console.debug("respond", respond);
+        
+        console.log(store.selectedChat);
+        store.selectedChat = convertToChat(store.selectedChat, convertToIChatInfo(respond?.data));
+
+        console.log(store.selectedChat);
+    } 
+    catch (error) {
+        console.error(error);
+    }
+    finally {
+    }
+})
 
 </script>
 
@@ -59,7 +89,7 @@ onMounted(() => {
                                                 (store.selectedChat as IPrivateChat).user.username : 
                                                 '' 
                                             }}
-                                    </NText>
+                                            </NText>
                                         </NGridItem>
                                         <NGridItem>
                                             <NText class="text-#007AFF text-14px">online</NText>
@@ -73,7 +103,6 @@ onMounted(() => {
                                 <NText class="text-#007AFF text-12px">Bio</NText>
                             </template>
                             <NInput
-                                placeholder="ex. Pizza lover" 
                                 class="rounded-7px"
                                 :disabled="true"
                                 :value="
@@ -83,14 +112,17 @@ onMounted(() => {
                                         (store.selectedChat as IPrivateChat).user.description : 
                                         ''
                                 "
+                                :loading="store.selectedChat?.type_id === ChatType.Group ? 
+                                        (store.selectedChat as IGroupChat).description == null : 
+                                        store.selectedChat?.type_id === ChatType.Private ? 
+                                        (store.selectedChat as IPrivateChat).user.description == null: true"
                             />
                         </NFormItemGi>
-                        <NFormItemGi :span="24">
+                        <NFormItemGi v-if="store.selectedChat?.type_id === ChatType.Private" :span="24" >
                             <template #label>
                                 <NText class="text-#007AFF text-12px">Email</NText>
                             </template>
                             <NInput 
-                                placeholder="example@email.com" 
                                 class="rounded-7px"
                                 :disabled="true"
                                 :value="
@@ -98,6 +130,8 @@ onMounted(() => {
                                     (store.selectedChat as IPrivateChat).user.email : 
                                     ''
                                 "
+                                :loading="store.selectedChat?.type_id === ChatType.Private && 
+                                        (store.selectedChat as IPrivateChat).user.email == null"  
                             />
                         </NFormItemGi>
                         <NFormItemGi :span="12"  :show-feedback="false" :show-label="false">
@@ -143,7 +177,7 @@ onMounted(() => {
                 </NFlex>
             </NFlex>
         </NCard>
-</NFlex>
+    </NFlex>
 </template>
 
 <style>
