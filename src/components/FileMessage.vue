@@ -26,14 +26,16 @@ function handleSelect(key: string | number) {
 }
 
 function handleContextMenu(e: MouseEvent, id: number) {
-    e.preventDefault();
-    activeDropdownId.value = id;
-    showDropdownRef.value = false;
-    nextTick().then(() => {
-        showDropdownRef.value = true;
-        xRef.value = e.clientX;
-        yRef.value = e.clientY;
-    });
+    if(props.messageFile.username === store.user?.username){
+        e.preventDefault();
+        activeDropdownId.value = id;
+        showDropdownRef.value = false;
+        nextTick().then(() => {
+            showDropdownRef.value = true;
+            xRef.value = e.clientX;
+            yRef.value = e.clientY;
+        });
+    }
 }
 
 function onClickoutside() {
