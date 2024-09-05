@@ -43,6 +43,12 @@ onBeforeMount(async ()=>{
     }
 })
 
+function onButtonMessageClick(){
+    if (store.inputRef) {
+        store.inputRef.focus();
+    }
+};
+
 </script>
 
 <template>
@@ -106,8 +112,7 @@ onBeforeMount(async ()=>{
                                         (store.selectedChat as IGroupChat).description : 
                                         store.selectedChat?.type_id === ChatType.Private ? 
                                         (store.selectedChat as IPrivateChat).user.description : 
-                                        ''
-                                "
+                                        '' "
                                 :loading="store.selectedChat?.type_id === ChatType.Group ? 
                                         (store.selectedChat as IGroupChat).description == null : 
                                         store.selectedChat?.type_id === ChatType.Private ? 
@@ -131,7 +136,7 @@ onBeforeMount(async ()=>{
                             />
                         </NFormItemGi>
                         <NFormItemGi :span="12"  :show-feedback="false" :show-label="false">
-                            <NButton type="primary" block strong>
+                            <NButton type="primary" block strong @click="onButtonMessageClick">
                                 <template #icon>
                                     <NIcon><EnvelopeIcon/></NIcon>
                                 </template>
