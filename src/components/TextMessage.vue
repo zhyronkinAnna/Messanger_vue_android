@@ -12,7 +12,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-console.log(props.message.is_read);
 </script>
 
 <template>

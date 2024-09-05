@@ -8,7 +8,6 @@ import { useStore } from '../stores/store';
 import NotSelectedChat from './NotSelectedChat.vue';
 
 const store = useStore();
-
 </script>
 
 <template>

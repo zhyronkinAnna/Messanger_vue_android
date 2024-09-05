@@ -9,6 +9,19 @@ function onShowEmojiPickerButtonClick() {
     store.showEmojiPicker = !store.showEmojiPicker; 
 }
 
+function onInputChange()
+{
+    if (store.selectedChat) {
+        const { chat_id, messageText } = store.selectedChat;
+
+        const chatInAllChats = store.allChats.find(chat => chat.chat_id === chat_id);
+
+        if (chatInAllChats) {
+            chatInAllChats.messageText = messageText;
+        }
+    }
+}
+
 </script>
 
 <template>
@@ -28,7 +41,7 @@ function onShowEmojiPickerButtonClick() {
             </NButton>
         </NFlex>
         <NFlex class="flex-1 m-l-10px m-r-10px">
-            <NInput :bordered="false" placeholder="Type your message here.." class="bg-#FAFAFA rounded-10px">
+            <NInput v-model:value="store.selectedChat!.messageText" :bordered="false" placeholder="Type your message here.." class="bg-#FAFAFA rounded-10px" @on-change="onInputChange">
                 <template #suffix>
                     <NIcon/>
                 </template>

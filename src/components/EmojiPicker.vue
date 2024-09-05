@@ -11,12 +11,11 @@ let ignoreClick = true;
 
 
 function onSelectEmoji(emoji: EmojiExt) {
-    console.log(emoji);
+    store.selectedChat!.messageText += emoji.i;
 }
 
 function handleClickOutside(event: MouseEvent) {
     if (ignoreClick === false && emojiPickerRef.value && !emojiPickerRef.value.$el.contains(event.target as Node)) {
-        console.log("wefwefwef");
         store.showEmojiPicker = false;
     }
     ignoreClick = false;
@@ -34,7 +33,7 @@ onBeforeUnmount(() => {
 
 <template>
     <NFlex>
-        <EmojiPicker ref="emojiPickerRef" @select="onSelectEmoji" class="h-300px" :disableSkinTones="true"/>
+        <EmojiPicker ref="emojiPickerRef" @select="onSelectEmoji" class="h-300px" :disableSkinTones="true" :native="true"/>
     </NFlex>
 </template>
 

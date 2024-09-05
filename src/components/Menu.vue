@@ -2,13 +2,21 @@
 import { NAvatar, NFlex, NIcon, NButton } from 'naive-ui';
 import { useStore } from '../stores/store';
 import { ArrowLeftEndOnRectangleIcon, Cog6ToothIcon } from '@heroicons/vue/24/outline';
+import { useRouter } from 'vue-router';
 
 const store = useStore();
+const router = useRouter();
 
 function onSettingsButtonClick()
 {
     store.showSettings = true;
 }
+
+function onButtonLogoutClick()
+{
+    store.$reset();
+    router.push({ name: 'SignIn' });
+} 
 
 </script>
 
@@ -25,7 +33,7 @@ function onSettingsButtonClick()
                 <NIcon :size="25"><Cog6ToothIcon/></NIcon>
             </template>
         </NButton>
-        <NButton :bordered="false" circle size="medium" class="m-b-10px" ghost color="#898989">
+        <NButton @click="onButtonLogoutClick" :bordered="false" circle size="medium" class="m-b-10px" ghost color="#898989">
             <template #icon>
                 <NIcon :size="25"><ArrowLeftEndOnRectangleIcon/></NIcon>
             </template>

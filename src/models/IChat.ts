@@ -9,6 +9,7 @@ export interface IChat {
     unread_messages_count: number;
     is_muted: boolean;
     messages: IChatMessage[];
+    messageText: string;
 }
 
 export function convertToIChat(data: any): IChat {
@@ -21,5 +22,6 @@ export function convertToIChat(data: any): IChat {
         unread_messages_count: data.unread_messages_count,
         is_muted: data.is_muted,
         messages: data.messages,
+        messageText: data.message ?? "",
     };
 }

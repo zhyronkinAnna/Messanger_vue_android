@@ -1,4 +1,3 @@
-import { NUpload } from "naive-ui";
 import { IChat, IUser } from "../models/index"; // Убедитесь, что путь правильный
 import { defineStore } from "pinia";
 import { ref } from "vue";
@@ -11,9 +10,22 @@ export const useStore = defineStore("store", () => {
     const showSettings = ref<boolean>(false);
     const showUserInfo = ref<boolean>(false);
     const showSetAvatar = ref<boolean>(false);
-    const cropperSrc  = ref<string | ArrayBuffer | null | undefined>(null);
+    const cropperSrc  = ref<string | ArrayBuffer | null | undefined>(undefined);
     const showEmojiPicker = ref<boolean>(false);
     const selectedChat = ref<IChat | null>(null);
+    const allChats = ref<IChat[]>([]);
+
+    function $reset() {
+        user.value = undefined;
+        previousRoute.value = undefined;
+        loading.value = false;
+        showSettings.value = false;
+        showUserInfo.value = false;
+        showSetAvatar.value = false;
+        cropperSrc.value = undefined;
+        showEmojiPicker.value = false;
+        selectedChat.value = null;
+    }
 
     return {
         user,
@@ -25,6 +37,8 @@ export const useStore = defineStore("store", () => {
         showSetAvatar,
         cropperSrc,
         showEmojiPicker,
-        selectedChat
+        selectedChat,
+        allChats,
+        $reset
     };
 });

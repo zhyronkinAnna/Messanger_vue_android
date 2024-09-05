@@ -34,11 +34,7 @@ onBeforeMount(async ()=>{
         }
 
         console.debug("respond", respond);
-        
-        console.log(store.selectedChat);
         store.selectedChat = convertToChat(store.selectedChat, convertToIChatInfo(respond?.data));
-
-        console.log(store.selectedChat);
     } 
     catch (error) {
         console.error(error);
@@ -156,7 +152,7 @@ onBeforeMount(async ()=>{
                         <NFormItemGi :span="24" :show-feedback="false" :show-label="false">
                             <NFlex justify="space-between" class="w-full">
                                 <NText>Notifications</NText>
-                                <NSwitch :value="store.selectedChat?.is_muted" size="medium"/>
+                                <NSwitch v-model:value="store.selectedChat!.is_muted" size="medium"/>
                             </NFlex>
                         </NFormItemGi>
                     </NGrid>

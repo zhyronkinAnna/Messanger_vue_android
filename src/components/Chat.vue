@@ -39,7 +39,6 @@ function handleSelect(key: string | number) {
 
 async function onSelectChat()
 {
- 
     try {
         const request: IRequest  = {
             command: "GetMessages", 
@@ -59,14 +58,11 @@ async function onSelectChat()
         props.chat.messages = (respond?.data as unknown as any[])?.map(item => 
           convertToIChatMessage(item)
         );
-
+        
         store.selectedChat = props.chat;
-        console.log("alalalalallalalalall", store.selectedChat.messages);
     } 
     catch (error) {
         console.error(error);
-    }
-    finally {
     }
 }
 

@@ -9,11 +9,10 @@ import { DocumentTextIcon } from '@heroicons/vue/24/solid';
 const store = useStore();
 
 interface Props {
-    message: IChatMessage
+    messageFile: IChatMessage
 }
 
 const props = defineProps<Props>();
-console.log(props.message.is_read);
 </script>
 
 <template>
@@ -24,8 +23,8 @@ console.log(props.message.is_read);
             </NFlex>
             <NFlex vertical :size="0">
                 <NFlex>
-                    <NText strong >
-                        {{ props.message.file_title }}
+                    <NText strong class="text-15px">
+                        {{ props.messageFile.file_title }}
                     </NText>
                 </NFlex>
                 <NFlex>
@@ -38,12 +37,12 @@ console.log(props.message.is_read);
                 </NFlex>
             </NFlex>
         </NFlex>
-        <NFlex :size="0" :class="{ 'm-l-auto': props.message.username === store.user?.username }" align="center">
-            <ReadIcon v-if="props.message.is_read === ReadTypes.Read" class="p-r-5px"/>
-            <UnreadIcon v-else-if="props.message.is_read === ReadTypes.Unread" class="p-r-5px"/>
+        <NFlex :size="0" :class="{ 'm-l-auto': props.messageFile.username === store.user?.username }" align="center">
+            <ReadIcon v-if="props.messageFile.is_read === ReadTypes.Read" class="p-r-5px"/>
+            <UnreadIcon v-else-if="props.messageFile.is_read === ReadTypes.Unread" class="p-r-5px"/>
             <NText class="opacity-45%">
                 {{ 
-                    new Date(props.message.sent_at)
+                    new Date(props.messageFile.sent_at)
                     .toLocaleTimeString('ru-RU', {
                         hour: '2-digit',
                         minute: '2-digit',

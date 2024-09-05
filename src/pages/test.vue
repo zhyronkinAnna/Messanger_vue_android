@@ -6,6 +6,7 @@ import 'vue3-emoji-picker/css'
 function onSelectEmoji(emoji: EmojiExt) {
     console.log(emoji);
 }
+
 </script>
 
 <template>

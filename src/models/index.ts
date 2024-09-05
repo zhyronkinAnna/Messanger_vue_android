@@ -21,3 +21,4 @@ export { convertToChat } from './ChatConverter';
 export type { IChatInfo } from './IChatInfo';
 export { convertToIChatInfo } from './IChatInfo';
 export { ChatMessageTypes } from './ChatMessageTypesEnum'
+export type { ISelectedChat } from './ISelectedChat';
