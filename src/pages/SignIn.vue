@@ -1,68 +1,86 @@
 <script setup lang="ts">
-import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex, useNotification } from 'naive-ui';
-import AuthContainer from "../components/AuthContainer.vue" 
+import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex, useNotification, FormInst, c } from 'naive-ui';
+import AuthContainer from "../components/AuthContainer.vue";
 import { useRouter } from 'vue-router';
 import { useStore } from '../stores/store';
-import { User, Error } from '../interfaces/index';
+import { IUser, IError, IRequest, convertToIUser } from '../models';
 import { ref } from 'vue';
-import { isSecurePassword, validateEmail } from '../helper';
+import { generateSHA256, isSecurePassword, formValidation, handleError, handleRequest } from '../helper';
+import { useWsService } from '../services/wsServiceManager';
+import { useRules } from '../rules/rules';
 
-const user = ref<User>({});
-const error = ref<Error>();
+const user = ref<IUser>({});
+const error = ref<IError | undefined>(undefined);
 
 const router = useRouter();
 const store = useStore();
+const wsService = useWsService();
+const signInFormRef = ref<FormInst | undefined>(undefined);
 const notification = useNotification();
 
+const rules = useRules();
+
 function onCreateNewAccountButtonClick() {
-    console.debug("onCreateNewAccountButtonClick");
     router.push({ name: 'SignUp' });
 }
 
 function onForgotPasswordButtonClick() {
-    console.debug("onForgotPasswordButtonClick");
     router.push({ name: 'ForgotPassword' });
 }
 
-function handleLoginError(): Boolean {
-    if (error && error.value !== undefined && error.value !== null) {
-        console.debug("onLoginButtonClick_Error", error.value);
-        notification.error({
-            title: error.value?.subject,
-            content: error.value?.body,
-            duration: 1500
-        });
-        error.value = undefined;
-        return true;
-    }
-    return false;
+function handleLoginError(): boolean {
+    const result = handleError(error.value, notification);
+    error.value = undefined;
+    return result;
 }
 
-function validation() {
-    if (!validateEmail(user.value?.email || "")) {
-        console.debug("validation_Email", user.value?.email);
-        error.value = {subject: "Email", body: "Email"};
-    }
-    else if (!isSecurePassword(user.value?.password || "")) {
-        console.debug("isSecurePassword_Password");
-        error.value = {subject: "Password", body: "Password"};
+async function validation() {
+    await formValidation(signInFormRef.value!, notification);
+
+    if(!isSecurePassword(user.value.password || "")) {
+        error.value = { subject: "Invalid email or password", body: "We couldn't find a user with the provided email and password. Please check your credentials and try again." };
     }
 }
 
-function onLoginButtonClick() {
-    validation();
+async function onLoginButtonClick() {
+    try {
+        await validation();
 
-    if (handleLoginError()) {
-        return;
+        if (handleLoginError()) {
+            return;
+        }
+
+        const hashedPassword = generateSHA256(user.value.password || "");
+
+        store.user = { ...user.value };
+        store.user.password = hashedPassword;
+
+        const request: IRequest  = {
+            command: "SignIn", 
+            data: store.user
+        };
+
+        store.loading = true;
+        const respond = await handleRequest(wsService!, request);
+
+        if (respond?.errorMessage) {
+            error.value = { subject: "Sign in Error", body: respond?.errorMessage };
+            if (handleLoginError()) {
+                return;
+            }
+        }
+
+        console.debug("respond", respond?.data);
+        store.user = convertToIUser(respond?.data);
+
+        router.push({ name: 'Messanger' });
     }
-    store.user = user.value;
-    //Send request to server and wait fot response
-
-    if (handleLoginError()) {
-        return;
+    catch (error) {
+        console.error(error);
     }
-
-    console.debug("onLoginButtonClick");
+    finally {
+        store.loading = false;
+    }
 }
 
 </script>
@@ -70,13 +88,13 @@ function onLoginButtonClick() {
 <template>
     <NFlex vertical justify="center" align="center" class="w-screen h-screen">
         <AuthContainer container-name="Welcome Back">
-            <NForm class="m-t-24px">
+            <NForm class="m-t-24px" :rules="rules.SignIn" :model="user" ref="signInFormRef">
                 <NGrid :cols="24">
-                    <NFormItemGi :span="24" label="Email">
+                    <NFormItemGi :span="24" label="Email" path="email">
                         <NInput placeholder="example@email.com" v-model:value="user.email"></NInput>
                     </NFormItemGi>
 
-                    <NFormItemGi :span="24">
+                    <NFormItemGi :span="24" path="password">
                         <template #label>
                             <NFlex justify="space-between" class="w-full">
                                 <NText>Password</NText>
@@ -85,7 +103,7 @@ function onLoginButtonClick() {
                                 </NButton>
                             </NFlex>
                         </template>
-                        <NInput type="password" placeholder="" v-model:value="user.password"></NInput>
+                        <NInput type="password" show-password-on="click" placeholder="" v-model:value="user.password"></NInput>
                     </NFormItemGi>
 
                     <NFormItemGi :span="24" :show-feedback="false" :show-label="false" class="mt-6px">
@@ -107,5 +125,4 @@ function onLoginButtonClick() {
 </template>
 
 <style scoped>
-
 </style>

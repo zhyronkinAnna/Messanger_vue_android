@@ -1,7 +1,10 @@
 export const themeOverrides = {
-    "Card": {
+  "Card": {
+    "closeColorHover": "rgba(0, 0, 0, 0)",
+    "closeColorPressed": "rgba(0, 0, 0, 0)",
     "paddingMedium": "0",
-    "titleFontSizeMedium": "24px"
+    "titleFontSizeMedium": "24px",
+    "borderRadius": "15px"
   },
   "Button": {
     "rippleColorPrimary": "#18a058",
@@ -54,5 +57,22 @@ export const themeOverrides = {
     "rippleColorWarning": "#f0a020",
     "rippleColorInfo": "#2080f0",
     "rippleDuration": "0"
+  },
+  "Spin": {
+    "color": "#007AFFFF"
+  },
+  "Typography": {
+    "headerMargin2": "0"
+  },
+  "Input": {
+    "color": "rgba(250, 250, 250, 1)",
+    "colorFocus": "rgba(250, 250, 250, 1)"
+  },
+  "Switch": {
+    "railColorActive": "#000000FF",
+    "loadingColor": "#000000FF"
+  },
+  "Upload": {
+    "itemDisabledOpacity": "1"
   }
 };

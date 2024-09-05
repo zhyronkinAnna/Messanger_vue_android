@@ -4,6 +4,7 @@ import vue from '@vitejs/plugin-vue';
 import electron from 'vite-plugin-electron/simple';
 import pkg from './package.json';
 import UnoCSS from 'unocss/vite';
+import svgLoader from 'vite-svg-loader';
 
 export default defineConfig(({ command }) => {
   fs.rmSync('dist-electron', { recursive: true, force: true });
@@ -16,6 +17,7 @@ export default defineConfig(({ command }) => {
     plugins: [
       vue(),
       UnoCSS(),
+      svgLoader(),
       electron({
         main: {
           entry: 'electron/main/index.ts',

@@ -1,4 +1,4 @@
-export interface Error {
+export interface IAlert  {
     subject?: string;
     body?: string;
 }

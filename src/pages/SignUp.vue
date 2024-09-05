@@ -1,45 +1,84 @@
 <script setup lang="ts">
-import { NInput, NButton, NForm, NGrid, NFormItemGi, NFlex } from 'naive-ui';
+import { NInput, NButton, NForm, NGrid, NFormItemGi, NFlex, useNotification, FormInst } from 'naive-ui';
 import AuthContainer from "../components/AuthContainer.vue";
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
-import { SignUpForm, Error } from "../interfaces/index"
-import { validateEmail } from "../helper/validateEmail"
+import { ISignUpForm, IError, IRequest } from "../models"
 import { useStore } from '../stores/store';
+import { useRules } from '../rules/rules';
+import { useWsService } from '../services/wsServiceManager';
+import { formValidation, generateSHA256, handleError, handleRequest, isSecurePassword } from '../helper';
 
-const user = ref<SignUpForm>({});
-const error = ref<Error>({});
+const user = ref<ISignUpForm>({});
+const error = ref<IError>();
 
 const router = useRouter();
 const store = useStore();
+const wsService = useWsService();
+const signUpFormRef = ref<FormInst | null>(null);
+const notification = useNotification();
+
+const rules = useRules();
 
 function onBackToLoginButtonClick() {
-    console.debug("onBackToLoginButtonClick");
     router.push({ name: 'SignIn' });
 }
 
-function validation() {
-    if (!validateEmail(user.value?.email || "")) {
-        console.debug("validation_Email");
-        error.value = {subject: "Email", body: "Email"};
-    }
+function handleLoginError(): boolean {
+    const result = handleError(error.value, notification);
+    error.value = undefined;
+    return result;
+}
 
-    else if (user.value?.password === user.value.retype_password) {
-        console.debug("validation_Password");
-        error.value = {subject: "Password", body: "Password"};
+async function validation() {
+    await formValidation(signUpFormRef.value!, notification);
+
+    if (user.value?.password !== user.value.retype_password) {
+        error.value = {subject: "Passwords do not match", body: "Please ensure that both password fields contain the same password."};
+    }
+    else if(!isSecurePassword(user.value.password || "")) {
+        error.value = { subject: "Weak password", body: "Please ensure your password is stronger by including a mix of uppercase letters, lowercase letters, numbers, and special characters." };
     }
 }
 
-function onRegisterClick() {
-    validation();
-    if (error?.value) {
-        console.debug("onRegisterClick_Error");
-        //PUT LOGIC TO SHOW ERROR
-        return;
+async function onRegisterClick() {
+    try {
+        await validation();
+        
+        if (handleLoginError()) {
+            return;
+        }
+
+        const hashedPassword = generateSHA256(user.value.password || "");
+
+        store.user = { ...user.value };
+        store.user.password = hashedPassword;
+
+        const request: IRequest  = {
+            command: "SignUp", 
+            data: store.user
+        };
+
+        store.loading = true;
+        const respond = await handleRequest(wsService!, request);
+        
+        if (respond?.errorMessage) {
+            error.value = { subject: "Sign up Error", body: respond?.errorMessage };
+            if (handleLoginError()) {
+                return;
+            }
+        }
+
+        console.debug("respond", respond);
+
+        router.push({ name: 'EmailConfirmation' });
     }
-    store.user = user.value;
-    //GO TO PAGE FOR AUTH
-    console.debug("onRegisterClick");
+    catch (error) {
+        console.error(error);
+    }
+    finally {
+        store.loading = false;
+    }
 }
 
 </script>
@@ -52,21 +91,21 @@ function onRegisterClick() {
             </NButton>
         </NFlex>
         <AuthContainer container-name="Create account">
-            <NForm class="m-t-24px">
+            <NForm class="m-t-24px" :rules="rules.SignUp" :model="user" ref="signUpFormRef">
                 <NGrid :cols="24">
-                    <NFormItemGi :span="24" label="Username">
+                    <NFormItemGi :span="24" label="Username" path="username">
                         <NInput placeholder="ex. Don Juan" v-model:value="user.username"></NInput>
                     </NFormItemGi>
 
-                    <NFormItemGi :span="24" label="Email">
+                    <NFormItemGi :span="24" label="Email" path="email">
                         <NInput placeholder="example@email.com" v-model:value="user.email"></NInput>
                     </NFormItemGi>
 
-                    <NFormItemGi :span="24" label="Password">
+                    <NFormItemGi :span="24" label="Password" path="password">
                         <NInput type="password" placeholder="" v-model:value="user.password"></NInput>
                     </NFormItemGi>
 
-                    <NFormItemGi :span="24" label="Re-type password">
+                    <NFormItemGi :span="24" label="Re-type password" path="retype_password">
                         <NInput type="password" placeholder="" v-model:value="user.retype_password"></NInput>
                     </NFormItemGi>
 

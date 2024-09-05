@@ -1,43 +1,75 @@
 <script setup lang="ts">
-import { NInput, NButton, NForm, NGrid, NFormItemGi, NText, NFlex } from 'naive-ui';
+import { NInput, NButton, NForm, NGrid, NFormItemGi, NFlex, useNotification, FormInst } from 'naive-ui';
 import AuthContainer from "../components/AuthContainer.vue" 
 import { useRouter } from 'vue-router';
 import { useStore } from '../stores/store';
-import { User, Error } from '../interfaces/index';
-import { validateEmail } from "../helper/validateEmail"
+import { IUser, IError, IRequest } from '../models';
 import { ref } from 'vue';
+import { formValidation, handleError, handleRequest } from '../helper';
+import { useRules } from '../rules/rules';
+import { useWsService } from '../services/wsServiceManager';
 
-const user = ref<User>({});
-const error = ref<Error>({});
+const user = ref<IUser>({});
+const error = ref<IError>();
 
 const router = useRouter();
 const store = useStore();
+const wsService = useWsService();
+const notification = useNotification();
+const forgotPasswordFormRef = ref<FormInst | null>(null);
+
+const rules = useRules();
 
 function onBackToLoginButtonClick() {
-    console.debug("onBackToLoginButtonClick");
     router.push({ name: 'SignIn' });
 }
 
-function validation() {
-    if (!validateEmail(user.value?.email || "")) {
-        console.debug("validation_Email");
-        error.value = {subject: "Email", body: "Email"};
-    }
+function handleLoginError(): boolean {
+    const result = handleError(error.value, notification);
+    error.value = undefined;
+    return result;
 }
 
-function onConfirmButtonClick() {
-    validation();
-
-    if (error?.value) {
-        console.debug("onConfirmButtonClick_Error");
-        //PUT LOGIC TO SHOW ERROR
-        return;
-    }
-
-    store.user = user.value;
-    console.debug("onConfirmButtonClick");
+async function validation() {
+    await formValidation(forgotPasswordFormRef.value!, notification);
 }
 
+async function onConfirmButtonClick() {
+    try {
+        await validation();
+
+        if (handleLoginError()) {
+            return;
+        }
+
+        store.user = { ...user.value };
+
+        const request: IRequest  = {
+            command: "ForgotPassword", 
+            data: store.user
+        };
+
+        store.loading = true;
+        const respond = await handleRequest(wsService!, request);
+            
+        if (respond?.errorMessage) {
+            error.value = { subject: "Forgot password Error", body: respond?.errorMessage };
+            if (handleLoginError()) {
+                return;
+            }
+        }
+
+        console.debug("respond", respond);
+
+        router.push({ name: 'EmailConfirmation' });
+    }
+    catch (error) {
+        console.error(error);
+    }
+    finally {
+        store.loading = false;
+    }
+}
 </script>
 
 <template>
@@ -48,10 +80,10 @@ function onConfirmButtonClick() {
             </NButton>
         </NFlex>
         <AuthContainer container-name="Forgot password">
-            <NForm class="m-t-24px">
+            <NForm class="m-t-24px" :rules="rules.ForgotPassword" :model="user" ref="forgotPasswordFormRef">
                 <NGrid :cols="24">
-                    <NFormItemGi :span="24" label="Email">
-                        <NInput placeholder="example@email.com"></NInput>
+                    <NFormItemGi :span="24" label="Email" path="email">
+                        <NInput placeholder="example@email.com" v-model:value="user.email"></NInput>
                     </NFormItemGi>
 
                     <NFormItemGi :span="24" :show-feedback="false" :show-label="false" class="mt-6px">
