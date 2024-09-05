@@ -1,4 +1,4 @@
-import { IChat, IUser } from "../models/index"; // Убедитесь, что путь правильный
+import { IChat, IUser } from "../models/index";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
@@ -14,6 +14,7 @@ export const useStore = defineStore("store", () => {
     const showEmojiPicker = ref<boolean>(false);
     const selectedChat = ref<IChat | null>(null);
     const allChats = ref<IChat[]>([]);
+    const inputRef = ref<any>(null)
 
     function $reset() {
         user.value = undefined;
@@ -39,6 +40,7 @@ export const useStore = defineStore("store", () => {
         showEmojiPicker,
         selectedChat,
         allChats,
+        inputRef,
         $reset
     };
 });

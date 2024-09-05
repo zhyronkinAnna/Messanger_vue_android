@@ -2,6 +2,7 @@
 import { NButton, NFlex, NIcon, NInput } from 'naive-ui';
 import { PaperClipIcon, FaceSmileIcon, PaperAirplaneIcon } from '@heroicons/vue/24/outline';
 import { useStore } from '../stores/store';
+import { onMounted, ref } from 'vue';
 
 const store = useStore();
 
@@ -22,6 +23,12 @@ function onInputChange()
     }
 }
 
+const inputRef = ref<InstanceType<typeof NInput> | undefined>(undefined);
+    
+onMounted(() => {
+    store.inputRef = inputRef;
+});
+
 </script>
 
 <template>
@@ -41,7 +48,7 @@ function onInputChange()
             </NButton>
         </NFlex>
         <NFlex class="flex-1 m-l-10px m-r-10px">
-            <NInput v-model:value="store.selectedChat!.messageText" :bordered="false" placeholder="Type your message here.." class="bg-#FAFAFA rounded-10px" @on-change="onInputChange">
+            <NInput ref="inputRef" v-model:value="store.selectedChat!.messageText" :bordered="false" placeholder="Type your message here.." class="bg-#FAFAFA rounded-10px" @on-change="onInputChange">
                 <template #suffix>
                     <NIcon/>
                 </template>

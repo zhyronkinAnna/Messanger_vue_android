@@ -36,5 +36,6 @@ const props = defineProps<Props>();
         </NFlex>
     </NFlex>
 </template>
+
 <style>
 </style>
