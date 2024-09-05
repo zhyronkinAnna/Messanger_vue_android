@@ -44,6 +44,7 @@ async function onSelectChat()
             command: "GetMessages", 
             data: {
                 id: props.chat?.id_of_user_chat,
+                user_id: store.user?.id
             }
         };
 
@@ -60,6 +61,9 @@ async function onSelectChat()
         );
         
         store.selectedChat = props.chat;
+        if (store.selectedChat.unread_messages_count > 0){
+            store.selectedChat.unread_messages_count = 0;
+        }
     } 
     catch (error) {
         console.error(error);
@@ -122,12 +126,12 @@ const props = defineProps<Props>();
                             </NText>
                         </NGridItem>
                         <NGridItem class="justify-right flex items-center" :span="3">
-                            <NText>{{ new Date(props.chat.last_message.sent_at)
+                            <NText>{{ props.chat.last_message.sent_at ? new Date(props.chat.last_message.sent_at)
                                     .toLocaleDateString('ru-RU', {
                                         day: '2-digit',
                                         month: '2-digit',
                                         year: 'numeric',
-                                    }) }}
+                                    }): '' }}
                             </NText>
                         </NGridItem>
                         <NGridItem :span="7">
