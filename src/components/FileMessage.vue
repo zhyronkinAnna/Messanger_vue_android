@@ -8,6 +8,40 @@ import { DocumentTextIcon } from '@heroicons/vue/24/solid';
 
 const store = useStore();
 
+const xRef = ref(0);
+const yRef = ref(0);
+const showDropdownRef = ref(false);
+const activeDropdownId = ref<number | null>(null);
+
+const options = [
+    {
+        label: 'Delete Message',
+        key: 'delete_message'
+    }
+]
+
+function handleSelect(key: string | number) {
+    showDropdownRef.value = false
+}
+
+function handleContextMenu(e: MouseEvent, id: number) {
+    if(props.messageFile.username === store.user?.username){
+        e.preventDefault();
+        activeDropdownId.value = id;
+        showDropdownRef.value = false;
+        nextTick().then(() => {
+            showDropdownRef.value = true;
+            xRef.value = e.clientX;
+            yRef.value = e.clientY;
+        });
+    }
+}
+
+function onClickoutside() {
+    showDropdownRef.value = false;
+    activeDropdownId.value = null;
+}
+
 interface Props {
     messageFile: IChatMessage
 }
