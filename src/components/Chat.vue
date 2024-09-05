@@ -9,9 +9,9 @@ import { handleError, handleRequest } from '../helper';
 import { useWsService } from '../services/wsServiceManager';
 
 const store = useStore();
-const showDropdownRef = ref(false)
-const xRef = ref(0)
-const yRef = ref(0)
+const showDropdownRef = ref(false);
+const xRef = ref(0);
+const yRef = ref(0);
 const wsService = useWsService();
 const notification = useNotification();
 
@@ -122,12 +122,16 @@ const props = defineProps<Props>();
                             </NText>
                         </NGridItem>
                         <NGridItem class="justify-right flex items-center" :span="3">
-                            <NText>{{ new Date(props.chat.last_message.sent_at)
-                                    .toLocaleDateString('ru-RU', {
-                                        day: '2-digit',
-                                        month: '2-digit',
-                                        year: 'numeric',
-                                    }) }}
+                            <NText>
+                                {{ 
+                                    props.chat.last_message.sent_at ? new Date(props.chat.last_message.sent_at)
+                                        .toLocaleDateString('ru-RU', {
+                                            day: '2-digit',
+                                            month: '2-digit',
+                                            year: 'numeric',
+                                        }): 
+                                    '' 
+                                }}
                             </NText>
                         </NGridItem>
                         <NGridItem :span="7">
