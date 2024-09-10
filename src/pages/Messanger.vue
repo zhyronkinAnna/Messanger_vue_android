@@ -26,7 +26,7 @@ const store = useStore();
           <Chats/>
         </NLayoutSider>
         <NFlex class="flex flex-col flex-grow-1">
-          <ChatInterface class="flex-grow-1"></ChatInterface>
+          <ChatInterface></ChatInterface>
         </NFlex>
       </NLayout>
     </NLayout>
