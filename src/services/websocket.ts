@@ -55,24 +55,30 @@ class WebSocketService {
         }, this.reconnectInterval);
     }
 
-    send(data: IRequest, waitForRequest: boolean = true): Promise<IResponse | null> {
-        return new Promise((resolve, reject) => {
-
-            if(waitForRequest) {
+    send(data: IRequest, waitForRequest: boolean): Promise<IResponse | null> {
+        if (waitForRequest) {
+            return new Promise((resolve, reject) => {
                 const requestId = Date.now().toString();
                 this.responseResolvers[requestId] = resolve;
                 data.requestId = requestId;
-            }
-
+    
+                if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+                    console.log('Sending message:', data);
+                    this.ws.send(JSON.stringify(data));
+                } else {
+                    reject('WebSocket is not open');
+                }
+            });
+        } else {
             if (this.ws && this.ws.readyState === WebSocket.OPEN) {
                 console.log('Sending message:', data);
                 this.ws.send(JSON.stringify(data));
             } else {
-                reject('WebSocket is not open');
+                console.error('WebSocket is not open');
             }
-        });
+            return Promise.resolve(null);
+        }
     }
-    
 
     private handleMessage(data: any) {
         console.log('Received message from server:', data);

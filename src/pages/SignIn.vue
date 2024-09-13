@@ -8,6 +8,7 @@ import { ref } from 'vue';
 import { generateSHA256, isSecurePassword, formValidation, handleError, handleRequest } from '../helper';
 import { useWsService } from '../services/wsServiceManager';
 import { useRules } from '../rules/rules';
+import { onMounted } from 'vue';
 
 const user = ref<IUser>({});
 const error = ref<IError | undefined>(undefined);
@@ -41,6 +42,10 @@ async function validation() {
         error.value = { subject: "Invalid email or password", body: "We couldn't find a user with the provided email and password. Please check your credentials and try again." };
     }
 }
+
+onMounted(()=>{
+    store.$reset();
+})
 
 async function onLoginButtonClick() {
     try {

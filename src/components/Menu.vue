@@ -1,20 +1,37 @@
 <script setup lang="ts">
-import { NAvatar, NFlex, NIcon, NButton } from 'naive-ui';
+import { NAvatar, NFlex, NIcon, NButton, useNotification } from 'naive-ui';
 import { useStore } from '../stores/store';
 import { ArrowLeftEndOnRectangleIcon, Cog6ToothIcon } from '@heroicons/vue/24/outline';
 import { useRouter } from 'vue-router';
+import { IRequest } from '../models';
+import { useWsService } from '../services/wsServiceManager';
+import { handleRequest } from '../helper';
 
 const store = useStore();
 const router = useRouter();
+const wsService = useWsService();
 
 function onSettingsButtonClick()
 {
     store.showSettings = true;
 }
 
-function onButtonLogoutClick()
+async function onButtonLogoutClick()
 {
-    store.$reset();
+    try {
+        const request: IRequest  = {
+            command: "LogOut", 
+            data: {}
+        };
+
+        handleRequest(wsService!, request, false);
+    } 
+    catch (error) {
+        console.error(error);
+    }
+    finally {
+        store.loading = false;
+    }
     router.push({ name: 'SignIn' });
 } 
 

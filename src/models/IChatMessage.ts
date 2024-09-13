@@ -2,7 +2,7 @@ import { ChatMessageTypes } from "./ChatMessageTypesEnum";
 import { ReadTypes } from "./ReadTypesEnum";
 
 export interface IChatMessage {
-    message_id: number;
+    message_id?: number;
     text: string;
     sent_at: Date;
     is_read: ReadTypes;

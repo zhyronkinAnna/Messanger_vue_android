@@ -2,6 +2,7 @@
 import { NFlex, NText } from 'naive-ui';
 import UnreadIcon from '../assets/unread.svg';
 import ReadIcon from '../assets/read.svg';
+import Sending from '../assets/sending.svg';
 import { IChatMessage, ReadTypes } from '../models';
 import { useStore } from '../stores/store';
 
@@ -24,6 +25,7 @@ const props = defineProps<Props>();
         <NFlex :size="0" :class="{ 'm-l-auto': props.message.username === store.user?.username }" align="center">
             <ReadIcon v-if="props.message.is_read === ReadTypes.Read" class="p-r-5px"/>
             <UnreadIcon v-else-if="props.message.is_read === ReadTypes.Unread" class="p-r-5px"/>
+            <Sending v-else-if="props.message.is_read === ReadTypes.Sending" class="p-r-5px"/>
             <NText class="opacity-45%">
                 {{ 
                     new Date(props.message.sent_at)

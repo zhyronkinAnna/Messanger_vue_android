@@ -51,7 +51,7 @@ async function onSelectChat()
         const respond = await handleRequest(wsService!, request);
 
         if (respond?.errorMessage) {
-            handleError({ subject: "Sign in Error", body: respond?.errorMessage }, notification)
+            handleError({ subject: "Error", body: respond?.errorMessage }, notification)
         }
 
         console.debug("respond", respond);
@@ -134,8 +134,8 @@ const props = defineProps<Props>();
                                     }): '' }}
                             </NText>
                         </NGridItem>
-                        <NGridItem :span="7">
-                            <NText>{{ props.chat.last_message.text }}</NText>
+                        <NGridItem :span="7" class="w-full overflow-hidden">
+                            <NText style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;">{{ props.chat.last_message.text }}</NText>
                         </NGridItem>
                         <NGridItem class="justify-right flex items-center">
                             <NText v-if="props.chat.unread_messages_count > 0" class="bg-#007AFF rounded-full text-white p-l-1 p-r-1 items-center justify-center flex ">{{props.chat.unread_messages_count}}</NText>
