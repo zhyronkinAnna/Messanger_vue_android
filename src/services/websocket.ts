@@ -1,4 +1,5 @@
 import { MessageTypeEnum, IMessage, IRequest, IResponse, INotification,  } from '../models';
+import { handleNotification } from '../models/INotification';
 import { useStore } from '../stores/store';
 
 class WebSocketService {
@@ -107,6 +108,7 @@ class WebSocketService {
         else if (message?.type === MessageTypeEnum.Notification) {
             let notification: INotification;
             notification = JSON.parse(data);
+            handleNotification(notification);
         }
     }
 

@@ -14,7 +14,8 @@ export const useStore = defineStore("store", () => {
     const showEmojiPicker = ref<boolean>(false);
     const selectedChat = ref<IChat | null>(null);
     const allChats = ref<IChat[]>([]);
-    const inputRef = ref<any>(null)
+    const inputRef = ref<any>(null);
+    const messangerNotification = ref<any>(undefined);
 
     function $reset() {
         user.value = undefined;
@@ -41,6 +42,7 @@ export const useStore = defineStore("store", () => {
         selectedChat,
         allChats,
         inputRef,
-        $reset
+        messangerNotification,
+        $reset,
     };
 });

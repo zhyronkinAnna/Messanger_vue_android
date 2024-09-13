@@ -14,7 +14,6 @@ export async function handleRequest(wsService: WebSocketService, request: IReque
         }
     }
     finally {
-        debugger
         return response;
     }
 }
