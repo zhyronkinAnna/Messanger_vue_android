@@ -63,6 +63,7 @@ async function onSelectChat()
         store.selectedChat = props.chat;
         if (store.selectedChat.unread_messages_count > 0){
             store.selectedChat.unread_messages_count = 0;
+            store.selectedChat.last_message.is_read = ReadTypes.DoNotShow;
         }
     } 
     catch (error) {

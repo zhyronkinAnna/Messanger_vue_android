@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NLayout, NLayoutSider, NFlex } from 'naive-ui';
+import { NLayout, NLayoutSider, NFlex, useNotification } from 'naive-ui';
 import Menu from '../components/Menu.vue';  
 import Chats from '../components/Chats.vue';
 import ChatInterface from '../components/ChatInterface.vue';
@@ -9,6 +9,7 @@ import UserInfo from '../components/UserInfo.vue';
 import SetAvatar from '../components/SetAvatar.vue';
 
 const store = useStore();
+store.messangerNotification = useNotification();
 
 </script>
 

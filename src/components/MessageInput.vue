@@ -34,6 +34,13 @@ onMounted(() => {
     store.inputRef = inputRef;
 });
 
+async function handleKeyDownEnter(event: KeyboardEvent)
+{
+    if (event.key === 'Enter') {
+        onButtonSendClick();
+    }
+}
+
 async function onButtonSendClick()
 {
     if(store.selectedChat!.messageText.length > 0){
@@ -103,7 +110,7 @@ async function onButtonSendClick()
 </script>
 
 <template>
-    <NFlex class="flex flex-row p-10px b-t-#EFEFF5 b-t-solid b-t-1px w-full" :size="0" >
+    <NFlex class="flex flex-row p-10px b-t-#EFEFF5 b-t-solid b-t-1px w-full" :size="0">
         <NFlex>
             <NButton :bordered="false" circle size="medium" ghost color="#898989">
                 <template #icon>
@@ -119,7 +126,7 @@ async function onButtonSendClick()
             </NButton>
         </NFlex>
         <NFlex class="flex-1 m-l-10px m-r-10px">
-            <NInput ref="inputRef" v-model:value="store.selectedChat!.messageText" :bordered="false" placeholder="Type your message here.." class="bg-#FAFAFA rounded-10px" @on-change="onInputChange">
+            <NInput ref="inputRef" v-model:value="store.selectedChat!.messageText" :bordered="false" placeholder="Type your message here.." class="bg-#FAFAFA rounded-10px" @on-change="onInputChange" @keydown="handleKeyDownEnter">
                 <template #suffix>
                     <NIcon/>
                 </template>

@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router';
 import { ref } from 'vue';
 import { IError } from '../models';
 import { useStore } from '../stores/store';
-import { formValidation, handleError, handleRequest, showErrorNotification, showInfoNotification } from '../helper';
+import { formValidation, handleError, handleRequest, showInfoNotification } from '../helper';
 import { useWsService } from '../services/wsServiceManager';
 import { useRules } from '../rules/rules';
 
@@ -47,8 +47,8 @@ async function onConfirmButtonClick() {
     const previousRoute = store.previousRoute ?? '';
     const routeConfig = requestConfig[previousRoute];
     
-    if (!routeConfig) return; // early return if the route is not supported
-
+    if (!routeConfig) return;
+    
     const request = {
         command: "IsCodeRight",
         data: {
