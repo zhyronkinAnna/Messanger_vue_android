@@ -96,7 +96,8 @@ async function onButtonSendClick()
                         c.last_message.message_id = message_id;
                 }
             });
-
+            
+            store.virtualListMessagesInst.scrollTo({ position: 'bottom' });
         } 
         catch (error) {
             console.error(error);
