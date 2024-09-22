@@ -35,6 +35,29 @@ function onClickoutside() {
 
 function handleSelect(key: string | number) {
     showDropdownRef.value = false
+    switch(key) {
+    case "delete_chat":
+        try {
+            const request: IRequest  = {
+                command: "DeleteChat", 
+                data: {
+                    id: props.chat.chat_id,
+                }
+            };
+
+            handleRequest(wsService!, request, false);
+
+            const index = store.allChats.findIndex(chat => chat.chat_id === props.chat.chat_id);
+
+            if (index !== -1) {
+                store.allChats.splice(index, 1);
+            }
+        } 
+        catch (error) {
+            console.error(error);
+        }
+        break;
+    }
 }
 
 async function onSelectChat()
