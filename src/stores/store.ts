@@ -16,6 +16,7 @@ export const useStore = defineStore("store", () => {
     const allChats = ref<IChat[]>([]);
     const inputRef = ref<any>(null);
     const messangerNotification = ref<any>(undefined);
+    const virtualListMessagesInst = ref<any>(null)
 
     function $reset() {
         user.value = undefined;
@@ -43,6 +44,7 @@ export const useStore = defineStore("store", () => {
         allChats,
         inputRef,
         messangerNotification,
+        virtualListMessagesInst,
         $reset,
     };
 });
