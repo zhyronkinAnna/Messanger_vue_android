@@ -49,7 +49,7 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <NFlex vertical :size="0" class="bg-#F4F4F7 p-10px" justify="center" @contextmenu="(e) => handleContextMenu(e, props.messageFile.message_id)">
+    <NFlex vertical :size="0" class="bg-#F4F4F7 p-10px" justify="center" @contextmenu="(e) => handleContextMenu(e, props.messageFile.message_id!)">
         <NDropdown
             placement="bottom-start"
             trigger="manual"
