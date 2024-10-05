@@ -3,7 +3,7 @@ import { NButton, NFlex, NIcon, NInput, useNotification } from 'naive-ui';
 import { PaperClipIcon, FaceSmileIcon, PaperAirplaneIcon } from '@heroicons/vue/24/outline';
 import { useStore } from '../stores/store';
 import { onMounted, ref } from 'vue';
-import { ChatMessageTypes, convertToIChatMessage, IChatMessage, IRequest, ReadTypes } from '../models';
+import { ChatMessageTypes, convertToIChatMessage, IChat, IChatMessage, IRequest, ReadTypes } from '../models';
 import { handleError, handleRequest } from '../helper';
 import { useWsService } from '../services/wsServiceManager';
 
@@ -38,6 +38,15 @@ async function handleKeyDownEnter(event: KeyboardEvent)
 {
     if (event.key === 'Enter') {
         onButtonSendClick();
+    }
+}
+
+function moveElementToStart(arr: IChat[], element: IChat) {
+    const index = arr.indexOf(element);
+    
+    if (index !== -1) { 
+        arr.splice(index, 1);
+        arr.unshift(element);
     }
 }
 
@@ -98,6 +107,8 @@ async function onButtonSendClick()
             });
             
             store.virtualListMessagesInst.scrollTo({ position: 'bottom' });
+
+            moveElementToStart(store.allChats, store.selectedChat!);
         } 
         catch (error) {
             console.error(error);

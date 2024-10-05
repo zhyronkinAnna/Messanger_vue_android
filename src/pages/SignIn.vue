@@ -88,10 +88,18 @@ async function onLoginButtonClick() {
     }
 }
 
+async function handleKeyDownEnter(event: KeyboardEvent)
+{
+    console.log("wef");
+    if (event.key === 'Enter') {
+        onLoginButtonClick();
+    }
+}
+
 </script>
 
 <template>
-    <NFlex vertical justify="center" align="center" class="w-screen h-screen">
+    <NFlex vertical justify="center" align="center" class="w-screen h-screen" @keydown="handleKeyDownEnter">
         <AuthContainer container-name="Welcome Back">
             <NForm class="m-t-24px" :rules="rules.SignIn" :model="user" ref="signInFormRef">
                 <NGrid :cols="24">

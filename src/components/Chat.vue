@@ -71,6 +71,15 @@ async function onSelectChat()
             }
         };
 
+        if (store.selectedChat?.chat_id == null)
+        {
+            let index = store.allChats.indexOf(store.selectedChat!);
+            
+            if (index !== -1) {
+                store.allChats.splice(index, 1);
+            }
+        }
+
         const respond = await handleRequest(wsService!, request);
 
         if (respond?.errorMessage) {
@@ -84,14 +93,26 @@ async function onSelectChat()
         );
         
         store.selectedChat = props.chat;
+
         if (store.selectedChat.unread_messages_count > 0){
             store.selectedChat.unread_messages_count = 0;
             store.selectedChat.last_message.is_read = ReadTypes.DoNotShow;
+        }
+
+        const temp = store.allChats.filter(chat =>
+            chat === store.selectedChat            
+        );
+
+        if (temp.length === 0)
+        {
+            store.allChats.unshift(store.selectedChat);
         }
     } 
     catch (error) {
         console.error(error);
     }
+
+    store.inputSearchInstRef.clear();
 }
 
 const options = [
@@ -113,7 +134,7 @@ const props = defineProps<Props>();
     <NFlex 
         vertical 
         class="m-l-5px w-250px h-50px bg-white rounded-2 overflow-hidden p-l-10px p-r-10px"
-        :class="{ 'hover-bg': !showDropdownRef, 'active-bg': activeDropdownId === props.chat.chat_id }" 
+        :class="{ 'hover-bg': !showDropdownRef && props.chat !== store.selectedChat, 'selected-bg': props.chat === store.selectedChat}" 
         @contextmenu="(e) => handleContextMenu(e, props.chat.chat_id)"
         @click="onSelectChat"
     >
@@ -184,5 +205,8 @@ const props = defineProps<Props>();
 
 .active-bg {
     background-color: #F4F7FF;
+}
+.selected-bg {
+    background-color: #D9E0F2;
 }
 </style>
