@@ -61,7 +61,7 @@ async function beforeUpload(data: { file: UploadFileInfo, fileList: UploadFileIn
 </script>
 
 <template>
-    <NModal v-model:show="store.showSettings">
+    <NFlex v-model:show="store.showSettings">
         <NCard
             class="w-400px"
             :bordered="false"
@@ -183,7 +183,7 @@ async function beforeUpload(data: { file: UploadFileInfo, fileList: UploadFileIn
                 </NGrid>
             </NForm>
         </NCard>
-    </NModal>
+    </NFlex>
 </template>
 
 <style>

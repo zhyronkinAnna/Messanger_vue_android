@@ -7,6 +7,8 @@ import SetNewPassword from '../pages/SetNewPassword.vue';
 import test from '../pages/test.vue';
 import { useStore } from '../stores/store';
 import Messanger from '../pages/Messanger.vue';
+import Chats from '../pages/Chats.vue';
+import MessangerMe from '../pages/MessangerMe.vue';
 
 const routes = [
 {
@@ -35,9 +37,15 @@ const routes = [
     component: SetNewPassword
 },
 {
+    path: '/Chats',
+    name: 'Chats',
+    component: Chats
+    // //TODO: то что должен видеть юсер первым  + Удалить чат вью и переименоваьт файл чатМе
+},
+{
     path: '/Messanger',
     name: 'Messanger',
-    component: Messanger
+    component: MessangerMe
 },
 {
     path: '/test',

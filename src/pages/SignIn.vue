@@ -78,7 +78,7 @@ async function onLoginButtonClick() {
         console.debug("respond", respond?.data);
         store.user = convertToIUser(respond?.data);
 
-        router.push({ name: 'Messanger' });
+        router.push({ name: 'Chats' });
     }
     catch (error) {
         console.error(error);

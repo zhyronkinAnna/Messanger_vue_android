@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NLayout, NLayoutSider, NFlex, useNotification } from 'naive-ui';
+import { NLayout, NLayoutSider, NFlex, useNotification, NLayoutHeader } from 'naive-ui';
 import Menu from '../components/Menu.vue';  
 import Chats from '../components/Chats.vue';
 import ChatInterface from '../components/ChatInterface.vue';
@@ -12,7 +12,6 @@ const store = useStore();
 store.messangerNotification = useNotification();
 
 </script>
-
 <template>
   <NFlex :size="0">
     <Menu/>
@@ -38,4 +37,11 @@ store.messangerNotification = useNotification();
 </template>
 
 <style scoped>
+.chat-title {
+  font-weight: bold;  /* Жирный текст */
+  font-size: 1rem;    /* Большой размер шрифта */ 
+}
 </style>
+
+
+

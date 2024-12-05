@@ -118,8 +118,7 @@ async function onRegisterClick() {
             </NForm>
         </AuthContainer>
     </NFlex>
-</template>
-
+  </template>
 <style scoped>
 
 </style>

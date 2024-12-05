@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { NFlex } from 'naive-ui';
 import ChatHeader from './ChatHeader.vue';
 import MessageHistory from './MessageHistory.vue';
@@ -6,6 +7,9 @@ import MessageInput from './MessageInput.vue';
 import EmojiPicker from './EmojiPicker.vue';
 import { useStore } from '../stores/store';
 import NotSelectedChat from './NotSelectedChat.vue';
+
+
+const isModalVisible = ref(false);
 
 const store = useStore();
 

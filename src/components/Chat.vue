@@ -7,6 +7,9 @@ import { ChatType, convertToIChatMessage, IChat, IGroupChat, IPrivateChat, IRequ
 import { useStore } from '../stores/store';
 import { handleError, handleRequest } from '../helper';
 import { useWsService } from '../services/wsServiceManager';
+import { NDivider } from 'naive-ui';
+import { useRouter } from 'vue-router';
+
 
 const store = useStore();
 const showDropdownRef = ref(false)
@@ -14,6 +17,8 @@ const xRef = ref(0)
 const yRef = ref(0)
 const wsService = useWsService();
 const notification = useNotification();
+const router = useRouter();
+
 
 const activeDropdownId = ref<number | null>(null);
 
@@ -113,7 +118,13 @@ async function onSelectChat()
     }
 
     store.inputSearchInstRef.clear();
+    goToChat();
 }
+
+function goToChat(){
+    router.push({name:'Messanger'});
+}
+
 
 const options = [
     {
@@ -133,7 +144,7 @@ const props = defineProps<Props>();
 <template>
     <NFlex 
         vertical 
-        class="m-l-5px w-250px h-50px bg-white rounded-2 overflow-hidden p-l-10px p-r-10px"
+        class="bg-white rounded-2 overflow-hidden p-l-10px p-r-20px"
         :class="{ 'hover-bg': !showDropdownRef && props.chat !== store.selectedChat, 'selected-bg': props.chat === store.selectedChat}" 
         @contextmenu="(e) => handleContextMenu(e, props.chat.chat_id)"
         @click="onSelectChat"
@@ -141,6 +152,7 @@ const props = defineProps<Props>();
         <NDropdown
             placement="bottom-start"
             trigger="manual"
+
             :x="xRef"
             :y="yRef"
             :options="options"
@@ -191,6 +203,7 @@ const props = defineProps<Props>();
                 </NFlex>
             </NGridItem>
         </NGrid>
+           <n-divider horizontal style="border-color: #ccc; border-width: 2px; height: 2px; margin: 0.5px 0 0 20%;" />
     </NFlex>
 </template>
 

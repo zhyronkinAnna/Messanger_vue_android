@@ -1,14 +1,9 @@
-import fs from 'node:fs';
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import electron from 'vite-plugin-electron/simple';
-import pkg from './package.json';
 import UnoCSS from 'unocss/vite';
 import svgLoader from 'vite-svg-loader';
 
 export default defineConfig(({ command }) => {
-  fs.rmSync('dist-electron', { recursive: true, force: true });
-
   const isServe = command === 'serve';
   const isBuild = command === 'build';
   const sourcemap = isServe || !!process.env.VSCODE_DEBUG;
@@ -18,55 +13,25 @@ export default defineConfig(({ command }) => {
       vue(),
       UnoCSS(),
       svgLoader(),
-      electron({
-        main: {
-          entry: 'electron/main/index.ts',
-          onstart({ startup }) {
-            if (process.env.VSCODE_DEBUG) {
-              console.log('[startup] Electron App');
-            } else {
-              startup();
-            }
-          },
-          vite: {
-            build: {
-              sourcemap,
-              minify: isBuild,
-              outDir: 'dist-electron/main',
-              rollupOptions: {
-                external: Object.keys(pkg.dependencies || {}),
-              },
-            },
-          },
-        },
-        preload: {
-          input: 'electron/preload/index.ts',
-          vite: {
-            build: {
-              sourcemap: sourcemap ? 'inline' : undefined,
-              minify: isBuild,
-              outDir: 'dist-electron/preload',
-              rollupOptions: {
-                external: Object.keys(pkg.dependencies || {}),
-              },
-            },
-          },
-        },
-        renderer: {},
-      }),
     ],
-    server: process.env.VSCODE_DEBUG && (() => {
-      const url = new URL(pkg.debug.env.VITE_DEV_SERVER_URL);
-      return {
-        host: url.hostname,
-        port: +url.port,
-      };
-    })(),
+    server: {
+      host: true, // Доступ к серверу с других устройств в сети
+      port: 3000, // Измените порт при необходимости
+      open: true, // Автоматическое открытие браузера при старте сервера
+    },
     clearScreen: false,
     resolve: {
       alias: {
-        '@': '/src',
+        '@': '/src', // Проверьте корректность пути
       },
+    },
+    build: {
+      outDir: 'dist', // Директория для сборки
+      rollupOptions: {
+        input: 'index.html', // Указание основного HTML-файла
+      },
+      sourcemap: sourcemap, // Включение source maps во время разработки или отладки в VSCode
+      base: './', // Это важно для корректного работы в Capacitor — все пути должны быть относительными
     },
   };
 });

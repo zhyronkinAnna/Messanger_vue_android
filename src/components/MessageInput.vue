@@ -7,6 +7,8 @@ import { ChatMessageTypes, convertToIChatMessage, IChat, IChatMessage, IRequest,
 import { handleError, handleRequest } from '../helper';
 import { useWsService } from '../services/wsServiceManager';
 
+//TODO: send file
+
 const store = useStore();
 const wsService = useWsService();
 const notification = useNotification();

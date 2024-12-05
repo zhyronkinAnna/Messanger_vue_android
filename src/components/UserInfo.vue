@@ -54,7 +54,7 @@ function onButtonMessageClick(){
 <template>
     <NFlex class="b-l-solid b-l-1px b-l-#EFEFF5">
         <NCard
-            class="w-400px h-100vh"
+            class="w-full h-100vh"
             :bordered="false"
             closable 
             @close="handleClose"
@@ -135,15 +135,7 @@ function onButtonMessageClick(){
                                         (store.selectedChat as IPrivateChat).user.email == null"  
                             />
                         </NFormItemGi>
-                        <NFormItemGi :span="12"  :show-feedback="false" :show-label="false">
-                            <NButton type="primary" block strong @click="onButtonMessageClick">
-                                <template #icon>
-                                    <NIcon><EnvelopeIcon/></NIcon>
-                                </template>
-                                Message
-                            </NButton>
-                        </NFormItemGi>
-                        <NFormItemGi :span="12" :show-feedback="false" :show-label="false">
+                        <NFormItemGi :span="24" :show-feedback="false" :show-label="false">
                             <NButton type="primary" block strong>
                                 <template #icon>
                                     <NIcon><PhoneIcon/></NIcon>

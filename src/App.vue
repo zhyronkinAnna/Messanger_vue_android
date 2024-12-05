@@ -31,7 +31,7 @@ onUnmounted(() => {
           <router-view />
           <Loader v-if="store.loading"/>
           <NFlex v-if="!store.isConnected" style="position: absolute; bottom: 20px; z-index: 1000; left: 20px; padding: 10px">
-            <NSpin size="Tiny"/>
+            <NSpin size="small"/>
             <NText strong>Connecting to the server</NText>
           </NFlex>
         </NNotificationProvider>

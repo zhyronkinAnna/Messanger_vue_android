@@ -5,7 +5,7 @@ let wsService: WebSocketService | null = null;
 
 export async function initializeWebSocketService(store: ReturnType<typeof useStore>) {
     if (!wsService) {
-        wsService = new WebSocketService("ws://localhost:8000/echo", store);
+        wsService = new WebSocketService("ws://localhost:8000/echo", store); //TODO: "ws://10.0.2.2:8000/echo"  or "ws://localhost:8000/echo"
         await wsService.connect();
     }
 }
