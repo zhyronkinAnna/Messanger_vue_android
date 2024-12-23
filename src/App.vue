@@ -10,10 +10,11 @@ import Loader from './components/Loader.vue'
 const router = useRouter();
 const store = useStore();
 const wsService = useWsService();
-initializeWebSocketService(store);
+
 
 onMounted(() => {
   console.log(`Current route: ${router.currentRoute.value.fullPath}`);
+  initializeWebSocketService(store);
 });
 
 onUnmounted(() => {

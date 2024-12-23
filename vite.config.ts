@@ -18,6 +18,7 @@ export default defineConfig(({ command }) => {
       host: true, // Доступ к серверу с других устройств в сети
       port: 3000, // Измените порт при необходимости
       open: true, // Автоматическое открытие браузера при старте сервера
+      https: undefined,
     },
     clearScreen: false,
     resolve: {

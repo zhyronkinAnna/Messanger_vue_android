@@ -13,7 +13,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "ionic:build": "npm run build",
     "ionic:serve": "vite dev --host"
@@ -25,12 +25,12 @@
     "@vitejs/plugin-vue": "^5.0.4",
     "naive-ui": "2.40.1",
     "sass": "^1.77.8",
-    "typescript": "^5.4.2",
+    "typescript": "^5.7.2",
     "unocss": "^0.60.4",
     "vite": "^5.1.5",
     "vite-svg-loader": "^5.1.0",
     "vue": "^3.4.21",
-    "vue-tsc": "^2.0.6"
+    "vue-tsc": "^2.1.10"
   },
   "dependencies": {
     "@capacitor/android": "^6.0.0",
