@@ -17,43 +17,57 @@ function handleClose()
     store.showUserInfo = false;
 }
 
+async function onUpdateMuted()
+{
+    const request: IRequest  = {
+        command: "UpdateIsMuted", 
+        data: {
+            id: store.selectedChat?.id_of_user_chat,
+            is_muted: store.selectedChat!.is_muted
+        }
+    };
+    handleRequest(wsService!, request, false);
+}
+
 onBeforeMount(async ()=>{
   try {
-        const request: IRequest  = {
-            command: "GetChatInfo", 
-            data: {
-                chat_id: store.selectedChat?.chat_id,
-                user_id: store.user?.id
+        if(
+            (store.selectedChat!.type_id === ChatType.Private && 
+            ((store.selectedChat as IPrivateChat).user!.email == null || (store.selectedChat as IPrivateChat).user!.email === ""))
+        ){
+            const request: IRequest  = {
+                command: "GetChatInfo", 
+                data: {
+                    chat_id: store.selectedChat?.chat_id,
+                    user_id: store.user?.id
+                }
+            };
+
+            const respond = await handleRequest(wsService!, request);
+
+            if (respond?.errorMessage) {
+                handleError({ subject: "Sign in Error", body: respond?.errorMessage }, notification)
             }
-        };
 
-        const respond = await handleRequest(wsService!, request);
-
-        if (respond?.errorMessage) {
-            handleError({ subject: "Sign in Error", body: respond?.errorMessage }, notification)
+            console.debug("respond", respond);
+            store.selectedChat = convertToChat(store.selectedChat, convertToIChatInfo(respond?.data));
         }
-
-        console.debug("respond", respond);
-        store.selectedChat = convertToChat(store.selectedChat, convertToIChatInfo(respond?.data));
     } 
     catch (error) {
         console.error(error);
     }
-    finally {
-    }
 })
 
 function getAvatarLink(): string {
-    let link = "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png";
     if(store.selectedChat!.type_id === ChatType.Group && (store.selectedChat as IGroupChat).avatar_url != null)
     {
-        link = (store.selectedChat as IGroupChat).avatar_url!;
+        return (store.selectedChat as IGroupChat).avatar_url!;
     }
     else if(store.selectedChat!.type_id === ChatType.Private && (store.selectedChat as IPrivateChat).user.avatar_url != null)
     {
-        link = (store.selectedChat as IPrivateChat).user.avatar_url!;
+        return (store.selectedChat as IPrivateChat).user.avatar_url!;
     }
-    return link
+    return "";
 }
 
 // function onButtonMessageClick(){
@@ -162,7 +176,7 @@ function getAvatarLink(): string {
                         <NFormItemGi :span="24" :show-feedback="false" :show-label="false">
                             <NFlex justify="space-between" class="w-full">
                                 <NText>Notifications</NText>
-                                <NSwitch v-model:value="store.selectedChat!.is_muted" size="medium"/>
+                                <NSwitch v-model:value="store.selectedChat!.is_muted" @update:value="onUpdateMuted" size="medium"/>
                             </NFlex>
                         </NFormItemGi>
                     </NGrid>

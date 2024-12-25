@@ -15,11 +15,11 @@ export function handleNotification(notification: INotification): void {
 
     switch (notification.typeOfNotification) {
         case NotificationTypes.Error:
-            console.log('Handling Type1 Notification:', notification.data);
+            console.debug('Handling Type1 Notification:', notification.data);
             break;
 
         case NotificationTypes.NewChat:
-            console.log('Handling Type2 Notification:', notification.data);
+            console.debug('Handling Type2 Notification:', notification.data);
             break;
 
         case NotificationTypes.NewMessage:
@@ -50,6 +50,7 @@ export function handleNotification(notification: INotification): void {
                     else {
                         chatToUpdate.unread_messages_count = 1;
                     }
+                    chatToUpdate.messages.push(notificationNewMessage.message);
                 }
             }
 

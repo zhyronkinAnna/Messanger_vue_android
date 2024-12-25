@@ -19,7 +19,7 @@ class WebSocketService {
             this.ws = new WebSocket(this.url);
 
             this.ws.onopen = () => {
-                console.log('Connected to the server');
+                console.debug('Connected to the server');
                 this.store.isConnected = true;
                 if (this.reconnectTimeout) {
                     clearTimeout(this.reconnectTimeout);
@@ -33,7 +33,7 @@ class WebSocketService {
             };
 
             this.ws.onclose = () => {
-                console.log('Disconnected from the server');
+                console.debug('Disconnected from the server');
                 this.store.isConnected = false;
                 this.scheduleReconnect();
             };
@@ -51,7 +51,7 @@ class WebSocketService {
             clearTimeout(this.reconnectTimeout);
         }
         this.reconnectTimeout = setTimeout(async () => {
-            console.log('Attempting to reconnect...');
+            console.debug('Attempting to reconnect...');
             await this.connect();
         }, this.reconnectInterval);
     }
@@ -64,7 +64,7 @@ class WebSocketService {
                 data.requestId = requestId;
     
                 if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-                    console.log('Sending message:', data);
+                    console.debug('Sending message:', data);
                     this.ws.send(JSON.stringify(data));
                 } else {
                     reject('WebSocket is not open');
@@ -82,7 +82,7 @@ class WebSocketService {
     }
 
     private handleMessage(data: any) {
-        console.log('Received message from server:', data);
+        console.debug('Received message from server:', data);
         
         let message: IMessage;
         try {
@@ -98,11 +98,11 @@ class WebSocketService {
             respond = JSON.parse(data);
             
             if (respond.requestId && this.responseResolvers[respond.requestId]) {
-                console.log('Resolving response for requestId:', respond.requestId, 'with response:', respond.data);
+                console.debug('Resolving response for requestId:', respond.requestId, 'with response:', respond.data);
                 this.responseResolvers[respond.requestId](respond);
                 delete this.responseResolvers[respond.requestId];
             } else {
-                console.log('No resolver found for requestId:', respond.requestId);
+                console.debug('No resolver found for requestId:', respond.requestId);
             }
         }
         else if (message?.type === MessageTypeEnum.Notification) {

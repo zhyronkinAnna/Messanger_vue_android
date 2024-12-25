@@ -11,6 +11,7 @@ import { ref } from 'vue';
 import { NDivider } from 'naive-ui';
 import Menu from '../components/Menu.vue';
 import Settings from '../components/Settings.vue';
+import SetAvatar from '../components/SetAvatar.vue';
 
 const store = useStore();
 
@@ -115,6 +116,7 @@ async function findChats(v: string)
             </NVirtualList>
         </NFlex>
         <Settings v-if="store.showSettings" class="absolute top-0 left-0 w-full h-full z-50 bg-white"/>
+        <SetAvatar/>
 </NFlex>
 </template>
 

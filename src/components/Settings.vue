@@ -141,18 +141,6 @@ async function beforeUpload(data: { file: UploadFileInfo, fileList: UploadFileIn
                     <NFormItemGi :span="24" :show-feedback="false" :show-label="false">
                         <NDivider />
                     </NFormItemGi>
-                    <!-- <NFormItemGi :span="12" label="First name">
-                        <NInput
-                            placeholder="ex. Ryan"
-                            class="rounded-7px"
-                        />
-                    </NFormItemGi>
-                    <NFormItemGi :span="12" label="Last name">
-                        <NInput
-                            placeholder="ex. Gosling" 
-                            class="rounded-7px"
-                        />
-                    </NFormItemGi> -->
                     <NFormItemGi :span="24" label="Username">
                         <NInput 
                             placeholder="ex. Don Juan" 

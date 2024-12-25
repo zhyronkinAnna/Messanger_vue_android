@@ -1,28 +1,50 @@
 <script setup lang="ts">
-import { NButton, NDivider, NFlex, NModal } from 'naive-ui';
+import { NButton, NDivider, NFlex, NModal, useNotification } from 'naive-ui';
 import { onMounted, ref } from 'vue';
 import { Cropper, CircleStencil } from 'vue-advanced-cropper';
 import 'vue-advanced-cropper/dist/style.css';
 import { useStore } from '../stores/store';
+import { IRequest } from '../models';
+import { handleError, handleRequest } from '../helper';
+import { useWsService } from '../services/wsServiceManager';
 
 const cropperRef = ref<any | null>(null);
 const isImageReady = ref<boolean>(false);
 const store = useStore();
+
+const notification = useNotification();
+const wsService = useWsService();
 
 function onImageReady()
 {
     isImageReady.value = true;
 }
 
-function onSetPhotoButtonClick() {
+async function onSetPhotoButtonClick() {
     if (cropperRef.value) {
         const result = cropperRef.value.getResult();
         
         if (result?.canvas) {
-            const link = document.createElement('a');
-            link.href = result.canvas.toDataURL('image/png');
-            link.download = 'cropped-image.png';
-            link.click();
+            const imageBase64 = result.canvas.toDataURL('image/png');
+            const request: IRequest  = {
+                command: "SetAvatar", 
+                data: {
+                    user_id: store.user?.id,
+                    image: imageBase64
+                }
+            };
+
+            onCancleButtonClick();
+            store.loading = true;
+
+            const respond = await handleRequest(wsService!, request);
+
+            if (respond?.errorMessage) {
+                handleError({ subject: "Sign in Error", body: respond?.errorMessage }, notification);
+            }
+            store.user = {avatar_url: (respond?.data as any)?.avatar_url ?? ''}
+
+            store.loading = false;
         }
     }
 }

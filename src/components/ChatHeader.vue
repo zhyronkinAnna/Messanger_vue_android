@@ -21,16 +21,15 @@ function onGoBack(){
 }
 
 function getAvatarLink(): string {
-    let link = "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png";
     if(store.selectedChat!.type_id === ChatType.Group && (store.selectedChat as IGroupChat).avatar_url != null)
     {
-        link = (store.selectedChat as IGroupChat).avatar_url!;
+        return (store.selectedChat as IGroupChat).avatar_url!;
     }
     else if(store.selectedChat!.type_id === ChatType.Private && (store.selectedChat as IPrivateChat).user.avatar_url != null)
     {
-        link = (store.selectedChat as IPrivateChat).user.avatar_url!;
+        return (store.selectedChat as IPrivateChat).user.avatar_url!;
     }
-    return link
+    return "";
 }
 </script>
 

@@ -90,7 +90,6 @@ async function onLoginButtonClick() {
 
 async function handleKeyDownEnter(event: KeyboardEvent)
 {
-    console.log("wef");
     if (event.key === 'Enter') {
         onLoginButtonClick();
     }

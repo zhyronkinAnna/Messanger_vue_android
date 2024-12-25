@@ -84,19 +84,20 @@ async function onSelectChat()
                 store.allChats.splice(index, 1);
             }
         }
+        
+        if (props.chat.messages?.length <= 0 || props.chat.messages == null){
+            const respond = await handleRequest(wsService!, request);
 
-        const respond = await handleRequest(wsService!, request);
+            if (respond?.errorMessage) {
+                handleError({ subject: "Error", body: respond?.errorMessage }, notification)
+            }
 
-        if (respond?.errorMessage) {
-            handleError({ subject: "Error", body: respond?.errorMessage }, notification)
+            console.debug("respond", respond);
+            
+            props.chat.messages = (respond?.data as unknown as any[])?.map(item => 
+                convertToIChatMessage(item)
+            );
         }
-
-        console.debug("respond", respond);
-        
-        props.chat.messages = (respond?.data as unknown as any[])?.map(item => 
-          convertToIChatMessage(item)
-        );
-        
         store.selectedChat = props.chat;
 
         if (store.selectedChat.unread_messages_count > 0){
@@ -134,19 +135,17 @@ const options = [
 ];
 
 function getAvatarLink(): string {
-    let link = "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png";
-
-    debugger;
+    
     if(props.chat.type_id === ChatType.Group && (props.chat as IGroupChat).avatar_url != null)
     {
-        link = (props.chat as IGroupChat).avatar_url!;
+        return (props.chat as IGroupChat).avatar_url!;
     }
     else if(props.chat.type_id === ChatType.Private && (props.chat as IPrivateChat).user.avatar_url != null)
     {
-        link = (props.chat as IPrivateChat).user.avatar_url!;
+        return (props.chat as IPrivateChat).user.avatar_url!;
     }
 
-    return link
+    return "";
 }
 
 interface Props {

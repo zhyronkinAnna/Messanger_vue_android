@@ -25,7 +25,6 @@ store.messangerNotification = useNotification();
 </NFlex>
 <!-- <SetAvatar/> -->
 </template>
-
 <style scoped>
 </style>
 
