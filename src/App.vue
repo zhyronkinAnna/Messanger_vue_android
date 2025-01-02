@@ -25,7 +25,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <NThemeEditor>
+  <!-- <NThemeEditor> -->
     <NConfigProvider :theme-overrides="themeOverrides">
       <NGlobalStyle />
       <NMessageProvider>
@@ -39,7 +39,7 @@ onUnmounted(() => {
         </NNotificationProvider>
       </NMessageProvider>
     </NConfigProvider>
-  </NThemeEditor>
+  <!-- </NThemeEditor> -->
 </template>
 
 <style>

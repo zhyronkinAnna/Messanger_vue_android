@@ -50,6 +50,11 @@ function handleSelect(key: string | number) {
                 }
             };
 
+            if(props.chat.chat_id === store.selectedChat?.chat_id)
+            {
+                store.selectedChat = null;
+            }
+
             handleRequest(wsService!, request, false);
 
             const index = store.allChats.findIndex(chat => chat.chat_id === props.chat.chat_id);
@@ -72,7 +77,7 @@ async function onSelectChat()
             command: "GetMessages", 
             data: {
                 id: props.chat?.id_of_user_chat,
-                user_id: store.user?.id
+                user_id: store.user?.id,
             }
         };
 
@@ -85,7 +90,8 @@ async function onSelectChat()
             }
         }
         
-        if (props.chat.messages?.length <= 0 || props.chat.messages == null){
+        if (props.chat.messages?.length <= 0 || props.chat.messages == null || 
+            props.chat.messages?.length <= props.chat.unread_messages_count){
             const respond = await handleRequest(wsService!, request);
 
             if (respond?.errorMessage) {

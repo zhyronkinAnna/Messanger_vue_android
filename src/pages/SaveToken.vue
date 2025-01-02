@@ -14,7 +14,7 @@ function delay(ms: number): Promise<void> {
 
 onMounted(async() => {
     console.log('Начало');
-    await delay(10000); // задержка на 10 секунд
+    await delay(10000);
     console.log('Через 10 секунд');
     const hash = window.location.hash.substring(1);
     const params = new URLSearchParams(hash);

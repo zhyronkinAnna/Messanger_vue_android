@@ -9,7 +9,7 @@ const store = useStore();
 const message = useMessage();
 const showFloatButton = ref<boolean>(false);
 const user = ref<IUser>({
-    id: store.user?.id ?? 0,
+    id: store.user?.id ?? "",
     email: store.user?.email ?? '',
     username: store.user?.username ?? '',
     description: store.user?.description ?? '',

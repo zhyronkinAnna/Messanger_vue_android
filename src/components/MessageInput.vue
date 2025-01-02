@@ -3,8 +3,8 @@ import { NButton, NFlex, NIcon, NInput, useNotification } from 'naive-ui';
 import { PaperClipIcon, FaceSmileIcon, PaperAirplaneIcon } from '@heroicons/vue/24/outline';
 import { useStore } from '../stores/store';
 import { onMounted, ref } from 'vue';
-import { ChatMessageTypes, convertToIChatMessage, IChat, IChatMessage, IRequest, ReadTypes } from '../models';
-import { handleError, handleRequest } from '../helper';
+import { ChatMessageTypes, ChatType, convertToChat, convertToIChatMessage, IChat, IChatMessage, 
+    IGroupChat, IPrivateChat, IRequest, ReadTypes } from '../models';import { handleError, handleRequest } from '../helper';
 import { useWsService } from '../services/wsServiceManager';
 
 //TODO: send file
@@ -61,7 +61,7 @@ async function onButtonSendClick()
             text: store.selectedChat!.messageText,
             type: ChatMessageTypes.Text,
             username: store.user!.username ?? '',
-            message_id: new Date().getTime()
+            message_id: Math.floor(new Date().getTime())
         }
 
         store.selectedChat!.messageText = "";
@@ -75,48 +75,118 @@ async function onButtonSendClick()
         });
 
         try {
-            const request: IRequest  = {
-                command: "SendTextMessage", 
-                data: {
-                    text: newMessage.text,
-                    sent_at: newMessage.sent_at,
-                    user_chat_id: store.selectedChat?.id_of_user_chat,
-                    type_id: newMessage.type
+            let request: IRequest;
+            if(store.selectedChat?.id_of_user_chat == null){
+                request = {
+                    command: "SendTextMessageAndAddNewChat", 
+                    data: {
+                        senderId: store.user?.id,
+                        receiverUsername: (store.selectedChat as IPrivateChat)?.user.username,
+                        text: newMessage.text,
+                        sent_at: newMessage.sent_at,
+                        type_id: newMessage.type
+                    }
+                };
+
+                const respond = await handleRequest(wsService!, request);
+
+                if (respond?.errorMessage) {
+                    handleError({ subject: "Error", body: respond?.errorMessage }, notification)
                 }
-            };
 
-            const respond = await handleRequest(wsService!, request);
+                const message_id = convertToIChatMessage(respond!.data).message_id;
+                
+                const chat = convertToChat(respond!.data)
+                store.selectedChat!.id_of_user_chat = chat.id_of_user_chat,
+                store.selectedChat!.chat_id = chat.chat_id,
+                store.selectedChat!.type_id = chat.type_id,
+                store.selectedChat!.is_muted = chat.is_muted,
 
-            if (respond?.errorMessage) {
-                handleError({ subject: "Error", body: respond?.errorMessage }, notification)
-            }
-
-            console.debug("respond", respond);
-
-            const message_id = convertToIChatMessage(respond).message_id;
-            
-            store.selectedChat?.messages.forEach(msg => {
-                if (msg.message_id === newMessage.message_id) {
-                    msg.message_id = message_id;
-                    msg.is_read = ReadTypes.Unread;
-                }
-            });
-            
-            store.allChats.forEach(c => {
-                if (c.id_of_user_chat === store.selectedChat?.id_of_user_chat) {
+                store.selectedChat?.messages.forEach(msg => {
+                    if (msg.message_id === newMessage.message_id) {
+                        msg.message_id = message_id;
+                        msg.is_read = ReadTypes.Unread;
+                    }
+                });
+                
+                const selectedChatTitle = store.selectedChat?.type_id === ChatType.Group 
+                                                ? (store.selectedChat as IGroupChat).chat_title 
+                                                : (store.selectedChat as IPrivateChat)?.user.username;
+                store.allChats.forEach(c => {
+                    const chatTitle = c.type_id === ChatType.Group 
+                                        ? (c as IGroupChat).chat_title 
+                                        : (c as IPrivateChat)?.user.username;
+                    
+                    if (chatTitle === selectedChatTitle) {
+                        c.chat_id = store.selectedChat!.chat_id;
+                        c.id_of_user_chat = store.selectedChat!.id_of_user_chat;
+                        c.type_id = store.selectedChat!.type_id;
+                        c.is_muted = store.selectedChat!.is_muted;
                         c.last_message.message_id = message_id;
-                }
-            });
-            
-            store.virtualListMessagesInst.scrollTo({ position: 'bottom' });
+                        c.messages.forEach(msg => {
+                            if (msg.message_id === newMessage.message_id) {   
+                                msg.message_id = message_id;
+                                msg.is_read = ReadTypes.Unread;
+                            }
+                        });
+                        
+                        moveElementToStart(store.allChats, store.selectedChat!);
+                        store.loading = false;
+                        return
+                    }
+                });
 
-            moveElementToStart(store.allChats, store.selectedChat!);
+                store.virtualListMessagesInst.scrollTo({ position: 'bottom' });
+
+                moveElementToStart(store.allChats, store.selectedChat!);
+            }
+            else{
+                request = {
+                    command: "SendTextMessage", 
+                    data: {
+                        text: newMessage.text,
+                        sent_at: newMessage.sent_at,
+                        user_chat_id: store.selectedChat?.id_of_user_chat,
+                        type_id: newMessage.type
+                    }
+                };
+
+                const respond = await handleRequest(wsService!, request);
+
+                if (respond?.errorMessage) {
+                    handleError({ subject: "Error", body: respond?.errorMessage }, notification)
+                }
+
+                const message_id = convertToIChatMessage(respond!.data).message_id;
+
+                store.selectedChat?.messages.forEach(msg => {
+                    if (msg.message_id === newMessage.message_id) {
+                        msg.message_id = message_id;
+                        msg.is_read = ReadTypes.Unread;
+                    }
+                });
+                
+                store.allChats.forEach(c => {
+                    if (c.id_of_user_chat === store.selectedChat?.id_of_user_chat) {
+                        c.last_message.message_id = message_id;
+                        c.messages.forEach(msg => {
+                            if (msg.message_id === newMessage.message_id) {   
+                                msg.message_id = message_id;
+                                msg.is_read = ReadTypes.Unread;
+                            }
+                        });
+                        
+                        store.virtualListMessagesInst.scrollTo({ position: 'bottom' });
+
+                        moveElementToStart(store.allChats, store.selectedChat!);
+                        store.loading = false;
+                        return
+                    }
+                });
+            }
         } 
         catch (error) {
             console.error(error);
-        }
-        finally {
-            store.loading = false;
         }
     }
 }

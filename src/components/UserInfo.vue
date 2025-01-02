@@ -3,7 +3,7 @@ import { NGridItem, NGrid, NH2, NAvatar, NText, NFlex, NIcon, NButton, NInput, N
 import { PhoneIcon, EnvelopeIcon } from '@heroicons/vue/24/solid';
 import { TrashIcon, NoSymbolIcon } from '@heroicons/vue/24/outline';
 import { useStore } from '../stores/store';
-import { onBeforeMount } from 'vue';
+import { onMounted, ref } from 'vue';
 import { ChatType, convertToChat, convertToIChatInfo, IGroupChat, IPrivateChat, IRequest } from '../models';
 import { handleError, handleRequest } from '../helper';
 import { useWsService } from '../services/wsServiceManager';
@@ -11,6 +11,11 @@ import { useWsService } from '../services/wsServiceManager';
 const store = useStore();
 const wsService = useWsService();
 const notification = useNotification();
+const bio = ref<string | undefined>(
+    store.selectedChat?.type_id === ChatType.Group 
+        ? (store.selectedChat as IGroupChat).description 
+        : (store.selectedChat as IPrivateChat)?.user.description
+);
 
 function handleClose()
 {
@@ -19,6 +24,8 @@ function handleClose()
 
 async function onUpdateMuted()
 {
+    store.selectedChat!.is_muted = !store.selectedChat!.is_muted;
+
     const request: IRequest  = {
         command: "UpdateIsMuted", 
         data: {
@@ -29,12 +36,13 @@ async function onUpdateMuted()
     handleRequest(wsService!, request, false);
 }
 
-onBeforeMount(async ()=>{
-  try {
-        if(
-            (store.selectedChat!.type_id === ChatType.Private && 
-            ((store.selectedChat as IPrivateChat).user!.email == null || (store.selectedChat as IPrivateChat).user!.email === ""))
-        ){
+onMounted(async ()=>{
+    try {
+        store.selectedChat!.is_muted_view = !store.selectedChat!.is_muted;
+        
+        if((store.selectedChat!.type_id === ChatType.Private && 
+            ((store.selectedChat as IPrivateChat).user!.email == null || (store.selectedChat as IPrivateChat).user!.email === "")))
+        {
             const request: IRequest  = {
                 command: "GetChatInfo", 
                 data: {
@@ -51,6 +59,12 @@ onBeforeMount(async ()=>{
 
             console.debug("respond", respond);
             store.selectedChat = convertToChat(store.selectedChat, convertToIChatInfo(respond?.data));
+            
+            bio.value = store.selectedChat?.type_id === ChatType.Group ? 
+                (store.selectedChat as IGroupChat).description : 
+                store.selectedChat?.type_id === ChatType.Private ? 
+                (store.selectedChat as IPrivateChat).user.description : 
+                '' 
         }
     } 
     catch (error) {
@@ -133,17 +147,10 @@ function getAvatarLink(): string {
                             </template>
                             <NInput
                                 class="rounded-7px"
+                                 placeholder="Bio is currently empty."
                                 :disabled="true"
-                                :value="
-                                        store.selectedChat?.type_id === ChatType.Group ? 
-                                        (store.selectedChat as IGroupChat).description : 
-                                        store.selectedChat?.type_id === ChatType.Private ? 
-                                        (store.selectedChat as IPrivateChat).user.description : 
-                                        '' "
-                                :loading="store.selectedChat?.type_id === ChatType.Group ? 
-                                        (store.selectedChat as IGroupChat).description == null : 
-                                        store.selectedChat?.type_id === ChatType.Private ? 
-                                        (store.selectedChat as IPrivateChat).user.description == null: true"
+                                :value="bio"
+                                :loading="undefined === bio"
                             />
                         </NFormItemGi>
                         <NFormItemGi v-if="store.selectedChat?.type_id === ChatType.Private" :span="24" >
@@ -176,7 +183,7 @@ function getAvatarLink(): string {
                         <NFormItemGi :span="24" :show-feedback="false" :show-label="false">
                             <NFlex justify="space-between" class="w-full">
                                 <NText>Notifications</NText>
-                                <NSwitch v-model:value="store.selectedChat!.is_muted" @update:value="onUpdateMuted" size="medium"/>
+                                <NSwitch v-model:value="store.selectedChat!.is_muted_view" @update:value="onUpdateMuted" size="medium" />
                             </NFlex>
                         </NFormItemGi>
                     </NGrid>

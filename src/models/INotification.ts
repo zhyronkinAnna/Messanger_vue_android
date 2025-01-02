@@ -3,6 +3,7 @@ import { useWsService } from "../services/wsServiceManager";
 import { useStore } from "../stores/store";
 import { IMessage } from "./IMessage";
 import { convertToINotificationNewMessage } from "./INotificationNewMessage";
+import { convertToINotificationUpdateMessageStatus } from "./INotificationUpdateMessageStatus";
 import { IRequest } from "./IRequest";
 import { NotificationTypes } from "./NotificationTypesEnum";
 import { convertToITokens } from "./ITokens";
@@ -30,6 +31,16 @@ export function handleNotification(notification: INotification): void {
             store.router.push({ name: 'Messanger' });
             break;
 
+        case NotificationTypes.UpdateMessageStatus:
+            const data = convertToINotificationUpdateMessageStatus(notification.data);
+            const chat = store.allChats.find(chat => chat.chat_id === data.chat_id);
+            const message = chat?.messages.find(message => message.message_id === data.message_id);
+            
+            if (message) {
+                message.is_read = data.is_read;
+            }
+        break;
+
         case NotificationTypes.NewMessage:
             const notificationNewMessage = convertToINotificationNewMessage(notification.data);
             const chatToUpdate = store.allChats.find(chat => chat.chat_id === notificationNewMessage.chat_id);
@@ -42,10 +53,12 @@ export function handleNotification(notification: INotification): void {
                     const wsService = useWsService();
                     chatToUpdate.messages.push(notificationNewMessage.message);
                     const request: IRequest  = {
-                        command: "ResetCountOfUnreadMessages", 
+                        command: "SetNewFirstUnreadMessage",  
                         data: {
                             user_id: store.user?.id,
-                            id: selectedChat!.id_of_user_chat,
+                            user_chat_id: selectedChat!.id_of_user_chat,
+                            message_id: notificationNewMessage.message.message_id,
+                            chat_id: selectedChat!.chat_id,
                         }
                     };
                     
@@ -58,6 +71,11 @@ export function handleNotification(notification: INotification): void {
                     else {
                         chatToUpdate.unread_messages_count = 1;
                     }
+
+                    if (!chatToUpdate.messages) {
+                        chatToUpdate.messages = [];
+                    }
+                    
                     chatToUpdate.messages.push(notificationNewMessage.message);
                 }
             }
