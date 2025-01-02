@@ -19,6 +19,12 @@ export const useStore = defineStore("store", () => {
     const virtualListMessagesInst = ref<any>(null);
     const findChats = ref<IChat[] | null>(null)
     const inputSearchInstRef = ref<any>(null);
+    const router = ref<any>(null);
+    const accessToken = ref<string | null>(localStorage.getItem("access-token"));
+    function setAccessToken(token: string) {
+        accessToken.value = token;
+        localStorage.setItem("access-token", token);
+    }
 
     function $reset() {
         user.value = undefined;
@@ -30,6 +36,7 @@ export const useStore = defineStore("store", () => {
         cropperSrc.value = undefined;
         showEmojiPicker.value = false;
         selectedChat.value = null;
+        localStorage.removeItem("access-token");
     }
 
     return {
@@ -50,5 +57,8 @@ export const useStore = defineStore("store", () => {
         findChats,
         inputSearchInstRef,
         $reset,
+        accessToken,
+        setAccessToken,
+        router
     };
 });

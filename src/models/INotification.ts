@@ -5,6 +5,8 @@ import { IMessage } from "./IMessage";
 import { convertToINotificationNewMessage } from "./INotificationNewMessage";
 import { IRequest } from "./IRequest";
 import { NotificationTypes } from "./NotificationTypesEnum";
+import { convertToITokens } from "./ITokens";
+
 
 export interface INotification extends IMessage {
     typeOfNotification: NotificationTypes;
@@ -20,6 +22,12 @@ export function handleNotification(notification: INotification): void {
 
         case NotificationTypes.NewChat:
             console.debug('Handling Type2 Notification:', notification.data);
+            break;
+
+        case NotificationTypes.Tokens:
+            const tokens = convertToITokens(notification.data);
+            store.setAccessToken(tokens.access_token);
+            store.router.push({ name: 'Messanger' });
             break;
 
         case NotificationTypes.NewMessage:

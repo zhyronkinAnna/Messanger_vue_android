@@ -9,7 +9,8 @@ import { useRules } from '../rules/rules';
 import { useWsService } from '../services/wsServiceManager';
 import { formValidation, generateSHA256, handleError, handleRequest, isSecurePassword } from '../helper';
 
-const user = ref<ISignUpForm>({});
+const user = ref<ISignUpForm>({email: "dimazavrik2014@gmail.com", username: "Dmytro", 
+retype_password: "Dimi6419QWE!", password: "Dimi6419QWE!"});
 const error = ref<IError>();
 
 const router = useRouter();
@@ -71,7 +72,7 @@ async function onRegisterClick() {
 
         console.debug("respond", respond);
 
-        router.push({ name: 'EmailConfirmation' });
+        router.push({ name: 'PleaseConfirmEmail' });
     }
     catch (error) {
         console.error(error);
@@ -102,11 +103,11 @@ async function onRegisterClick() {
                     </NFormItemGi>
 
                     <NFormItemGi :span="24" label="Password" path="password">
-                        <NInput type="password" placeholder="" v-model:value="user.password"></NInput>
+                        <NInput type="password" placeholder="" show-password-on="click" v-model:value="user.password"></NInput>
                     </NFormItemGi>
 
                     <NFormItemGi :span="24" label="Re-type password" path="retype_password">
-                        <NInput type="password" placeholder="" v-model:value="user.retype_password"></NInput>
+                        <NInput type="password" placeholder="" show-password-on="click" v-model:value="user.retype_password"></NInput>
                     </NFormItemGi>
 
                     <NFormItemGi :span="24" :show-feedback="false" :show-label="false" class="mt-6px">

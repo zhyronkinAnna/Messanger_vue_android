@@ -23,4 +23,6 @@ export { convertToIChatInfo } from './IChatInfo';
 export { ChatMessageTypes } from './ChatMessageTypesEnum'
 export type { ISelectedChat } from './ISelectedChat';
 export type { INotificationNewMessage } from './INotificationNewMessage'
+export type { ITokens } from './ITokens'
 export { convertToINotificationNewMessage } from './INotificationNewMessage'
+export { convertToITokens } from './ITokens'

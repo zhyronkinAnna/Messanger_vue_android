@@ -14,6 +14,7 @@ const wsService = useWsService();
 
 onMounted(() => {
   console.debug(`Current route: ${router.currentRoute.value.fullPath}`);
+  store.router = router;
   initializeWebSocketService(store);
 });
 

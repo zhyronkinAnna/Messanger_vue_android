@@ -49,15 +49,6 @@ export function useRules() {
                 message: 'Please entry this field'
             }
         },
-        EmailConfirmation: {
-            code: {
-                validator(rule: FormItemRule, value: string) {
-                    return value != null && value != '';
-                },
-                trigger: 'blur',
-                message: 'Please entry this field'
-            }
-        },
         ForgotPassword: {
             email: {
                 validator(rule: FormItemRule, value: string) {

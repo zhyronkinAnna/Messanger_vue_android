@@ -60,8 +60,6 @@ async function onConfirmButtonClick() {
         }
 
         console.debug("respond", respond);
-
-        router.push({ name: 'EmailConfirmation' });
     }
     catch (error) {
         console.error(error);
