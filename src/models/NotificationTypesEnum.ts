@@ -4,4 +4,6 @@ export enum NotificationTypes {
     NewChat,
     Tokens,
     UpdateMessageStatus,
+    UpdateMessagesStatus,
+    MyUser,
 }

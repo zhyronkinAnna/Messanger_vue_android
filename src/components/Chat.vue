@@ -22,6 +22,7 @@ const router = useRouter();
 
 const activeDropdownId = ref<number | null>(null);
 
+
 function handleContextMenu(e: MouseEvent, id: number) {
     e.preventDefault();
     activeDropdownId.value = id;
@@ -70,9 +71,56 @@ function handleSelect(key: string | number) {
     }
 }
 
+function formatDateTime(date: string | Date): string {
+    const now = new Date();
+
+    const parsedDate = typeof date === 'string' ? new Date(date) : date;
+
+    if (isNaN(parsedDate.getTime())) {
+        throw new Error("Invalid date format");
+    }
+    
+    debugger
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    if (parsedDate >= today) {
+        return `today ${parsedDate.toLocaleTimeString('ru-RU', {
+            hour: '2-digit',
+            minute: '2-digit',
+        })}`;
+    } else if (parsedDate >= yesterday) {
+        return `yesterday ${parsedDate.toLocaleTimeString('ru-RU', {
+            hour: '2-digit',
+            minute: '2-digit',
+        })}`;
+    } else {
+        return parsedDate.toLocaleDateString('ru-RU', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        });
+    }
+}
+
+function setOnlineStatus() {
+    debugger;
+    if (store.selectedChat!.type_id === ChatType.Private) {
+        console.log((store.selectedChat as IPrivateChat).user.logout_time, "logout_time");
+        if ((store.selectedChat as IPrivateChat).user.logout_time == null) {
+            store.selectedChat!.onlineStatus = "Online";
+        } else {
+            store.selectedChat!.onlineStatus = formatDateTime((store.selectedChat as IPrivateChat).user.logout_time!);
+        }
+    }
+}
+
 async function onSelectChat()
 {
     try {
+        store.showUserInfo = false;
+
         const request: IRequest  = {
             command: "GetMessages", 
             data: {
@@ -89,9 +137,9 @@ async function onSelectChat()
                 store.allChats.splice(index, 1);
             }
         }
+        debugger
         
-        if (props.chat.messages?.length <= 0 || props.chat.messages == null || 
-            props.chat.messages?.length <= props.chat.unread_messages_count){
+        if (props.chat.messages?.length <= 0 || props.chat.messages == null || props.chat.messages?.length <= props.chat.unread_messages_count){
             const respond = await handleRequest(wsService!, request);
 
             if (respond?.errorMessage) {
@@ -105,10 +153,22 @@ async function onSelectChat()
             );
         }
         store.selectedChat = props.chat;
+        setOnlineStatus();
+        debugger;
 
         if (store.selectedChat.unread_messages_count > 0){
             store.selectedChat.unread_messages_count = 0;
             store.selectedChat.last_message.is_read = ReadTypes.DoNotShow;
+            const request: IRequest  = {
+                command: "ResetCountOfUnreadMessages", 
+                data: {
+                    user_id: store.user?.id,
+                    id: store.selectedChat!.id_of_user_chat,
+                    chat_id: store.selectedChat!.chat_id,
+                }
+            };
+            
+            handleRequest(wsService!, request, false);
         }
 
         const temp = store.allChats.filter(chat =>
@@ -125,7 +185,6 @@ async function onSelectChat()
     }
 
     store.inputSearchInstRef.clear();
-    goToChat();
 }
 
 function goToChat(){

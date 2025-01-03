@@ -6,6 +6,7 @@ export interface IUser {
     last_login?: Date;
     description?: string;
     avatar_url?: string;
+    logout_time?: Date;
 }
 
 export function convertToIUser(data: any): IUser {

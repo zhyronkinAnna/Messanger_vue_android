@@ -14,7 +14,6 @@ import Settings from '../components/Settings.vue';
 import SetAvatar from '../components/SetAvatar.vue';
 
 const store = useStore();
-
 const wsService = useWsService();
 const notification = useNotification();
 const inputSearchInstRef = ref<InstanceType<typeof NInput> | undefined>(undefined);
@@ -71,14 +70,32 @@ async function findChats(v: string)
             store.findChats = [
                 ...store.allChats.filter(chat =>
                     chat.type_id === ChatType.Group ? 
-                    (chat as IGroupChat).chat_title?.toLowerCase().includes(v.toLowerCase()) : 
+                    (chat as IGroupChat).chat_title?.toLowerCase().startsWith(v.toLowerCase()) :  
                     chat.type_id === ChatType.Private ? 
-                    (chat as IPrivateChat).user.username?.toLowerCase().includes(v.toLowerCase()) : 
+                    (chat as IPrivateChat).user.username?.toLowerCase().startsWith(v.toLowerCase()) : 
                     ''
                 ),
-                ...(respond?.data as unknown as any[])?.map(item => 
-                    convertToChat(item)
-                )
+                ...(respond?.data as unknown as any[])?.reduce((acc, item) => {
+                    const chat = convertToChat(item);
+                    if (store.selectedChat) {
+                        if (
+                            store.selectedChat.type_id === ChatType.Group &&
+                            chat.type_id === ChatType.Group &&
+                            (store.selectedChat as IGroupChat).chat_title === (chat as IGroupChat).chat_title
+                        ) {
+                            return acc;
+                        }
+                        if (
+                            store.selectedChat.type_id === ChatType.Private &&
+                            chat.type_id === ChatType.Private &&
+                            (store.selectedChat as IPrivateChat).user.username === (chat as IPrivateChat).user.username
+                        ) {
+                            return acc;
+                        }
+                    }
+                    acc.push(chat);
+                    return acc;
+                }, [])
             ];
         } 
         catch (error) {

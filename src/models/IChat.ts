@@ -11,6 +11,7 @@ export interface IChat {
     is_muted_view?: boolean;
     messages: IChatMessage[];
     messageText: string;
+    onlineStatus?: string | "";
 }
 
 export function convertToIChat(data: any): IChat {
@@ -24,5 +25,6 @@ export function convertToIChat(data: any): IChat {
         is_muted: data.is_muted, 
         messages: data.messages,
         messageText: data.message ?? "",
+        onlineStatus: data.onlineStatus
     };
 }

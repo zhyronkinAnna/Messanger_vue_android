@@ -56,13 +56,16 @@ function getAvatarLink(): string {
             lastSeenOnline
         </NText>
     </NFlex>
-    <NFlex class="items-center" @click="onAvatarClick">
+    <NText>
+        {{
+            store.selectedChat?.onlineStatus ?? ""
+        }}
+    </NText>
         <NAvatar 
             round
             :size="43"
             :src="getAvatarLink()"
         />
-    </NFlex>
 </NFlex>
 </template>
 

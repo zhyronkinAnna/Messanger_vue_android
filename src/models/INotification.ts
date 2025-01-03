@@ -4,6 +4,8 @@ import { useStore } from "../stores/store";
 import { IMessage } from "./IMessage";
 import { convertToINotificationNewMessage } from "./INotificationNewMessage";
 import { convertToINotificationUpdateMessageStatus } from "./INotificationUpdateMessageStatus";
+import { convertToChat } from "./ChatConverter";
+import { convertToIUser } from "./IUser";
 import { IRequest } from "./IRequest";
 import { NotificationTypes } from "./NotificationTypesEnum";
 import { convertToITokens } from "./ITokens";
@@ -15,6 +17,7 @@ export interface INotification extends IMessage {
 
 export function handleNotification(notification: INotification): void {
     const store = useStore();
+    debugger
 
     switch (notification.typeOfNotification) {
         case NotificationTypes.Error:
@@ -22,13 +25,18 @@ export function handleNotification(notification: INotification): void {
             break;
 
         case NotificationTypes.NewChat:
-            console.debug('Handling Type2 Notification:', notification.data);
+            const chat2 = convertToChat(notification.data);
+            store.allChats.unshift(chat2);
             break;
 
         case NotificationTypes.Tokens:
             const tokens = convertToITokens(notification.data);
             store.setAccessToken(tokens.access_token);
-            store.router.push({ name: 'Messanger' });
+            break;
+
+        case NotificationTypes.MyUser:            
+            store.user = convertToIUser(notification.data);
+            store.router.push({ name: 'Messanger' }); //TODO:
             break;
 
         case NotificationTypes.UpdateMessageStatus:
@@ -40,6 +48,22 @@ export function handleNotification(notification: INotification): void {
                 message.is_read = data.is_read;
             }
         break;
+
+        case NotificationTypes.UpdateMessagesStatus:
+            debugger
+            const data1 = convertToINotificationUpdateMessageStatus(notification.data);
+            const chat1 = store.allChats.find(chat => chat.chat_id === data1.chat_id);
+            if(chat1?.messages)
+            {
+                const filteredMessages = chat1?.messages.filter(message => message.message_id! >= data1.message_id && message.username === store.user?.username);
+                if (filteredMessages) {
+                    filteredMessages.forEach(message => message.is_read = data1.is_read);
+                }
+            }
+            if (chat1) {
+                chat1.last_message.is_read = data1.is_read;
+            }
+            break;
 
         case NotificationTypes.NewMessage:
             const notificationNewMessage = convertToINotificationNewMessage(notification.data);
@@ -77,6 +101,11 @@ export function handleNotification(notification: INotification): void {
                     }
                     
                     chatToUpdate.messages.push(notificationNewMessage.message);
+                }
+                const chatIndex = store.allChats.indexOf(chatToUpdate);
+                if (chatIndex > -1) {
+                    store.allChats.splice(chatIndex, 1);
+                    store.allChats.unshift(chatToUpdate);
                 }
             }
 

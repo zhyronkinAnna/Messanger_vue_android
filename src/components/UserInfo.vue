@@ -58,6 +58,7 @@ onMounted(async ()=>{
             }
 
             console.debug("respond", respond);
+            debugger
             store.selectedChat = convertToChat(store.selectedChat, convertToIChatInfo(respond?.data));
             
             bio.value = store.selectedChat?.type_id === ChatType.Group ? 
@@ -135,7 +136,10 @@ function getAvatarLink(): string {
                                             </NText>
                                         </NGridItem>
                                         <NGridItem>
-                                            <NText class="text-#007AFF text-14px">online</NText>
+                                            <NText 
+                                                :class="{ 'text-#007AFF text-14px': store.selectedChat?.onlineStatus === 'Online' }">
+                                                {{ store.selectedChat?.onlineStatus ?? "" }}
+                                            </NText>
                                         </NGridItem>
                                     </NGrid>
                                 </NFlex>
