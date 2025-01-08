@@ -19,7 +19,6 @@ class WebSocketService {
             this.ws = new WebSocket(this.url);
 
             this.ws.onopen = () => {
-                console.debug('Connected to the server');
                 this.store.isConnected = true;
                 if (this.reconnectTimeout) {
                     clearTimeout(this.reconnectTimeout);
@@ -33,7 +32,6 @@ class WebSocketService {
             };
 
             this.ws.onclose = () => {
-                console.debug('Disconnected from the server');
                 this.store.isConnected = false;
                 this.scheduleReconnect();
             };
@@ -51,7 +49,6 @@ class WebSocketService {
             clearTimeout(this.reconnectTimeout);
         }
         this.reconnectTimeout = setTimeout(async () => {
-            console.debug('Attempting to reconnect...');
             await this.connect();
         }, this.reconnectInterval);
     }
@@ -64,7 +61,6 @@ class WebSocketService {
                 data.requestId = requestId;
     
                 if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-                    console.debug('Sending message:', data);
                     this.ws.send(JSON.stringify(data));
                 } else {
                     reject('WebSocket is not open');
@@ -81,9 +77,7 @@ class WebSocketService {
         }
     }
 
-    private handleMessage(data: any) {
-        console.debug('Received message from server:', data);
-        
+    private handleMessage(data: any) {        
         let message: IMessage;
         try {
             message = JSON.parse(data);
@@ -98,11 +92,9 @@ class WebSocketService {
             respond = JSON.parse(data);
             
             if (respond.requestId && this.responseResolvers[respond.requestId]) {
-                console.debug('Resolving response for requestId:', respond.requestId, 'with response:', respond.data);
                 this.responseResolvers[respond.requestId](respond);
                 delete this.responseResolvers[respond.requestId];
             } else {
-                console.debug('No resolver found for requestId:', respond.requestId);
             }
         }
         else if (message?.type === MessageTypeEnum.Notification) {

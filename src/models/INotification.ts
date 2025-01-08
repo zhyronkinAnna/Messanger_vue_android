@@ -17,11 +17,9 @@ export interface INotification extends IMessage {
 
 export function handleNotification(notification: INotification): void {
     const store = useStore();
-    debugger
 
     switch (notification.typeOfNotification) {
         case NotificationTypes.Error:
-            console.debug('Handling Type1 Notification:', notification.data);
             break;
 
         case NotificationTypes.NewChat:
@@ -50,7 +48,6 @@ export function handleNotification(notification: INotification): void {
         break;
 
         case NotificationTypes.UpdateMessagesStatus:
-            debugger
             const data1 = convertToINotificationUpdateMessageStatus(notification.data);
             const chat1 = store.allChats.find(chat => chat.chat_id === data1.chat_id);
             if(chat1?.messages)

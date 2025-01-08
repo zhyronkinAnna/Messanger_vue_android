@@ -57,8 +57,6 @@ onMounted(async ()=>{
                 handleError({ subject: "Sign in Error", body: respond?.errorMessage }, notification)
             }
 
-            console.debug("respond", respond);
-            debugger
             store.selectedChat = convertToChat(store.selectedChat, convertToIChatInfo(respond?.data));
             
             bio.value = store.selectedChat?.type_id === ChatType.Group ? 

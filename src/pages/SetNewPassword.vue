@@ -68,8 +68,6 @@ async function onSetNewPasswordClick() {
             }
         }
 
-        console.debug("respond", respond);
-
         router.push({ name: 'SignIn' });
     }
     catch (error) {

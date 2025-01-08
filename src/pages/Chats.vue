@@ -33,7 +33,6 @@ onMounted(async ()=>{
             handleError({ subject: "Sign in Error", body: respond?.errorMessage }, notification)
         }
 
-        console.debug("respond", respond);
         store.allChats = (respond?.data as unknown as any[])?.map(item => 
           convertToChat(item)
         );
@@ -64,8 +63,6 @@ async function findChats(v: string)
             if (respond?.errorMessage) {
                 handleError({ subject: "Sign in Error", body: respond?.errorMessage }, notification)
             }
-
-            console.debug("respond", respond);
             
             store.findChats = [
                 ...store.allChats.filter(chat =>

@@ -59,7 +59,6 @@ async function onConfirmButtonClick() {
             }
         }
 
-        console.debug("respond", respond);
     }
     catch (error) {
         console.error(error);

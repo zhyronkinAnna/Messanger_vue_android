@@ -70,8 +70,6 @@ async function onRegisterClick() {
             }
         }
 
-        console.debug("respond", respond);
-
         router.push({ name: 'PleaseConfirmEmail' });
     }
     catch (error) {

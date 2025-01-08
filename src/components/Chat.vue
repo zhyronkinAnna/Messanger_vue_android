@@ -80,7 +80,6 @@ function formatDateTime(date: string | Date): string {
         throw new Error("Invalid date format");
     }
     
-    debugger
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
@@ -105,7 +104,6 @@ function formatDateTime(date: string | Date): string {
 }
 
 function setOnlineStatus() {
-    debugger;
     if (store.selectedChat!.type_id === ChatType.Private) {
         console.log((store.selectedChat as IPrivateChat).user.logout_time, "logout_time");
         if ((store.selectedChat as IPrivateChat).user.logout_time == null) {
@@ -137,8 +135,7 @@ async function onSelectChat()
                 store.allChats.splice(index, 1);
             }
         }
-        debugger
-        
+     
         if (props.chat.messages?.length <= 0 || props.chat.messages == null || props.chat.messages?.length <= props.chat.unread_messages_count){
             const respond = await handleRequest(wsService!, request);
 
@@ -146,15 +143,12 @@ async function onSelectChat()
                 handleError({ subject: "Error", body: respond?.errorMessage }, notification)
             }
 
-            console.debug("respond", respond);
-            
             props.chat.messages = (respond?.data as unknown as any[])?.map(item => 
                 convertToIChatMessage(item)
             );
         }
         store.selectedChat = props.chat;
         setOnlineStatus();
-        debugger;
 
         if (store.selectedChat.unread_messages_count > 0){
             store.selectedChat.unread_messages_count = 0;

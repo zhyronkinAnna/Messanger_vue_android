@@ -9,7 +9,6 @@ export interface IPrivateChat extends IChat {
 export function convertToIPrivateChat(data: any, chatInfo?: IChatInfo): IPrivateChat {
   const baseChat: IChat = convertToIChat(data);
   
-  console.log(baseChat)
   const user = {
     description: chatInfo?.description ?? data.description ?? '',
     email: chatInfo?.email ?? data.email ?? '',
@@ -17,8 +16,6 @@ export function convertToIPrivateChat(data: any, chatInfo?: IChatInfo): IPrivate
     avatar_url: data?.avatar_url ?? data?.user?.avatar_url ?? "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png",
   };
   
-  console.log(user)
-  debugger
   return {
     ...baseChat,
     user,
