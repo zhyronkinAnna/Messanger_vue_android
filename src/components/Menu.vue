@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NAvatar, NFlex, NIcon, NButton, useNotification } from 'naive-ui';
+import { NFlex, NIcon, NButton} from 'naive-ui';
 import { useStore } from '../stores/store';
 import { ArrowLeftEndOnRectangleIcon, Cog6ToothIcon } from '@heroicons/vue/24/outline';
 import { useRouter } from 'vue-router';

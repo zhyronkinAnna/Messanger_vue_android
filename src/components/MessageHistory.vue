@@ -13,37 +13,55 @@ const store = useStore();
 const virtualListMessagesInst = ref<VirtualListInst>();
 
 const messagesWithDates = computed(() => {
-  const messages = store.selectedChat?.messages || [];
-  const result: any = [];
-  let lastDate: any = null;
+    const messages = store.selectedChat?.messages || [];
+    const result: any = [];
+    let lastDate: any = null;
 
-  messages.forEach((message) => {
-    const messageDate = new Date(message.sent_at);
-    const currentDate = messageDate.toDateString();
+    messages.forEach((message) => {
+        const messageDate = new Date(message.sent_at);
+        const currentDate = messageDate.toDateString();
 
-    if (lastDate !== currentDate) {
-      result.push({ isDate: true, date: messageDate, key: messageDate.getTime() });
-      lastDate = currentDate;
-    }
-    
-    result.push({ ...message, isDate: false, key: message.message_id });
-  });
+        if (lastDate !== currentDate) {
+            result.push({ isDate: true, date: messageDate, key: messageDate.getTime() });
+            lastDate = currentDate;
+        }
+        
+        result.push({ ...message, isDate: false, key: message.message_id });
+    });
 
-  return result;
+    return result;
 });
+
+function scrollToBottom() {
+    if (store.virtualListMessagesInst) {
+        store.virtualListMessagesInst.scrollTo({ position: 'bottom' });
+    }
+}
+
+watch(() => messagesWithDates, () => {
+    if (store.virtualListMessagesInst) {
+        nextTick(() => {
+            scrollToBottom();
+
+            setTimeout(() => {
+                scrollToBottom();
+            }, 100);
+        });
+    }
+}, { deep: true });
 
 onMounted(() => {
     store.virtualListMessagesInst = virtualListMessagesInst;
-    store.virtualListMessagesInst.scrollTo({ position: 'bottom' });
-    
-    watch(() => messagesWithDates, (newVal, oldVal) => {
-        if (store.virtualListMessagesInst) {
-            nextTick(() => {
-                store.virtualListMessagesInst.scrollTo({ position: 'bottom' });
-            });
-        }
-    }, { deep: true });
-})
+    if (store.virtualListMessagesInst) {
+        nextTick(() => {
+            scrollToBottom();
+
+            setTimeout(() => {
+                scrollToBottom();
+            }, 100);
+        });
+    }
+});
 
 </script>
 
@@ -70,9 +88,12 @@ onMounted(() => {
                         <TextMessage
                             v-if="item.type === ChatMessageTypes.Text"
                             :message="item"
-                            :class="item.username !== store.user?.username
+                            :class="[
+                            item.username !== store.user?.username
                             ? 'm-r-auto rounded-br-20px rounded-tr-20px rounded-bl-20px'
-                            : 'm-l-auto rounded-br-20px rounded-tl-20px rounded-bl-20px'"
+                            : 'm-l-auto rounded-br-20px rounded-tl-20px rounded-bl-20px',
+                            'text-container'
+                        ]"
                         />
                         <FileMessage
                             v-else-if="item.type === ChatMessageTypes.File"
@@ -89,4 +110,10 @@ onMounted(() => {
 </template>
 
 <style>
+.text-container {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    max-width: 45%;
+}
 </style>

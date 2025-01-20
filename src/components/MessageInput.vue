@@ -38,8 +38,11 @@ onMounted(() => {
 
 async function handleKeyDownEnter(event: KeyboardEvent)
 {
-    if (event.key === 'Enter') {
-        onButtonSendClick();
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        await onButtonSendClick(); 
+    } else {
+        return;
     }
 }
 
@@ -210,11 +213,24 @@ async function onButtonSendClick()
             </NButton>
         </NFlex>
         <NFlex class="flex-1 m-l-10px m-r-10px">
-            <NInput ref="inputRef" v-model:value="store.selectedChat!.messageText" :bordered="false" placeholder="Type your message here.." class="bg-#FAFAFA rounded-10px" @on-change="onInputChange" @keydown="handleKeyDownEnter">
-                <template #suffix>
+            <NInput
+                ref="inputRef"
+                type="textarea"
+                :autosize="{
+                    minRows: 2,
+                    maxRows: 2,
+                }"
+                v-model:value="store.selectedChat!.messageText"
+                :bordered="false"
+                placeholder="Type your message here.."
+                class="bg-#FAFAFA rounded-10px"
+                @on-change="onInputChange"
+                @keydown="handleKeyDownEnter"
+            >
+            <template #suffix>
                     <NIcon/>
-                </template>
-            </NInput>
+            </template>
+        </NInput>
         </NFlex>
         <NFlex>
             <NButton :bordered="false" circle size="medium" ghost color="#007AFF" @click="onButtonSendClick">

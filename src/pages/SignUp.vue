@@ -9,8 +9,7 @@ import { useRules } from '../rules/rules';
 import { useWsService } from '../services/wsServiceManager';
 import { formValidation, generateSHA256, handleError, handleRequest, isSecurePassword } from '../helper';
 
-const user = ref<ISignUpForm>({email: "dimazavrik2014@gmail.com", username: "Dmytro", 
-retype_password: "Dimi6419QWE!", password: "Dimi6419QWE!"});
+const user = ref<ISignUpForm>({});
 const error = ref<IError>();
 
 const router = useRouter();

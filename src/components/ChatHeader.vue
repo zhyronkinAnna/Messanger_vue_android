@@ -20,17 +20,17 @@ function onGoBack(){
     router.push({name: 'Chats'});
 }
 
-function getAvatarLink(): string {
-    if(store.selectedChat!.type_id === ChatType.Group && (store.selectedChat as IGroupChat).avatar_url != null)
-    {
-        return (store.selectedChat as IGroupChat).avatar_url!;
-    }
-    else if(store.selectedChat!.type_id === ChatType.Private && (store.selectedChat as IPrivateChat).user.avatar_url != null)
-    {
-        return (store.selectedChat as IPrivateChat).user.avatar_url!;
-    }
-    return "";
-}
+// function getAvatarLink(): string {
+//     if(store.selectedChat!.type_id === ChatType.Group && (store.selectedChat as IGroupChat).avatar_url != null)
+//     {
+//         return (store.selectedChat as IGroupChat).avatar_url!;
+//     }
+//     else if(store.selectedChat!.type_id === ChatType.Private && (store.selectedChat as IPrivateChat).user.avatar_url != null)
+//     {
+//         return (store.selectedChat as IPrivateChat).user.avatar_url!;
+//     }
+//     return "";
+// }
 </script>
 
 <template>
@@ -66,7 +66,8 @@ function getAvatarLink(): string {
         <NAvatar 
             round
             :size="43"
-            :src="getAvatarLink()"
+            :src="store.selectedChat.type_id === ChatType.Group ? (store.selectedChat as IGroupChat).avatar_url! : 
+                store.selectedChat!.type_id === ChatType.Private ? (store.selectedChat as IPrivateChat).user.avatar_url! : ''"
             @click="onAvatarClick"
         />
 </NFlex>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NGridItem, NGrid, NAvatar, NText, NFlex, NDropdown, useNotification } from 'naive-ui';
+import { NGridItem, NGrid, NAvatar, NText, NFlex, NDropdown, useNotification, NIcon } from 'naive-ui';
 import ReadIcon from '../assets/read.svg';
 import UnreadIcon from '../assets/unread.svg';
 import { nextTick, ref } from 'vue';
@@ -9,7 +9,7 @@ import { formatDateTime, handleError, handleRequest } from '../helper';
 import { useWsService } from '../services/wsServiceManager';
 import { NDivider } from 'naive-ui';
 import { useRouter } from 'vue-router';
-
+import { SpeakerXMarkIcon } from '@heroicons/vue/24/outline';
 
 
 const store = useStore();
@@ -163,19 +163,19 @@ const options = [
     }
 ];
 
-function getAvatarLink(): string {
+// function getAvatarLink(): string {
     
-    if(props.chat.type_id === ChatType.Group && (props.chat as IGroupChat).avatar_url != null)
-    {
-        return (props.chat as IGroupChat).avatar_url!;
-    }
-    else if(props.chat.type_id === ChatType.Private && (props.chat as IPrivateChat).user.avatar_url != null)
-    {
-        return (props.chat as IPrivateChat).user.avatar_url!;
-    }
+//     if(props.chat.type_id === ChatType.Group && (props.chat as IGroupChat).avatar_url != null)
+//     {
+//         return (props.chat as IGroupChat).avatar_url!;
+//     }
+//     else if(props.chat.type_id === ChatType.Private && (props.chat as IPrivateChat).user.avatar_url != null)
+//     {
+//         return (props.chat as IPrivateChat).user.avatar_url!;
+//     }
 
-    return "";
-}
+//     return "";
+// }
 
 interface Props {
     chat: IChat;
@@ -208,14 +208,15 @@ const props = defineProps<Props>();
                 <NAvatar 
                 round
                 :size="43"
-                :src="getAvatarLink()"
+                :src="props.chat.type_id === ChatType.Group ? (props.chat as IGroupChat).avatar_url! : 
+                    props.chat.type_id === ChatType.Private ? (props.chat as IPrivateChat).user.avatar_url! : ''"
                 />
             </NGridItem>
             <NGridItem :span="4">
                 <NFlex>
                     <NGrid :cols="8">
                         <NGridItem :span="5">
-                            <NText strong>
+                            <!-- <NText strong>
                                 {{ 
                                     props.chat.type_id === ChatType.Group ? 
                                     (props.chat as IGroupChat).chat_title : 
@@ -223,7 +224,21 @@ const props = defineProps<Props>();
                                     (props.chat as IPrivateChat).user.username : 
                                     ''
                                 }}
-                            </NText>
+                            </NText> -->
+                            <NFlex align="center" :size="5">
+                                <NText strong>
+                                    {{ 
+                                        props.chat.type_id === ChatType.Group ? 
+                                        (props.chat as IGroupChat).chat_title : 
+                                        props.chat.type_id === ChatType.Private ? 
+                                        (props.chat as IPrivateChat).user.username : 
+                                        ''
+                                    }}
+                                </NText>
+                                <NIcon v-if="props.chat.is_muted" :size="16">
+                                    <SpeakerXMarkIcon/>
+                                </NIcon>
+                            </NFlex>
                         </NGridItem>
                         <NGridItem class="justify-right flex items-center" :span="3">
                             <NText>{{ props.chat.last_message.sent_at ? new Date(props.chat.last_message.sent_at)

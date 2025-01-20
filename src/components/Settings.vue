@@ -93,7 +93,7 @@ async function beforeUpload(data: { file: UploadFileInfo, fileList: UploadFileIn
                                             class="avatar-upload"
                                             round
                                             :size="60"
-                                            :src="store.user?.avatar_url ?? 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'"
+                                            :src="store.user?.avatar_url"
                                         />
                                         <NFloatButton 
                                             v-if="showFloatButton"

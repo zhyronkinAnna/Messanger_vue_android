@@ -34,17 +34,26 @@ async function onSetPhotoButtonClick() {
                 }
             };
 
-            onCancleButtonClick();
-            store.loading = true;
+            const byteString = atob(imageBase64.split(',')[1]);
+            const mimeString = imageBase64.split(',')[0].split(':')[1].split(';')[0];
+            const arrayBuffer = new Uint8Array(byteString.length);
 
-            const respond = await handleRequest(wsService!, request);
-
-            if (respond?.errorMessage) {
-                handleError({ subject: "Sign in Error", body: respond?.errorMessage }, notification);
+            for (let i = 0; i < byteString.length; i++) {
+                arrayBuffer[i] = byteString.charCodeAt(i);
             }
-            store.user = {avatar_url: (respond?.data as any)?.avatar_url ?? ''}
 
-            store.loading = false;
+            const blob = new Blob([arrayBuffer], { type: mimeString });
+
+            const localImageUrl = URL.createObjectURL(blob);
+
+
+            onCancleButtonClick();
+            handleRequest(wsService!, request);
+
+            store.user = {
+                ...store.user,
+                avatar_url: localImageUrl
+            }
         }
     }
 }

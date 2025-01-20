@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">vue-vite-app</string>
-    <string name="title_activity_main">vue-vite-app</string>
+    <string name="app_name">Talkify</string>
+    <string name="title_activity_main">Talkify</string>
     <string name="package_name">vue.vite.app</string>
     <string name="custom_url_scheme">vue.vite.app</string>
 </resources>

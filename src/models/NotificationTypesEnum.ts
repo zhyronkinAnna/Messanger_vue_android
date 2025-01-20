@@ -7,4 +7,6 @@ export enum NotificationTypes {
     UpdateMessagesStatus,
     MyUser,
     UserOnline,
+    SetAvatarUrl,
+    NewUserAvatar,
 }

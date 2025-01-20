@@ -3,6 +3,8 @@ import { useWsService } from "../services/wsServiceManager";
 import { useStore } from "../stores/store";
 import { convertToChat } from "./ChatConverter";
 import { ChatType } from "./ChatTypeEnum";
+import { convertToIChat } from "./IChat";
+import { IGroupChat } from "./IGroupChat";
 import { IMessage } from "./IMessage";
 import { convertToINotificationNewMessage } from "./INotificationNewMessage";
 import { convertToINotificationUpdateMessageStatus } from "./INotificationUpdateMessageStatus";
@@ -32,6 +34,39 @@ export function handleNotification(notification: INotification): void {
         case NotificationTypes.Tokens:
             const tokens = convertToITokens(notification.data);
             store.setAccessToken(tokens.access_token);
+            break;
+
+        case NotificationTypes.SetAvatarUrl:
+            const user = convertToIUser(notification.data);
+            store.user = {
+                ...store.user!,
+                avatar_url: user.avatar_url
+            };
+            break;
+
+        case NotificationTypes.NewUserAvatar:
+            const chat4 = convertToIChat(notification.data);
+            const user1 = convertToIUser(notification.data);
+
+            const chat3 = store.allChats.find(chat => chat.chat_id === chat4.chat_id);
+            
+            if(chat3?.type_id === ChatType.Private) {
+                (chat3 as IPrivateChat).user.avatar_url = user1.avatar_url;
+                if(store.selectedChat?.type_id === ChatType.Private) {
+                    if((store.selectedChat as IPrivateChat).chat_id === (chat3 as IPrivateChat).chat_id) {
+                        (store.selectedChat as IPrivateChat).user.avatar_url = user1.avatar_url;
+                    }
+                }
+            }
+            else if(chat3?.type_id === ChatType.Group) {
+                (chat3 as IGroupChat).avatar_url = user1.avatar_url;
+                if(store.selectedChat?.type_id === ChatType.Group) {
+                    if((store.selectedChat as IGroupChat).chat_id === (chat3 as IGroupChat).chat_id) {
+                        (store.selectedChat as IGroupChat).avatar_url = user1.avatar_url;
+                    }
+                }
+            }
+            
             break;
 
         case NotificationTypes.UserOnline:
@@ -125,9 +160,11 @@ export function handleNotification(notification: INotification): void {
                     store.allChats.splice(chatIndex, 1);
                     store.allChats.unshift(chatToUpdate);
                 }
+                
+                if(chatToUpdate.is_muted === false) {
+                    showInfoNotification(store.messangerNotification, { subject: "New message", body: `You have new Message in chat ${notificationNewMessage.chat_title}` });
+                }
             }
-            
-            showInfoNotification(store.messangerNotification, { subject: "New message", body: `You have new Message in chat ${notificationNewMessage.chat_title}` });
             break;
 
         default:

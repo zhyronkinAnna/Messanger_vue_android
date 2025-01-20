@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHashHistory } from 'vue-router';
 import SignIn from '../pages/SignIn.vue';
 import SignUp from '../pages/SignUp.vue';
 import ForgotPassword from '../pages/ForgotPassword.vue';
@@ -38,6 +38,16 @@ const routes = [
     component: SetNewPassword
 },
 {
+    path: '/test',
+    name: 'test',
+    component: test
+},
+{
+    path: '/SaveToken',
+    name: 'SaveToken',
+    component: SaveToken
+},
+{
     path: '/Chats',
     name: 'Chats',
     component: Chats
@@ -49,16 +59,6 @@ const routes = [
     component: MessangerMe
 },
 {
-    path: '/test',
-    name: 'test',
-    component: test
-},
-{
-    path: '/save-token',
-    name: 'SaveToken',
-    component: SaveToken,
-},
-{
     path: '/PleaseConfirmEmail',
     name: 'PleaseConfirmEmail',
     component: PleaseConfirmEmail,
@@ -67,7 +67,7 @@ const routes = [
 
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHashHistory(),
     routes
 });
 

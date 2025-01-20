@@ -39,6 +39,12 @@ async function onUpdateMuted()
 onMounted(async ()=>{
     try {
         store.selectedChat!.is_muted_view = !store.selectedChat!.is_muted;
+       
+        store.allChats.forEach(chat => {
+            if (chat.chat_id === store.selectedChat!.chat_id) {
+                chat.is_muted = store.selectedChat!.is_muted;
+            }
+        });
         
         if((store.selectedChat!.type_id === ChatType.Private && 
             ((store.selectedChat as IPrivateChat).user!.email == null || (store.selectedChat as IPrivateChat).user!.email === "")))
@@ -71,17 +77,17 @@ onMounted(async ()=>{
     }
 })
 
-function getAvatarLink(): string {
-    if(store.selectedChat!.type_id === ChatType.Group && (store.selectedChat as IGroupChat).avatar_url != null)
-    {
-        return (store.selectedChat as IGroupChat).avatar_url!;
-    }
-    else if(store.selectedChat!.type_id === ChatType.Private && (store.selectedChat as IPrivateChat).user.avatar_url != null)
-    {
-        return (store.selectedChat as IPrivateChat).user.avatar_url!;
-    }
-    return "";
-}
+// function getAvatarLink(): string {
+//     if(store.selectedChat!.type_id === ChatType.Group && (store.selectedChat as IGroupChat).avatar_url != null)
+//     {
+//         return (store.selectedChat as IGroupChat).avatar_url!;
+//     }
+//     else if(store.selectedChat!.type_id === ChatType.Private && (store.selectedChat as IPrivateChat).user.avatar_url != null)
+//     {
+//         return (store.selectedChat as IPrivateChat).user.avatar_url!;
+//     }
+//     return "";
+// }
 
 // function onButtonMessageClick(){
 //     if (store.inputRef) {
@@ -117,7 +123,8 @@ function getAvatarLink(): string {
                                     <NAvatar 
                                         round
                                         :size="60"
-                                        :src="getAvatarLink()"
+                                        :src="store.selectedChat.type_id === ChatType.Group ? (store.selectedChat as IGroupChat).avatar_url! : 
+                                            store.selectedChat!.type_id === ChatType.Private ? (store.selectedChat as IPrivateChat).user.avatar_url! : ''"
                                     />
                                 </NFlex>
                                 <NFlex>

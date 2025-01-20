@@ -17,6 +17,6 @@ export function convertToIUser(data: any): IUser {
         username: data.username,
         last_login: data.last_login ? new Date(data.last_login) : undefined,
         description: data.description,
-        avatar_url: data.avatar_url,
+        avatar_url: data.avatar_url ?? "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png",
     };
 }
