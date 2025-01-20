@@ -10,6 +10,7 @@ export function convertToIPrivateChat(data: any, chatInfo?: IChatInfo): IPrivate
   const baseChat: IChat = convertToIChat(data);
   
   const user = {
+    id: data.user_id,
     description: chatInfo?.description ?? data.description ?? '',
     email: chatInfo?.email ?? data.email ?? '',
     username: data?.chat_title ?? data?.user?.username ??'',

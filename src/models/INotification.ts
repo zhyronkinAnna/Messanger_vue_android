@@ -1,15 +1,16 @@
-import { handleRequest, showInfoNotification } from "../helper";
+import { formatDateTime, handleRequest, showInfoNotification } from "../helper";
 import { useWsService } from "../services/wsServiceManager";
 import { useStore } from "../stores/store";
+import { convertToChat } from "./ChatConverter";
+import { ChatType } from "./ChatTypeEnum";
 import { IMessage } from "./IMessage";
 import { convertToINotificationNewMessage } from "./INotificationNewMessage";
 import { convertToINotificationUpdateMessageStatus } from "./INotificationUpdateMessageStatus";
-import { convertToChat } from "./ChatConverter";
-import { convertToIUser } from "./IUser";
+import { IPrivateChat } from "./IPrivateChat";
 import { IRequest } from "./IRequest";
-import { NotificationTypes } from "./NotificationTypesEnum";
 import { convertToITokens } from "./ITokens";
-
+import { convertToIUser } from "./IUser";
+import { NotificationTypes } from "./NotificationTypesEnum";
 
 export interface INotification extends IMessage {
     typeOfNotification: NotificationTypes;
@@ -20,32 +21,51 @@ export function handleNotification(notification: INotification): void {
 
     switch (notification.typeOfNotification) {
         case NotificationTypes.Error:
+            console.debug('Handling Type1 Notification:', notification.data);
             break;
 
         case NotificationTypes.NewChat:
             const chat2 = convertToChat(notification.data);
             store.allChats.unshift(chat2);
             break;
-
+        
         case NotificationTypes.Tokens:
             const tokens = convertToITokens(notification.data);
             store.setAccessToken(tokens.access_token);
             break;
 
+        case NotificationTypes.UserOnline:
+            const data3 = convertToChat(notification.data);
+            
+            const chats = store.allChats.filter(chat => chat.type_id === ChatType.Private);
+            chats.forEach(chat => {
+                if ((chat as IPrivateChat).user.id === (data3 as IPrivateChat).user.id) {
+                    (chat as IPrivateChat).user.logout_time = (data3 as IPrivateChat).user.logout_time;
+                    if(store.selectedChat?.type_id === ChatType.Private) {
+                        if((store.selectedChat as IPrivateChat).user.id === (data3 as IPrivateChat).user.id) {
+                            (store.selectedChat as IPrivateChat).onlineStatus = (data3 as IPrivateChat).user.logout_time! == null 
+                            ? "Online" : formatDateTime((data3 as IPrivateChat).user.logout_time!);
+                        }
+                    }
+                }
+            });
+
+            break;
+
         case NotificationTypes.MyUser:            
             store.user = convertToIUser(notification.data);
-            store.router.push({ name: 'Messanger' }); //TODO:
+            store.router.push({ name: 'Messanger' });
             break;
 
         case NotificationTypes.UpdateMessageStatus:
             const data = convertToINotificationUpdateMessageStatus(notification.data);
             const chat = store.allChats.find(chat => chat.chat_id === data.chat_id);
             const message = chat?.messages.find(message => message.message_id === data.message_id);
-            
+
             if (message) {
                 message.is_read = data.is_read;
             }
-        break;
+            break;
 
         case NotificationTypes.UpdateMessagesStatus:
             const data1 = convertToINotificationUpdateMessageStatus(notification.data);
@@ -57,9 +77,11 @@ export function handleNotification(notification: INotification): void {
                     filteredMessages.forEach(message => message.is_read = data1.is_read);
                 }
             }
+
             if (chat1) {
                 chat1.last_message.is_read = data1.is_read;
             }
+
             break;
 
         case NotificationTypes.NewMessage:
@@ -74,7 +96,7 @@ export function handleNotification(notification: INotification): void {
                     const wsService = useWsService();
                     chatToUpdate.messages.push(notificationNewMessage.message);
                     const request: IRequest  = {
-                        command: "SetNewFirstUnreadMessage",  
+                        command: "SetNewFirstUnreadMessage", 
                         data: {
                             user_id: store.user?.id,
                             user_chat_id: selectedChat!.id_of_user_chat,
@@ -92,11 +114,10 @@ export function handleNotification(notification: INotification): void {
                     else {
                         chatToUpdate.unread_messages_count = 1;
                     }
-
+                    
                     if (!chatToUpdate.messages) {
                         chatToUpdate.messages = [];
                     }
-                    
                     chatToUpdate.messages.push(notificationNewMessage.message);
                 }
                 const chatIndex = store.allChats.indexOf(chatToUpdate);
@@ -105,7 +126,7 @@ export function handleNotification(notification: INotification): void {
                     store.allChats.unshift(chatToUpdate);
                 }
             }
-
+            
             showInfoNotification(store.messangerNotification, { subject: "New message", body: `You have new Message in chat ${notificationNewMessage.chat_title}` });
             break;
 
