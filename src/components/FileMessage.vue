@@ -1,17 +1,23 @@
 <script setup lang="ts">
-import { NButton, NDropdown, NFlex, NIcon, NText } from 'naive-ui';
+import { NButton, NDropdown, NFlex, NIcon, NSpin, NText, useNotification } from 'naive-ui';
 import UnreadIcon from '../assets/unread.svg';
 import ReadIcon from '../assets/read.svg';
+import Sending from '../assets/sending.svg';
 import { IChatMessage, ReadTypes } from '../models';
 import { useStore } from '../stores/store';
-import { DocumentTextIcon } from '@heroicons/vue/24/solid';
+import { DocumentTextIcon, ArrowPathIcon  } from '@heroicons/vue/24/solid';
 import { nextTick, ref } from 'vue';
+import { downloadFile, handleError, handleRequest } from '../helper';
+import { useWsService } from '../services/wsServiceManager';
 
 const store = useStore();
+const wsService = useWsService();
+const notification = useNotification();
 
 const xRef = ref(0);
 const yRef = ref(0);
 const showDropdownRef = ref(false);
+const fileLoading = ref(false);
 const activeDropdownId = ref<number | null>(null);
 
 const options = [
@@ -45,6 +51,24 @@ interface Props {
     messageFile: IChatMessage
 }
 
+async function onButtonSaveClick() {
+    fileLoading.value = true;
+    const request = {
+        command: "DownloadFileFromChat", 
+        data: {
+            id: props.messageFile.message_id,
+        }
+    };
+    const respond = await handleRequest(wsService!, request);
+    
+    if (respond?.errorMessage) {
+        handleError({ subject: "Error", body: respond?.errorMessage }, notification)
+    }
+    const fileLink = (respond?.data as { file_link?: string })?.file_link;
+    await downloadFile(fileLink!, props.messageFile.file_title!);
+    fileLoading.value = false;
+}
+
 const props = defineProps<Props>();
 </script>
 
@@ -62,7 +86,14 @@ const props = defineProps<Props>();
         />
         <NFlex align="center">
             <NFlex align="center" justify="center" class="w-50px h-50px rounded-8px bg-#DCE8F5">
-                <NIcon :size="40"  color="#007AFFFF"><DocumentTextIcon/></NIcon>
+                <NIcon v-if="!fileLoading" :size="40"  color="#007AFFFF"><DocumentTextIcon/></NIcon>
+                <NSpin v-if="fileLoading">
+                    <template #icon>
+                        <n-icon>
+                            <ArrowPathIcon />
+                        </n-icon>
+                    </template>
+                </NSpin>
             </NFlex>
             <NFlex vertical :size="0">
                 <NFlex>
@@ -72,9 +103,9 @@ const props = defineProps<Props>();
                 </NFlex>
                 <NFlex>
                     <NText>
-                        1KB
+                        {{ props.messageFile.file_size }}
                     </NText>
-                    <NButton text tag="a" text-color="#007AFFFF">
+                    <NButton v-if="props.messageFile.is_read !== ReadTypes.Sending" text tag="a" text-color="#007AFFFF" @click="onButtonSaveClick">
                         Save
                     </NButton>
                 </NFlex>
@@ -83,6 +114,7 @@ const props = defineProps<Props>();
         <NFlex :size="0" :class="{ 'm-l-auto': props.messageFile.username === store.user?.username }" align="center">
             <ReadIcon v-if="props.messageFile.is_read === ReadTypes.Read" class="p-r-5px"/>
             <UnreadIcon v-else-if="props.messageFile.is_read === ReadTypes.Unread" class="p-r-5px"/>
+            <Sending v-else-if="props.messageFile.is_read === ReadTypes.Sending" class="p-r-5px"/>
             <NText class="opacity-45%">
                 {{ 
                     new Date(props.messageFile.sent_at)

@@ -3,13 +3,15 @@ import { NGridItem, NGrid, NAvatar, NText, NFlex, NDropdown, useNotification, NI
 import ReadIcon from '../assets/read.svg';
 import UnreadIcon from '../assets/unread.svg';
 import { nextTick, ref } from 'vue';
-import { ChatType, convertToIChatMessage, IChat, IGroupChat, IPrivateChat, IRequest, ReadTypes } from '../models';
+import { ChatMessageTypes, ChatType, convertToIChatMessage, IChat, IGroupChat, IPrivateChat, IRequest, ReadTypes } from '../models';
 import { useStore } from '../stores/store';
 import { formatDateTime, handleError, handleRequest } from '../helper';
 import { useWsService } from '../services/wsServiceManager';
 import { NDivider } from 'naive-ui';
 import { useRouter } from 'vue-router';
 import { SpeakerXMarkIcon } from '@heroicons/vue/24/outline';
+import Sending from '../assets/sending.svg';
+
 
 
 const store = useStore();
@@ -250,12 +252,15 @@ const props = defineProps<Props>();
                             </NText>
                         </NGridItem>
                         <NGridItem :span="7" class="w-full overflow-hidden">
-                            <NText style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;">{{ props.chat.last_message.text }}</NText>
+                            <NText style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;">
+                                {{ props.chat.last_message.type == ChatMessageTypes.Text ? props.chat.last_message.text : "File" }}
+                            </NText>
                         </NGridItem>
                         <NGridItem class="justify-right flex items-center">
                             <NText v-if="props.chat.unread_messages_count > 0" class="bg-#007AFF rounded-full text-white p-l-1 p-r-1 items-center justify-center flex ">{{props.chat.unread_messages_count}}</NText>
                             <UnreadIcon v-else-if="props.chat.last_message.is_read === ReadTypes.Unread"/>
                             <ReadIcon v-else-if="props.chat.last_message.is_read === ReadTypes.Read"/>
+                            <Sending v-else-if="props.chat.last_message.is_read === ReadTypes.Sending" class="p-r-5px"/>
                         </NGridItem>
                     </NGrid>
                 </NFlex>

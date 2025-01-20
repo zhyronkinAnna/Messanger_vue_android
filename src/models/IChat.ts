@@ -15,7 +15,7 @@ export interface IChat {
 }
 
 export function convertToIChat(data: any): IChat {
-    const last_message = convertToIChatMessage({text: data.last_message, sent_at: data.sent_time, is_read: data.is_read});
+    const last_message = convertToIChatMessage({text: data.last_message, sent_at: data.sent_time, is_read: data.is_read, type: data.type});
     return {
         chat_id: data.chat_id,
         id_of_user_chat: data.id_of_user_chat,

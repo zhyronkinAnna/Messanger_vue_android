@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { NButton, NFlex, NIcon, NInput, useNotification } from 'naive-ui';
-import { PaperClipIcon, FaceSmileIcon, PaperAirplaneIcon } from '@heroicons/vue/24/outline';
+import { NButton, NFlex, NIcon, NInput, NUpload, UploadFileInfo, useNotification } from 'naive-ui';
+import { PaperClipIcon, FaceSmileIcon, PaperAirplaneIcon, ChevronDoubleLeftIcon } from '@heroicons/vue/24/outline';
 import { useStore } from '../stores/store';
 import { onMounted, ref } from 'vue';
 import { ChatMessageTypes, ChatType, convertToChat, convertToIChatMessage, IChat, IChatMessage, 
-    IGroupChat, IPrivateChat, IRequest, ReadTypes } from '../models';import { handleError, handleRequest } from '../helper';
+    IGroupChat, IPrivateChat, IRequest, ReadTypes } from '../models';
+import { fileToBase64, formatFileSize, handleError, handleRequest } from '../helper';
 import { useWsService } from '../services/wsServiceManager';
 
 //TODO: send file
@@ -44,6 +45,67 @@ async function handleKeyDownEnter(event: KeyboardEvent)
     } else {
         return;
     }
+}
+
+async function onChange(options: { file: UploadFileInfo; fileList: Array<UploadFileInfo> }) {
+    if (options.file.status === "pending") {
+        const file = options.file.file;
+        if (file) {
+            let newMessage: IChatMessage = {
+                is_read: ReadTypes.Sending,
+                sent_at: new Date(),
+                file_title: file.name,
+                type: ChatMessageTypes.File,
+                username: store.user!.username ?? '',
+                message_id: Math.floor(new Date().getTime()),
+                file_size: formatFileSize(file.size)
+            }
+            store.selectedChat!.messages.push(newMessage);
+            store.selectedChat!.last_message = newMessage;
+            const request = {
+                    command: "SendFileMessage", 
+                    data: {
+                        sent_at: newMessage.sent_at,
+                        user_chat_id: store.selectedChat?.id_of_user_chat,
+                        type_id: newMessage.type,
+                        file: await fileToBase64(file),
+                        title: newMessage.file_title,
+                        size: newMessage.file_size
+                    }
+                };
+            
+            const respond = await handleRequest(wsService!, request);
+            if (respond?.errorMessage) {
+                handleError({ subject: "Error", body: respond?.errorMessage }, notification)
+            }
+            const message_id = convertToIChatMessage(respond!.data).message_id;
+            store.selectedChat?.messages.forEach(msg => {
+                if (msg.message_id === newMessage.message_id) {
+                    msg.message_id = message_id;
+                    msg.is_read = ReadTypes.Unread;
+                }
+            });
+            store.allChats.forEach(c => {
+                if (c.id_of_user_chat === store.selectedChat?.id_of_user_chat) {
+                    c.last_message.message_id = message_id;
+                    c.messages.forEach(msg => {
+                        if (msg.message_id === newMessage.message_id) {   
+                            msg.message_id = message_id;
+                            msg.is_read = ReadTypes.Unread;
+                        }
+                    });
+                    
+                    store.virtualListMessagesInst.scrollTo({ position: 'bottom' });
+                    moveElementToStart(store.allChats, store.selectedChat!);
+                    store.loading = false;
+                    return
+                }
+            });
+        } else {
+            console.error('File is null or undefined');
+        }
+    }
+    console.log(options.file);
 }
 
 function moveElementToStart(arr: IChat[], element: IChat) {
@@ -199,11 +261,15 @@ async function onButtonSendClick()
 <template>
     <NFlex class="flex flex-row p-10px b-t-#EFEFF5 b-t-solid b-t-1px w-full" :size="0">
         <NFlex>
-            <NButton :bordered="false" circle size="medium" ghost color="#898989">
-                <template #icon>
-                    <NIcon :size="25"><PaperClipIcon/></NIcon>
-                </template>
-            </NButton>
+            <NUpload
+                @change="onChange"
+            >
+                <NButton :bordered="false" circle size="medium" ghost color="#898989">
+                    <template #icon>
+                        <NIcon :size="25"><PaperClipIcon/></NIcon>
+                    </template>
+                </NButton>
+            </NUpload>
         </NFlex>
         <NFlex>
             <NButton @click="onShowEmojiPickerButtonClick" :bordered="false" circle size="medium" ghost color="#898989">
