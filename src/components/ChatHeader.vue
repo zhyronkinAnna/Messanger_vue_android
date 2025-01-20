@@ -20,6 +20,12 @@ function onGoBack(){
     router.push({name: 'Chats'});
 }
 
+// function onCallButtonClick()
+// {
+//     store.callPanel = true;
+//     store.outgoingCall = true;
+// }
+
 // function getAvatarLink(): string {
 //     if(store.selectedChat!.type_id === ChatType.Group && (store.selectedChat as IGroupChat).avatar_url != null)
 //     {

@@ -2,6 +2,7 @@ import { formatDateTime, handleRequest, showInfoNotification } from "../helper";
 import { useWsService } from "../services/wsServiceManager";
 import { useStore } from "../stores/store";
 import { convertToChat } from "./ChatConverter";
+import { CallSignalTypeEnum } from "./CallSignalTypeEnum";
 import { ChatType } from "./ChatTypeEnum";
 import { convertToIChat } from "./IChat";
 import { IGroupChat } from "./IGroupChat";
@@ -13,13 +14,16 @@ import { IRequest } from "./IRequest";
 import { convertToITokens } from "./ITokens";
 import { convertToIUser } from "./IUser";
 import { NotificationTypes } from "./NotificationTypesEnum";
+import { convertToICallSignalData } from "./ICallSignalData";
+
 
 export interface INotification extends IMessage {
     typeOfNotification: NotificationTypes;
 }
 
-export function handleNotification(notification: INotification): void {
+export async function handleNotification(notification: INotification): Promise<void> {
     const store = useStore();
+    const wsService = useWsService();
 
     switch (notification.typeOfNotification) {
         case NotificationTypes.Error:
@@ -90,6 +94,48 @@ export function handleNotification(notification: INotification): void {
         case NotificationTypes.MyUser:            
             store.user = convertToIUser(notification.data);
             store.router.push({ name: 'Messanger' });
+            break;
+
+        case NotificationTypes.CallOffer:
+            store.dataForCall = convertToICallSignalData(notification.data);
+            console.log('CallOffer:', store.dataForCall);
+            console.log('CallOffer:', notification.data);
+            store.callPanel = true;
+            store.incomingCall = true;
+            break;
+        case NotificationTypes.CallAnswer:
+            await store.peerConnection!.setRemoteDescription(new RTCSessionDescription({
+                type: "answer",
+                sdp: convertToICallSignalData(notification.data).Sdp,
+            }));
+            store.peerConnection!.onicecandidate = (event) => {
+                if (event.candidate) {
+                    console.log("Отправляем ICE-кандидат:", event.candidate);
+            
+                    const candidateRequest = {
+                        command: "HandleCall",
+                        data: {
+                            TargetUserId: store.dataForCall!.SenderUserId, // Для принимающего
+                            Type: CallSignalTypeEnum.Candidate,
+                            Candidate: event.candidate.candidate,
+                            SenderUserId: store.user?.id,
+                        }
+                    };
+                    handleRequest(wsService!, candidateRequest);
+                }
+            };
+            store.incomingCall = false;
+            store.outgoingCall = false;
+            store.activeCall = true;
+            break;
+        case NotificationTypes.ICECandidate:
+            console.log("Получен ICE-кандидат:", convertToICallSignalData(notification.data).Candidate);
+            await store.peerConnection!.addIceCandidate(new RTCIceCandidate({
+                candidate: convertToICallSignalData(notification.data).Candidate,
+            }));
+            break;
+        case NotificationTypes.Hangup:
+        
             break;
 
         case NotificationTypes.UpdateMessageStatus:

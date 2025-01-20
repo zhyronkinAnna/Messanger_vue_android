@@ -253,11 +253,13 @@ const props = defineProps<Props>();
                         </NGridItem>
                         <NGridItem :span="7" class="w-full overflow-hidden">
                             <NText style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;">
-                                {{ props.chat.last_message.type == ChatMessageTypes.Text ? props.chat.last_message.text : "File" }}
+                                {{ props.chat.last_message.type == ChatMessageTypes.Text ? 
+                                     props.chat.last_message.text : props.chat.chat_id != null ? "File" : '' }}
                             </NText>
                         </NGridItem>
                         <NGridItem class="justify-right flex items-center">
-                            <NText v-if="props.chat.unread_messages_count > 0" class="bg-#007AFF rounded-full text-white p-l-1 p-r-1 items-center justify-center flex ">{{props.chat.unread_messages_count}}</NText>
+                            <NText v-if="props.chat.unread_messages_count > 0" class="bg-#007AFF rounded-full text-white p-l-1 p-r-1 items-center justify-center flex ">
+                                {{props.chat.unread_messages_count}}</NText>
                             <UnreadIcon v-else-if="props.chat.last_message.is_read === ReadTypes.Unread"/>
                             <ReadIcon v-else-if="props.chat.last_message.is_read === ReadTypes.Read"/>
                             <Sending v-else-if="props.chat.last_message.is_read === ReadTypes.Sending" class="p-r-5px"/>

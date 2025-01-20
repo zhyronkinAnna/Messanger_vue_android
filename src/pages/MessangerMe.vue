@@ -7,7 +7,7 @@ import { useStore } from '../stores/store';
 import Settings from '../components/Settings.vue';
 import UserInfo from '../components/UserInfo.vue';
 import SetAvatar from '../components/SetAvatar.vue';
-
+import CallPanel from '../components/CallPanel.vue';
 
 const store = useStore();
 store.messangerNotification = useNotification();

@@ -1,4 +1,4 @@
-import { IChat, IUser } from "../models/index";
+import { ICallSignalData, IChat, IUser } from "../models/index";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
@@ -20,6 +20,12 @@ export const useStore = defineStore("store", () => {
     const findChats = ref<IChat[] | null>(null)
     const inputSearchInstRef = ref<any>(null);
     const router = ref<any>(null);
+    const callPanel = ref<boolean>(false);
+    const outgoingCall = ref<boolean>(false);
+    const incomingCall = ref<boolean>(false);
+    const activeCall = ref<boolean>(false);
+    const dataForCall = ref<ICallSignalData | null>(null);
+    const peerConnection = ref<RTCPeerConnection | null>(null);
     const accessToken = ref<string | null>(localStorage.getItem("access-token"));
     function setAccessToken(token: string) {
         accessToken.value = token;
@@ -59,6 +65,12 @@ export const useStore = defineStore("store", () => {
         $reset,
         accessToken,
         setAccessToken,
-        router
+        router,
+        callPanel,
+        outgoingCall,
+        incomingCall,
+        activeCall,
+        dataForCall,
+        peerConnection
     };
 });

@@ -9,4 +9,8 @@ export enum NotificationTypes {
     UserOnline,
     SetAvatarUrl,
     NewUserAvatar,
+    CallOffer,
+    CallAnswer,
+    ICECandidate,
+    Hangup,
 }
