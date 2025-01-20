@@ -165,20 +165,6 @@ const options = [
     }
 ];
 
-// function getAvatarLink(): string {
-    
-//     if(props.chat.type_id === ChatType.Group && (props.chat as IGroupChat).avatar_url != null)
-//     {
-//         return (props.chat as IGroupChat).avatar_url!;
-//     }
-//     else if(props.chat.type_id === ChatType.Private && (props.chat as IPrivateChat).user.avatar_url != null)
-//     {
-//         return (props.chat as IPrivateChat).user.avatar_url!;
-//     }
-
-//     return "";
-// }
-
 interface Props {
     chat: IChat;
 }

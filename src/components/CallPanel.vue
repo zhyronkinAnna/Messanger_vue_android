@@ -4,6 +4,7 @@ import { useStore } from '../stores/store';
 import IncomingCall from './IncomingCall.vue';
 import ActiveCall from './ActiveCall.vue';
 import OutgoingCall from './OutgoingCall.vue';
+
 const store = useStore();
 </script>
 <template>

@@ -6,6 +6,7 @@ import { CallSignalTypeEnum, IPrivateChat, IRequest, NotificationTypes } from '.
 import { onMounted } from 'vue';
 import { useWsService } from '../services/wsServiceManager';
 import { handleRequest } from '../helper';
+
 const store = useStore();
 const wsService = useWsService();
 function onButtonEndCallClick()
@@ -13,6 +14,7 @@ function onButtonEndCallClick()
     store.callPanel = false;
     store.outgoingCall = false;
 }
+
 onMounted(async () => {
     console.log("Outgoing call");
     store.peerConnection = new RTCPeerConnection({

@@ -7,6 +7,8 @@ import { onMounted, ref } from 'vue';
 import { ChatType, convertToChat, convertToIChatInfo, IGroupChat, IPrivateChat, IRequest } from '../models';
 import { handleError, handleRequest } from '../helper';
 import { useWsService } from '../services/wsServiceManager';
+import CallPanel from './CallPanel.vue';
+
 
 const store = useStore();
 const wsService = useWsService();
@@ -77,23 +79,12 @@ onMounted(async ()=>{
     }
 })
 
-// function getAvatarLink(): string {
-//     if(store.selectedChat!.type_id === ChatType.Group && (store.selectedChat as IGroupChat).avatar_url != null)
-//     {
-//         return (store.selectedChat as IGroupChat).avatar_url!;
-//     }
-//     else if(store.selectedChat!.type_id === ChatType.Private && (store.selectedChat as IPrivateChat).user.avatar_url != null)
-//     {
-//         return (store.selectedChat as IPrivateChat).user.avatar_url!;
-//     }
-//     return "";
-// }
-
-// function onButtonMessageClick(){
-//     if (store.inputRef) {
-//         store.inputRef.focus();
-//     }
-// };
+function onCallButtonClick()
+{
+    store.callPanel = true;
+    store.outgoingCall = true;
+    console.debug("onCall");
+}
 
 </script>
 
@@ -179,7 +170,7 @@ onMounted(async ()=>{
                             />
                         </NFormItemGi>
                         <NFormItemGi :span="24" :show-feedback="false" :show-label="false">
-                            <NButton type="primary" block strong>
+                            <NButton type="primary" block strong @click="onCallButtonClick">
                                 <template #icon>
                                     <NIcon><PhoneIcon/></NIcon>
                                 </template>
@@ -212,6 +203,7 @@ onMounted(async ()=>{
                     </NButton>
                 </NFlex>
             </NFlex>
+            <CallPanel/>
         </NCard>
     </NFlex>
 </template>
