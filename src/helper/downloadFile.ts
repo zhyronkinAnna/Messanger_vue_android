@@ -1,3 +1,20 @@
+/**
+ * Downloads a file from the given URL and saves it with the specified file name.
+ *
+ * @param {string} fileLink - The URL of the file to be downloaded.
+ * @param {string} fileName - The name to save the downloaded file as.
+ * @returns {Promise<void>} A promise that resolves when the file has been downloaded and saved.
+ *
+ * @throws {Error} If the HTTP request fails or the response is not ok.
+ *
+ * @example
+ * ```typescript
+ * downloadFile('https://example.com/file.pdf', 'downloadedFile.pdf')
+ *   .then(() => console.log('File downloaded successfully'))
+ *   .catch(error => console.error('Error downloading file:', error));
+ * ```
+ */
+
 export async function downloadFile(fileLink: string, fileName: string) {
     try {
         const response = await fetch(fileLink);

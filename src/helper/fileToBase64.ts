@@ -1,3 +1,10 @@
+/**
+ * Converts a File object to a Base64 encoded string.
+ * 
+ * @param {File} file - The file to be converted.
+ * @returns {Promise<string>} - A promise that resolves to the Base64 encoded string.
+ */
+
 export function fileToBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();

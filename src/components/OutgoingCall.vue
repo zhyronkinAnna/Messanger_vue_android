@@ -5,57 +5,23 @@ import { PhoneXMarkIcon } from '@heroicons/vue/24/outline';
 import { CallSignalTypeEnum, IPrivateChat, IRequest, NotificationTypes } from '../models';
 import { onMounted } from 'vue';
 import { useWsService } from '../services/wsServiceManager';
-import { handleRequest } from '../helper';
+import { handleOutcomingCall, endCallAndSendRequestToReceiver} from '../helper';
 
+// Initialize store and WebSocket service
 const store = useStore();
 const wsService = useWsService();
+
+// Function to handle end call button click
 function onButtonEndCallClick()
 {
-    store.callPanel = false;
-    store.outgoingCall = false;
+    store.callPanel = false; // Hide call panel
+    store.outgoingCall = false; // Set outgoing call status to false
+    endCallAndSendRequestToReceiver(store, wsService); // End call and notify receiver
 }
 
+// Lifecycle hook to handle outgoing call when component is mounted
 onMounted(async () => {
-    console.log("Outgoing call");
-    store.peerConnection = new RTCPeerConnection({
-        iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
-    });
-    store.peerConnection.ontrack = (event) => {
-        console.log("Получен медиапоток:", event.streams[0]);
-        const audioElement = document.createElement("audio");
-        audioElement.srcObject = event.streams[0]; // Полученный поток
-        audioElement.autoplay = true; // Воспроизведение потока
-        document.body.appendChild(audioElement); // Добавляем элемент на страницу
-    };
-    store.peerConnection.onconnectionstatechange = () => {
-    console.log("Состояние соединения:", store.peerConnection!.connectionState);
-    if (store.peerConnection!.connectionState === "connected") {
-        console.log("Соединение установлено!");
-    }
-};
-    let localStream: MediaStream | null  = null;
-    try {
-        localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        console.log("Локальные треки:", localStream.getTracks());
-        localStream.getTracks().forEach(track => store.peerConnection!.addTrack(track, localStream!));
-    } catch (error) {
-        console.error("Ошибка при доступе к микрофону:", error);
-        return;
-    }
-    const offer = await store.peerConnection.createOffer();
-    await store.peerConnection.setLocalDescription(offer);
-    const request: IRequest  = {
-        command: "HandleCall", 
-        data: {
-            TargetUserId: (store.selectedChat as IPrivateChat)?.user.id,
-            Type: CallSignalTypeEnum.Offer,
-            Sdp: offer.sdp,
-            Candidate: null,
-            notificationType: NotificationTypes.CallOffer,
-            SenderUserId: store.user?.id,
-        }
-    };
-    handleRequest(wsService!, request);
+    await handleOutcomingCall(store, wsService);
 });
 </script>
 <template>

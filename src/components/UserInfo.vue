@@ -9,10 +9,10 @@ import { handleError, handleRequest } from '../helper';
 import { useWsService } from '../services/wsServiceManager';
 import CallPanel from './CallPanel.vue';
 
-
 const store = useStore();
 const wsService = useWsService();
 const notification = useNotification();
+
 const bio = ref<string | undefined>(
     store.selectedChat?.type_id === ChatType.Group 
         ? (store.selectedChat as IGroupChat).description 
@@ -38,20 +38,14 @@ async function onUpdateMuted()
     handleRequest(wsService!, request, false);
 }
 
-onMounted(async ()=>{
+onMounted(async () => {
     try {
         store.selectedChat!.is_muted_view = !store.selectedChat!.is_muted;
-       
-        store.allChats.forEach(chat => {
-            if (chat.chat_id === store.selectedChat!.chat_id) {
-                chat.is_muted = store.selectedChat!.is_muted;
-            }
-        });
-        
-        if((store.selectedChat!.type_id === ChatType.Private && 
-            ((store.selectedChat as IPrivateChat).user!.email == null || (store.selectedChat as IPrivateChat).user!.email === "")))
-        {
-            const request: IRequest  = {
+
+        if (store.selectedChat!.type_id === ChatType.Private && 
+            ((store.selectedChat as IPrivateChat).user!.email == null || (store.selectedChat as IPrivateChat).user!.email === "")) {
+            
+            const request: IRequest = {
                 command: "GetChatInfo", 
                 data: {
                     chat_id: store.selectedChat?.chat_id,
@@ -62,7 +56,7 @@ onMounted(async ()=>{
             const respond = await handleRequest(wsService!, request);
 
             if (respond?.errorMessage) {
-                handleError({ subject: "Sign in Error", body: respond?.errorMessage }, notification)
+                handleError({ subject: "Sign in Error", body: respond?.errorMessage }, notification);
             }
 
             store.selectedChat = convertToChat(store.selectedChat, convertToIChatInfo(respond?.data));
@@ -71,13 +65,12 @@ onMounted(async ()=>{
                 (store.selectedChat as IGroupChat).description : 
                 store.selectedChat?.type_id === ChatType.Private ? 
                 (store.selectedChat as IPrivateChat).user.description : 
-                '' 
+                '';
         }
-    } 
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
-})
+});
 
 function onCallButtonClick()
 {

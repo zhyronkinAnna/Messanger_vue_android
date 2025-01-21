@@ -1,5 +1,6 @@
 export enum CallSignalTypeEnum {
     Offer,
     Answer,
-    Candidate
+    Candidate,
+    EndCall,
 }

@@ -7,7 +7,10 @@ export interface ICallSignalData  {
     Sdp: string;
     Candidate: string;
     notificationType?: NotificationTypes;
-}
+    SdpMLineIndex: number;
+    SdpMid: string;
+} 
+
 export function convertToICallSignalData(data: any): ICallSignalData {
     return {
         TargetUserId: data.targetUserId,
@@ -15,5 +18,7 @@ export function convertToICallSignalData(data: any): ICallSignalData {
         Type: data.type,
         Sdp: data.sdp,
         Candidate: data.candidate,
+        SdpMLineIndex: data.SdpMLineIndex,
+        SdpMid: data.SdpMid
     };
 }

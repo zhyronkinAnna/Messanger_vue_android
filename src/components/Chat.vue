@@ -13,19 +13,19 @@ import { SpeakerXMarkIcon } from '@heroicons/vue/24/outline';
 import Sending from '../assets/sending.svg';
 
 
-
+// Initialize store and services
 const store = useStore();
-const showDropdownRef = ref(false)
-const xRef = ref(0)
-const yRef = ref(0)
 const wsService = useWsService();
 const notification = useNotification();
 const router = useRouter();
 
-
+// Reactive references for dropdown menu
 const activeDropdownId = ref<number | null>(null);
+const showDropdownRef = ref(false)
+const xRef = ref(0)
+const yRef = ref(0)
 
-
+// Handle right-click context menu
 function handleContextMenu(e: MouseEvent, id: number) {
     e.preventDefault();
     activeDropdownId.value = id;
@@ -37,115 +37,99 @@ function handleContextMenu(e: MouseEvent, id: number) {
     });
 }
 
+// Handle click outside of dropdown menu
 function onClickoutside() {
     showDropdownRef.value = false;
     activeDropdownId.value = null;
 }
 
 function handleSelect(key: string | number) {
-    showDropdownRef.value = false
-    switch(key) {
-    case "delete_chat":
+    showDropdownRef.value = false;
+    if (key === "delete_chat") {
         try {
-            const request: IRequest  = {
-                command: "DeleteChat", 
+            const request: IRequest = {
+                command: "DeleteChat",
                 data: {
                     id: props.chat.chat_id,
                 }
             };
 
-            if(props.chat.chat_id === store.selectedChat?.chat_id)
-            {
+            if (props.chat.chat_id === store.selectedChat?.chat_id) {
                 store.selectedChat = null;
             }
 
             handleRequest(wsService!, request, false);
 
             const index = store.allChats.findIndex(chat => chat.chat_id === props.chat.chat_id);
-
             if (index !== -1) {
                 store.allChats.splice(index, 1);
             }
-        } 
-        catch (error) {
+        } catch (error) {
             console.error(error);
         }
-        break;
     }
 }
 
+// Set online status for private chats
 function setOnlineStatus() {
     if (store.selectedChat!.type_id === ChatType.Private) {
         console.log((store.selectedChat as IPrivateChat).user.logout_time, "logout_time");
-        if ((store.selectedChat as IPrivateChat).user.logout_time == null) {
-            store.selectedChat!.onlineStatus = "Online";
-        } else {
-            store.selectedChat!.onlineStatus = formatDateTime((store.selectedChat as IPrivateChat).user.logout_time!);
-        }
+        const privateChat = store.selectedChat as IPrivateChat;
+        store.selectedChat!.onlineStatus = privateChat.user.logout_time == null
+            ? "Online"
+            : formatDateTime(privateChat.user.logout_time!);
     }
 }
 
-async function onSelectChat()
-{
+// Handle chat selection
+async function onSelectChat() {
     try {
         store.showUserInfo = false;
 
-        const request: IRequest  = {
-            command: "GetMessages", 
+        const request: IRequest = {
+            command: "GetMessages",
             data: {
                 id: props.chat?.id_of_user_chat,
                 user_id: store.user?.id,
             }
         };
 
-        if (store.selectedChat?.chat_id == null)
-        {
-            let index = store.allChats.indexOf(store.selectedChat!);
-            
+        if (store.selectedChat?.chat_id == null) {
+            const index = store.allChats.indexOf(store.selectedChat!);
             if (index !== -1) {
                 store.allChats.splice(index, 1);
             }
         }
-     
-        if (props.chat.messages?.length <= 0 || props.chat.messages == null || props.chat.messages?.length <= props.chat.unread_messages_count){
+
+        if (!props.chat.messages || props.chat.messages.length <= props.chat.unread_messages_count) {
             const respond = await handleRequest(wsService!, request);
-
             if (respond?.errorMessage) {
-                handleError({ subject: "Error", body: respond?.errorMessage }, notification)
+                handleError({ subject: "Error", body: respond?.errorMessage }, notification);
             }
-
-            props.chat.messages = (respond?.data as unknown as any[])?.map(item => 
-                convertToIChatMessage(item)
-            );
+            props.chat.messages = (respond?.data as unknown as any[])?.map(item => convertToIChatMessage(item));
         }
+
         store.selectedChat = props.chat;
         setOnlineStatus();
 
-        if (store.selectedChat.unread_messages_count > 0){
+        if (store.selectedChat.unread_messages_count > 0) {
             store.selectedChat.unread_messages_count = 0;
             store.selectedChat.last_message.is_read = ReadTypes.DoNotShow;
-            const request: IRequest  = {
-                command: "ResetCountOfUnreadMessages", 
+            const resetRequest: IRequest = {
+                command: "ResetCountOfUnreadMessages",
                 data: {
                     user_id: store.user?.id,
                     id: store.selectedChat!.id_of_user_chat,
                     chat_id: store.selectedChat!.chat_id,
                 }
             };
-            
-            handleRequest(wsService!, request, false);
+            handleRequest(wsService!, resetRequest, false);
         }
 
-        const temp = store.allChats.filter(chat =>
-            chat === store.selectedChat            
-        );
-
-        if (temp.length === 0)
-        {
+        if (!store.allChats.includes(store.selectedChat)) {
             store.allChats.unshift(store.selectedChat);
         }
-    } 
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 
@@ -153,11 +137,12 @@ async function onSelectChat()
     store.inputSearchInstRef.clear();
 }
 
+
 function goToChat(){
     router.push({name:'Messanger'});
 }
 
-
+// Dropdown menu options
 const options = [
     {
         label: 'Delete Chat',
@@ -165,6 +150,7 @@ const options = [
     }
 ];
 
+// Define component props
 interface Props {
     chat: IChat;
 }

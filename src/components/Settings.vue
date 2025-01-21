@@ -49,13 +49,12 @@ async function onChange(options: { file: UploadFileInfo; fileList: Array<UploadF
 
 
 async function beforeUpload(data: { file: UploadFileInfo, fileList: UploadFileInfo[] }) {
-    if (data.file.file?.type !== 'image/png' && data.file.file?.type !== 'image/jpeg' && data.file.file?.type !== 'image/jpg') {
-        message.error(
-            'Only upload picture files, please re-upload.'
-        );
-        return false
+    const fileType = data.file.file?.type;
+    if (fileType !== 'image/png' && fileType !== 'image/jpeg' && fileType !== 'image/jpg') {
+        message.error('Only upload picture files, please re-upload.');
+        return false;
     }
-    return true
+    return true;
 }
 
 </script>

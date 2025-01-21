@@ -18,11 +18,11 @@ const wsService = useWsService();
 const notification = useNotification();
 const inputSearchInstRef = ref<InstanceType<typeof NInput> | undefined>(undefined);
 
-onMounted(async ()=>{
+onMounted(async () => {
     store.inputSearchInstRef = inputSearchInstRef;
     try {
-        const request: IRequest  = {
-            command: "GetMyChats", 
+        const request: IRequest = {
+            command: "GetMyChats",
             data: store.user
         };
 
@@ -30,17 +30,14 @@ onMounted(async ()=>{
         const respond = await handleRequest(wsService!, request);
 
         if (respond?.errorMessage) {
-            handleError({ subject: "Sign in Error", body: respond?.errorMessage }, notification)
+            handleError({ subject: "Sign in Error", body: respond?.errorMessage }, notification);
         }
 
-        store.allChats = (respond?.data as unknown as any[])?.map(item => 
-          convertToChat(item)
-        );
-    } 
-    catch (error) {
+        // Convert response data to chat objects
+        store.allChats = (respond?.data as unknown as any[])?.map(item => convertToChat(item));
+    } catch (error) {
         console.error(error);
-    }
-    finally {
+    } finally {
         store.loading = false;
     }
 });

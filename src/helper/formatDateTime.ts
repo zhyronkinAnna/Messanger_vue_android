@@ -1,3 +1,14 @@
+/**
+ * Formats a given date as a string.
+ * If the date is today, it returns "today HH:MM".
+ * If the date is yesterday, it returns "yesterday HH:MM".
+ * Otherwise, it returns the date in "DD.MM.YYYY" format.
+ * 
+ * @param date - The date to format, either as a string or a Date object.
+ * @returns The formatted date string.
+ * @throws Will throw an error if the date is invalid.
+ */
+
 export function formatDateTime(date: string | Date): string {
     const now = new Date();
     const parsedDate = typeof date === 'string' ? new Date(date) : date;

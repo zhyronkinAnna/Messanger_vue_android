@@ -26,6 +26,8 @@ export const useStore = defineStore("store", () => {
     const activeCall = ref<boolean>(false);
     const dataForCall = ref<ICallSignalData | null>(null);
     const peerConnection = ref<RTCPeerConnection | null>(null);
+    const userCall = ref<IUser | null>(null);
+
     const accessToken = ref<string | null>(localStorage.getItem("access-token"));
     function setAccessToken(token: string) {
         accessToken.value = token;
@@ -71,6 +73,7 @@ export const useStore = defineStore("store", () => {
         incomingCall,
         activeCall,
         dataForCall,
-        peerConnection
+        peerConnection,
+        userCall,
     };
 });

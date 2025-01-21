@@ -1,9 +1,10 @@
-import { formatDateTime, handleRequest, showInfoNotification } from "../helper";
+import { endCallAndSendRequestToReceiver, formatDateTime, handleRequest, showInfoNotification } from "../helper";
 import { useWsService } from "../services/wsServiceManager";
 import { useStore } from "../stores/store";
-import { convertToChat } from "./ChatConverter";
 import { CallSignalTypeEnum } from "./CallSignalTypeEnum";
+import { convertToChat } from "./ChatConverter";
 import { ChatType } from "./ChatTypeEnum";
+import { convertToICallSignalData } from "./ICallSignalData";
 import { convertToIChat } from "./IChat";
 import { IGroupChat } from "./IGroupChat";
 import { IMessage } from "./IMessage";
@@ -14,8 +15,6 @@ import { IRequest } from "./IRequest";
 import { convertToITokens } from "./ITokens";
 import { convertToIUser } from "./IUser";
 import { NotificationTypes } from "./NotificationTypesEnum";
-import { convertToICallSignalData } from "./ICallSignalData";
-
 
 export interface INotification extends IMessage {
     typeOfNotification: NotificationTypes;
@@ -96,6 +95,16 @@ export async function handleNotification(notification: INotification): Promise<v
             store.router.push({ name: 'Messanger' });
             break;
 
+        case NotificationTypes.UpdateMessageStatus:
+            const data = convertToINotificationUpdateMessageStatus(notification.data);
+            const chat = store.allChats.find(chat => chat.chat_id === data.chat_id);
+            const message = chat?.messages.find(message => message.message_id === data.message_id);
+
+            if (message) {
+                message.is_read = data.is_read;
+            }
+            break;
+
         case NotificationTypes.CallOffer:
             store.dataForCall = convertToICallSignalData(notification.data);
             console.log('CallOffer:', store.dataForCall);
@@ -108,6 +117,7 @@ export async function handleNotification(notification: INotification): Promise<v
                 type: "answer",
                 sdp: convertToICallSignalData(notification.data).Sdp,
             }));
+
             store.peerConnection!.onicecandidate = (event) => {
                 if (event.candidate) {
                     console.log("Отправляем ICE-кандидат:", event.candidate);
@@ -119,33 +129,36 @@ export async function handleNotification(notification: INotification): Promise<v
                             Type: CallSignalTypeEnum.Candidate,
                             Candidate: event.candidate.candidate,
                             SenderUserId: store.user?.id,
+                            notificationType: NotificationTypes.ICECandidate,
+                            SdpMid: event.candidate.sdpMid,            // Добавляем sdpMid
+                            SdpMLineIndex: event.candidate.sdpMLineIndex,
                         }
                     };
                     handleRequest(wsService!, candidateRequest);
                 }
             };
+
             store.incomingCall = false;
             store.outgoingCall = false;
             store.activeCall = true;
             break;
         case NotificationTypes.ICECandidate:
             console.log("Получен ICE-кандидат:", convertToICallSignalData(notification.data).Candidate);
-            await store.peerConnection!.addIceCandidate(new RTCIceCandidate({
+            const candidate = new RTCIceCandidate({
                 candidate: convertToICallSignalData(notification.data).Candidate,
-            }));
+                sdpMid: convertToICallSignalData(notification.data).SdpMid,
+                sdpMLineIndex: convertToICallSignalData(notification.data).SdpMLineIndex
+            });
+            
+            await store.peerConnection!.addIceCandidate(candidate);
             break;
         case NotificationTypes.Hangup:
-        
-            break;
-
-        case NotificationTypes.UpdateMessageStatus:
-            const data = convertToINotificationUpdateMessageStatus(notification.data);
-            const chat = store.allChats.find(chat => chat.chat_id === data.chat_id);
-            const message = chat?.messages.find(message => message.message_id === data.message_id);
-
-            if (message) {
-                message.is_read = data.is_read;
-            }
+            endCallAndSendRequestToReceiver(store, wsService, false);
+            
+            store.callPanel = false;
+            store.incomingCall = false;
+            store.outgoingCall = false;
+            store.activeCall = false;
             break;
 
         case NotificationTypes.UpdateMessagesStatus:

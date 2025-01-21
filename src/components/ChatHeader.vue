@@ -6,8 +6,8 @@ import { useStore } from '../stores/store';
 import { ChatType, IGroupChat, IPrivateChat } from '../models';
 import { useRouter } from 'vue-router';
 
-//TODO: avatars  
-
+ 
+// Initialize the store
 const store = useStore();
 const router = useRouter();
 
@@ -19,24 +19,6 @@ function onAvatarClick()
 function onGoBack(){
     router.push({name: 'Chats'});
 }
-
-// function onCallButtonClick()
-// {
-//     store.callPanel = true;
-//     store.outgoingCall = true;
-// }
-
-// function getAvatarLink(): string {
-//     if(store.selectedChat!.type_id === ChatType.Group && (store.selectedChat as IGroupChat).avatar_url != null)
-//     {
-//         return (store.selectedChat as IGroupChat).avatar_url!;
-//     }
-//     else if(store.selectedChat!.type_id === ChatType.Private && (store.selectedChat as IPrivateChat).user.avatar_url != null)
-//     {
-//         return (store.selectedChat as IPrivateChat).user.avatar_url!;
-//     }
-//     return "";
-// }
 </script>
 
 <template>
@@ -64,11 +46,6 @@ function onGoBack(){
             }}
         </NText>
     </NFlex>
-    <!-- <NText>
-        {{
-            store.selectedChat?.onlineStatus ?? ""
-        }}
-    </NText> -->
         <NAvatar 
             round
             :size="43"
