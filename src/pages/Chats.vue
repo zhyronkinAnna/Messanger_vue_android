@@ -20,6 +20,9 @@ const inputSearchInstRef = ref<InstanceType<typeof NInput> | undefined>(undefine
 
 onMounted(async () => {
     store.inputSearchInstRef = inputSearchInstRef;
+    if(store.allChats.length > 0){
+        return;
+    }
     try {
         const request: IRequest = {
             command: "GetMyChats",

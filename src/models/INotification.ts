@@ -15,6 +15,8 @@ import { IRequest } from "./IRequest";
 import { convertToITokens } from "./ITokens";
 import { convertToIUser } from "./IUser";
 import { NotificationTypes } from "./NotificationTypesEnum";
+import { convertToIChatMessage } from "./IChatMessage";
+
 
 export interface INotification extends IMessage {
     typeOfNotification: NotificationTypes;
@@ -107,6 +109,9 @@ export async function handleNotification(notification: INotification): Promise<v
 
         case NotificationTypes.CallOffer:
             store.dataForCall = convertToICallSignalData(notification.data);
+            store.userCall = convertToIUser(notification.data);
+            store.userCall.id = store.dataForCall.SenderUserId;
+
             console.log('CallOffer:', store.dataForCall);
             console.log('CallOffer:', notification.data);
             store.callPanel = true;

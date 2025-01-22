@@ -163,7 +163,7 @@ const props = defineProps<Props>();
     <NFlex 
         vertical 
         class="bg-white rounded-2 overflow-hidden p-l-10px p-r-20px"
-        :class="{ 'hover-bg': !showDropdownRef && props.chat !== store.selectedChat, 'selected-bg': props.chat === store.selectedChat}" 
+        :class="{ 'hover-bg': !showDropdownRef && props.chat.chat_id !== store.selectedChat?.chat_id, 'selected-bg': props.chat.chat_id === store.selectedChat?.chat_id}"
         @contextmenu="(e) => handleContextMenu(e, props.chat.chat_id)"
         @click="onSelectChat"
     >

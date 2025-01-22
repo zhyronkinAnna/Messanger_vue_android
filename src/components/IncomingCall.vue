@@ -34,12 +34,12 @@ function onButtonDeclineClick() {
                 class="avatar-upload"
                 round
                 :size="150"
-                :src="(store.selectedChat as IPrivateChat)?.user.avatar_url"
+                :src="store.userCall!.avatar_url"
             />
         </NFlex>
         <NFlex class="w-full" justify="center">
             <!-- Display the username of the user who is calling -->
-            <NH3 strong>{{ (store.selectedChat as IPrivateChat)?.user.username }}</NH3>
+            <NH3 strong>{{ store.userCall!.username }}</NH3>        
         </NFlex>
         <NGrid :cols="1" :y-gap="100">
             <NGridItem>

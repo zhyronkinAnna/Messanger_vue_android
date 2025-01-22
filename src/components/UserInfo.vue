@@ -66,6 +66,19 @@ onMounted(async () => {
                 store.selectedChat?.type_id === ChatType.Private ? 
                 (store.selectedChat as IPrivateChat).user.description : 
                 '';
+
+            store.selectedChat!.is_muted_view = !store.selectedChat!.is_muted;
+
+            store.allChats.forEach(chat => {
+                if (chat.chat_id === store.selectedChat!.chat_id) {
+                    if(store.selectedChat?.type_id === ChatType.Group) {
+                        (chat as IGroupChat).description = (store.selectedChat as IGroupChat).description;
+                    } else if(store.selectedChat?.type_id === ChatType.Private) {
+                        (chat as IPrivateChat).user.description = (store.selectedChat as IPrivateChat).user.description;
+                        (chat as IPrivateChat).user.email = (store.selectedChat as IPrivateChat).user.email;
+                    }
+                }
+            });
         }
     } catch (error) {
         console.error(error);
@@ -182,7 +195,7 @@ function onCallButtonClick()
                     </NGrid>
                 </NForm>
                 <NFlex justify="space-between" class="w-full p-4 mt-auto">
-                    <NButton text type="primary" text-color="#FF0000" size="large">
+                    <!-- <NButton text type="primary" text-color="#FF0000" size="large">
                         <template #icon>
                             <NIcon><TrashIcon/></NIcon>
                         </template>
@@ -193,7 +206,7 @@ function onCallButtonClick()
                             <NIcon><NoSymbolIcon/></NIcon>
                         </template>
                         Block user
-                    </NButton>
+                    </NButton> -->
                 </NFlex>
             </NFlex>
             <CallPanel/>

@@ -25,13 +25,13 @@ function onButtonEndCallClick() {
             <NAvatar
                 round
                 :size="150"
-                :src="(store.selectedChat as IPrivateChat)?.user.avatar_url"
+                :src="store.userCall!.avatar_url"
             />
         </NFlex>
         
         <!-- Username of the user in the active call -->
         <NFlex class="w-full" justify="center">
-            <NH3 strong>{{ (store.selectedChat as IPrivateChat)?.user.username }}</NH3>
+            <NH3 strong>{{ store.userCall!.username }}</NH3>
         </NFlex>
         
         <!-- Grid layout for call duration and end call button -->

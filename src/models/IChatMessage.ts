@@ -8,7 +8,7 @@ export interface IChatMessage {
     is_read: ReadTypes;
     type: ChatMessageTypes;
     file_title?: string;
-    username: string;
+    username?: string;
     file_size?: string;
 }
 

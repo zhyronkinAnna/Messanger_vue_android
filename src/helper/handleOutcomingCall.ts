@@ -37,8 +37,9 @@ export async function handleOutcomingCall(store: any, wsService: WebSocketServic
     }
 
     const offer = await store.peerConnection.createOffer();
-
     await store.peerConnection.setLocalDescription(offer);
+
+    store.userCall = (store.selectedChat as IPrivateChat)?.user;
 
     const request: IRequest  = {
         command: "HandleCall", 
@@ -49,6 +50,8 @@ export async function handleOutcomingCall(store: any, wsService: WebSocketServic
             Candidate: null,
             notificationType: NotificationTypes.CallOffer,
             SenderUserId: store.user?.id,
+            username: store.user?.username,
+            avatar_url: store.user?.avatar_url
         }
     };
     

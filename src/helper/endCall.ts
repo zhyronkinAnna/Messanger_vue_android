@@ -34,7 +34,7 @@ export function endCallAndSendRequestToReceiver(store: any, wsService: WebSocket
         const endCallRequest: IRequest = {
             command: "HandleCall",
             data: {
-                TargetUserId: (store.selectedChat as IPrivateChat)?.user.id,
+                TargetUserId: store.userCall.id,
                 Type: CallSignalTypeEnum.EndCall,
                 SenderUserId: store.user?.id,
                 notificationType: NotificationTypes.Hangup,
