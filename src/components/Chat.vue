@@ -21,37 +21,46 @@ const router = useRouter();
 
 // Reactive references for dropdown menu
 const activeDropdownId = ref<number | null>(null);
-const showDropdownRef = ref(false)
-const xRef = ref(0)
-const yRef = ref(0)
+const showDropdownRef = ref(false);
+const xRef = ref(0);
+const yRef = ref(0);
+let pressTimer: ReturnType<typeof setTimeout> | null = null;
 
-// Handle right-click context menu
-function handleContextMenu(e: MouseEvent, id: number) {
-    e.preventDefault();
-    activeDropdownId.value = id;
-    showDropdownRef.value = false;
-    nextTick().then(() => {
+// Обработчик долгого нажатия (контекстное меню)
+function handleLongPress(e: TouchEvent, id: number) {
+    pressTimer = setTimeout(() => {
+        const touch = e.touches[0];
+        activeDropdownId.value = id;
         showDropdownRef.value = true;
-        xRef.value = e.clientX;
-        yRef.value = e.clientY;
-    });
+        xRef.value = touch.clientX;
+        yRef.value = touch.clientY;
+    }, 600); // Срабатывает через 600 мс
 }
 
-// Handle click outside of dropdown menu
-function onClickoutside() {
-    showDropdownRef.value = false;
-    activeDropdownId.value = null;
+// Очищаем таймер при отмене нажатия
+function cancelLongPress() {
+    if (pressTimer) {
+        clearTimeout(pressTimer);
+        pressTimer = null;
+    }
 }
 
+// Закрытие контекстного меню
+function onClickoutside(event: Event) {
+    const dropdown = document.querySelector(".dropdown-menu"); 
+    if (!dropdown || !dropdown.contains(event.target as Node)) {
+        showDropdownRef.value = false;
+        activeDropdownId.value = null;
+    }
+}
+
+// Обработчик выбора элемента в меню
 function handleSelect(key: string | number) {
-    showDropdownRef.value = false;
     if (key === "delete_chat") {
         try {
             const request: IRequest = {
                 command: "DeleteChat",
-                data: {
-                    id: props.chat.chat_id,
-                }
+                data: { id: props.chat.chat_id },
             };
 
             if (props.chat.chat_id === store.selectedChat?.chat_id) {
@@ -59,15 +68,12 @@ function handleSelect(key: string | number) {
             }
 
             handleRequest(wsService!, request, false);
-
-            const index = store.allChats.findIndex(chat => chat.chat_id === props.chat.chat_id);
-            if (index !== -1) {
-                store.allChats.splice(index, 1);
-            }
+            store.allChats = store.allChats.filter(chat => chat.chat_id !== props.chat.chat_id);
         } catch (error) {
             console.error(error);
         }
     }
+    showDropdownRef.value = false;
 }
 
 // Set online status for private chats
@@ -163,8 +169,10 @@ const props = defineProps<Props>();
     <NFlex 
         vertical 
         class="bg-white rounded-2 overflow-hidden p-l-10px p-r-20px"
-        :class="{ 'hover-bg': !showDropdownRef && props.chat.chat_id !== store.selectedChat?.chat_id, 'selected-bg': props.chat.chat_id === store.selectedChat?.chat_id}"
-        @contextmenu="(e) => handleContextMenu(e, props.chat.chat_id)"
+        :class="{ 'hover-bg': !showDropdownRef && props.chat.chat_id !== store.selectedChat?.chat_id, 'selected-bg': props.chat.chat_id === store.selectedChat?.chat_id 
+        && store.selectedChat != null}"
+        @touchstart="handleLongPress($event, chat.chat_id)" 
+        @touchend="cancelLongPress"
         @click="onSelectChat"
     >
         <NDropdown

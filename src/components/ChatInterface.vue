@@ -16,7 +16,7 @@ const store = useStore();
 </script>
 
 <template>
-    <NotSelectedChat v-if="!store.selectedChat"/>
+    <!-- <NotSelectedChat v-if="!store.selectedChat"/> -->
     <NFlex v-if="store.selectedChat" class="flex flex-col h-100vh w-full" :size="0" vertical>
         <NFlex>
             <ChatHeader/>

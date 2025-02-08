@@ -74,6 +74,7 @@ async function findChats(v: string)
                 ),
                 ...(respond?.data as unknown as any[])?.reduce((acc, item) => {
                     const chat = convertToChat(item);
+                   
                     if (store.selectedChat) {
                         if (
                             store.selectedChat.type_id === ChatType.Group &&

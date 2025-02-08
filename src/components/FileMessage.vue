@@ -3,7 +3,7 @@ import { NButton, NDropdown, NFlex, NIcon, NSpin, NText, useNotification } from 
 import UnreadIcon from '../assets/unread.svg';
 import ReadIcon from '../assets/read.svg';
 import Sending from '../assets/sending.svg';
-import { IChatMessage, ReadTypes } from '../models';
+import { ChatMessageTypes, IChatMessage, IRequest, ReadTypes } from '../models';
 import { useStore } from '../stores/store';
 import { DocumentTextIcon, ArrowPathIcon  } from '@heroicons/vue/24/solid';
 import { nextTick, ref } from 'vue';
@@ -28,7 +28,59 @@ const options = [
 ]
 
 function handleSelect(key: string | number) {
-    showDropdownRef.value = false
+    showDropdownRef.value = false;
+    if (key === "delete_message") {
+        try {
+            let request: IRequest;
+            const index = store.selectedChat?.messages.findIndex(message => message.message_id === props.messageFile.message_id);
+
+            if (store.selectedChat && store.selectedChat.messages[index!].message_id === props.messageFile.message_id) {
+                if(store.selectedChat.messages.length === 1) {
+                    request = {
+                        command: "DeleteChat",
+                        data: {
+                            id: store.selectedChat.chat_id,
+                        }
+                    };
+
+                    store.selectedChat = null;
+
+                    handleRequest(wsService!, request, false);
+
+                    const index = store.allChats.findIndex(chat => chat.chat_id === store.selectedChat!.chat_id);
+                    if (index !== -1) {
+                        store.allChats.splice(index, 1);
+                    }
+                } else
+                {
+                    request = {
+                        command: "DeleteMessage",
+                        data: {
+                            id: props.messageFile.message_id,
+                            type: ChatMessageTypes.File
+                        }
+                    };
+
+                    if(store.selectedChat.last_message.message_id === props.messageFile.message_id) {
+                        store.selectedChat.last_message = store.selectedChat.messages[store.selectedChat.messages.length - 2];
+                        const targetChat = store.allChats.find(chat => chat.chat_id === store.selectedChat?.chat_id);
+                        if (targetChat) {
+                            targetChat.last_message = store.selectedChat?.last_message;
+                        }
+                        store.allChats.sort((a, b) => new Date(b.last_message.sent_at).getTime() - new Date(a.last_message.sent_at).getTime());
+                    }
+
+                    if (index !== undefined && index !== -1) {
+                        store.selectedChat?.messages.splice(index, 1);
+                    }
+
+                    handleRequest(wsService!, request, false);
+                }
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
 }
 
 function handleContextMenu(e: MouseEvent, id: number) {
@@ -73,7 +125,8 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <NFlex vertical :size="0" class="bg-#F4F4F7 p-10px" justify="center" @contextmenu="(e) => handleContextMenu(e, props.messageFile.message_id!)">
+    <NFlex vertical :size="0" class="bg-#F4F4F7 p-10px" justify="center" @contextmenu="(e) => 
+            {if (store.user?.username === props.messageFile.username) handleContextMenu(e, props.messageFile.message_id!)}">
         <NDropdown
             placement="bottom-start"
             trigger="manual"
