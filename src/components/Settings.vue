@@ -110,7 +110,7 @@ async function beforeUpload(data: { file: UploadFileInfo, fileList: UploadFileIn
                                     </NFlex>
                                 </NUpload>
                             </NFlex>
-                            <NFlex>
+                            <NFlex class="ml-10">
                                 <NGrid :cols="1">
                                     <NGridItem>
                                         <NText strong>{{ user.username }}</NText>

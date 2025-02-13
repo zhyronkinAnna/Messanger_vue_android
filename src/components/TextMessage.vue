@@ -111,44 +111,51 @@ const props = defineProps<Props>();
 
 <template>
     <NFlex 
-        vertical 
-        :size="0" 
-        class="bg-#F4F4F7 p-10px" 
-        justify="center" 
-        @touchstart="(e) => { if (store.user?.username === props.message.username) handleLongPress(e, props.message.message_id!) }"
-        @touchend="cancelLongPress"
-    >
-        <!-- Контекстное меню -->
-        <NDropdown
-            placement="bottom-start"
-            trigger="manual"
-            :x="xRef"
-            :y="yRef"
-            :options="options"
-            :show="showDropdownRef"
-            @clickoutside="onClickoutside"
-            @select="handleSelect"
-        />
-        
-        <NFlex class="text-17px">
-            <NText>
-                {{ props.message.text }}
-            </NText>
-        </NFlex>
+    vertical 
+    :size="0" 
+    class="bg-#F4F4F7 p-10px" 
+    justify="center" 
+    @touchstart="(e) => { if (store.user?.username === props.message.username) handleLongPress(e, props.message.message_id!) }"
+    @touchend="cancelLongPress"
+>
+    <!-- Контекстное меню -->
+    <NDropdown
+        placement="bottom-start"
+        trigger="manual"
+        :x="xRef"
+        :y="yRef"
+        :options="options"
+        :show="showDropdownRef"
+        @clickoutside="onClickoutside"
+        @select="handleSelect"
+    />
+    
+    <!-- Текст сообщения -->
+    <NFlex class="text-17px">
+        <NText>
+            {{ props.message.text }}
+        </NText>
+    </NFlex>
 
-        <NFlex :size="0" :class="{ 'm-l-auto': props.message.username === store.user?.username }" align="center">
+    <!-- Статус и время -->
+    <NFlex :size="0" :class="{ 'm-l-auto': props.message.username === store.user?.username }" align="center" justify="end">
+        <!-- Статус -->
+        <NFlex align="center">
             <ReadIcon v-if="props.message.is_read === ReadTypes.Read" class="p-r-5px"/>
             <UnreadIcon v-else-if="props.message.is_read === ReadTypes.Unread" class="p-r-5px"/>
             <Sending v-else-if="props.message.is_read === ReadTypes.Sending" class="p-r-5px"/>
-            <NText class="opacity-45%">
-                {{ 
-                    new Date(props.message.sent_at)
-                    .toLocaleTimeString('ru-RU', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                    }) 
-                }}
-            </NText>
         </NFlex>
+
+        <!-- Время -->
+        <NText class="opacity-45%">
+            {{ 
+                new Date(props.message.sent_at)
+                .toLocaleTimeString('ru-RU', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                }) 
+            }}
+        </NText>
     </NFlex>
+</NFlex>
 </template>

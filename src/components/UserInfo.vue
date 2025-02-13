@@ -111,7 +111,7 @@ function onCallButtonClick()
             <template #header>
                 <NH2>User info</NH2>
             </template>
-            <NFlex direction="column" class="h-full w-full">
+            <NFlex direction="column" class="h-full w-full" :gap="10">
                 <NForm class="w-full">
                     <NGrid :cols="24" :x-gap="10" >
                         <NFormItemGi :span="24" :show-label="false">
@@ -124,7 +124,7 @@ function onCallButtonClick()
                                             store.selectedChat!.type_id === ChatType.Private ? (store.selectedChat as IPrivateChat).user.avatar_url! : ''"
                                     />
                                 </NFlex>
-                                <NFlex>
+                                <NFlex class="ml-10">
                                     <NGrid :cols="1">
                                         <NGridItem>
                                             <NText strong>

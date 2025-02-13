@@ -105,17 +105,6 @@ function handleSelect(key: string | number) {
     }
 }
 
-// function handleContextMenu(e: MouseEvent, id: number) {
-//     e.preventDefault();
-//     activeDropdownId.value = id;
-//     showDropdownRef.value = false;
-//     nextTick().then(() => {
-//         showDropdownRef.value = true;
-//         xRef.value = e.clientX;
-//         yRef.value = e.clientY;
-//     });
-// }
-
 function onClickoutside() {
     showDropdownRef.value = false;
     activeDropdownId.value = null;
@@ -147,7 +136,7 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <NFlex vertical :size="0" 
+    <!-- <NFlex vertical :size="0" 
             class="bg-#F4F4F7 p-10px" 
             justify="center" 
             @touchstart="(e) => {if (store.user?.username === props.messageFile.username) 
@@ -204,7 +193,75 @@ const props = defineProps<Props>();
                 }}
             </NText>
         </NFlex>
+    </NFlex> -->
+    <NFlex vertical :size="0" 
+    class="bg-#F4F4F7 p-10px" 
+    justify="center" 
+    @touchstart="(e) => {if (store.user?.username === props.messageFile.username) 
+        handleLongPress(e, props.messageFile.message_id!)}"
+    @touchend="cancelLongPress"
+>
+    <!-- Контекстное меню -->
+    <NDropdown
+        placement="bottom-start"
+        trigger="manual"
+        :x="xRef"
+        :y="yRef"
+        :options="options"
+        :show="showDropdownRef"
+        :on-clickoutside="onClickoutside"
+        @select="handleSelect"
+    />
+
+    <!-- Иконка файла + Информация -->
+    <NFlex align="center">
+        <NFlex align="center" justify="center" class="w-50px h-50px rounded-8px bg-#DCE8F5 mb-2">
+            <NIcon v-if="!fileLoading" :size="40" color="#007AFFFF"><DocumentTextIcon/></NIcon>
+            <NSpin v-if="fileLoading">
+                <template #icon>
+                    <n-icon>
+                        <ArrowPathIcon />
+                    </n-icon>
+                </template>
+            </NSpin>
+        </NFlex>
+
+        <NFlex vertical :size="2" class="m-l-8px">
+            <!-- Название файла -->
+            <NText strong class="text-15px">
+                {{ props.messageFile.file_title }}
+            </NText>
+
+            <!-- Размер файла + Save -->
+            <NFlex justify="space-between" align="center">
+                <NText>{{ props.messageFile.file_size }}</NText>
+                <NButton v-if="props.messageFile.is_read !== ReadTypes.Sending" text tag="a" text-color="#007AFFFF" class="ml-2" @click="onButtonSaveClick">
+                    Save
+                </NButton>
+            </NFlex>
+
+            <!-- Статус + Время (на одном уровне) -->
+            <NFlex :size="0" :class="{ 'm-l-auto': props.messageFile.username === store.user?.username }" align="center" justify="flex-end">
+                <NFlex align="center">
+                    <ReadIcon v-if="props.messageFile.is_read === ReadTypes.Read" class="p-r-5px"/>
+                    <UnreadIcon v-else-if="props.messageFile.is_read === ReadTypes.Unread" class="p-r-5px"/>
+                    <Sending v-else-if="props.messageFile.is_read === ReadTypes.Sending" class="p-r-5px"/>
+                </NFlex>
+
+                <NText class="opacity-45%">
+                    {{ 
+                        new Date(props.messageFile.sent_at)
+                        .toLocaleTimeString('ru-RU', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                        }) 
+                    }}
+                </NText>
+            </NFlex>
+        </NFlex>
     </NFlex>
+</NFlex>
+
 </template>
 <style>
 </style>

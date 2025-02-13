@@ -222,7 +222,7 @@ const props = defineProps<Props>();
                                 </NIcon>
                             </NFlex>
                         </NGridItem>
-                        <NGridItem class="justify-right flex items-center" :span="3">
+                        <!-- <NGridItem class="justify-right flex items-center" :span="3">
                             <NText>{{ props.chat.last_message.sent_at ? new Date(props.chat.last_message.sent_at)
                                     .toLocaleDateString('ru-RU', {
                                         day: '2-digit',
@@ -243,6 +243,21 @@ const props = defineProps<Props>();
                             <UnreadIcon v-else-if="props.chat.last_message.is_read === ReadTypes.Unread"/>
                             <ReadIcon v-else-if="props.chat.last_message.is_read === ReadTypes.Read"/>
                             <Sending v-else-if="props.chat.last_message.is_read === ReadTypes.Sending" class="p-r-5px"/>
+                        </NGridItem> -->
+                        <NGridItem :span="3" class="flex flex-col items-end min-w-60px">
+                            <NText>
+                                {{ props.chat.last_message.sent_at ? new Date(props.chat.last_message.sent_at)
+                                .toLocaleDateString('ru-RU', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                }) : '' }}
+                            </NText>
+                            <NFlex class="mt-1 self-end">
+                                <UnreadIcon v-if="props.chat.last_message.is_read === ReadTypes.Unread"/>
+                                <ReadIcon v-else-if="props.chat.last_message.is_read === ReadTypes.Read"/>
+                                <Sending v-else-if="props.chat.last_message.is_read === ReadTypes.Sending" class="pr-1"/>
+                            </NFlex>
                         </NGridItem>
                     </NGrid>
                 </NFlex>
