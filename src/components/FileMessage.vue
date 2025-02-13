@@ -19,6 +19,7 @@ const yRef = ref(0);
 const showDropdownRef = ref(false);
 const fileLoading = ref(false);
 const activeDropdownId = ref<number | null>(null);
+let pressTimer: ReturnType<typeof setTimeout> | null = null;
 
 const options = [
     {
@@ -26,6 +27,27 @@ const options = [
         key: 'delete_message'
     }
 ]
+
+function handleLongPress(e: TouchEvent, id: number) {
+    pressTimer = setTimeout(() => {
+        const touch = e.touches[0];
+        activeDropdownId.value = id;
+        xRef.value = touch.clientX;
+        yRef.value = touch.clientY;
+        
+        nextTick().then(() => {
+            showDropdownRef.value = true; // Открываем меню после обновления координат
+        });
+    }, 600); // Долгое нажатие — 600 мс
+}
+
+// Очищаем таймер при отмене нажатия
+function cancelLongPress() {
+    if (pressTimer) {
+        clearTimeout(pressTimer);
+        pressTimer = null;
+    }
+}
 
 function handleSelect(key: string | number) {
     showDropdownRef.value = false;
@@ -83,16 +105,16 @@ function handleSelect(key: string | number) {
     }
 }
 
-function handleContextMenu(e: MouseEvent, id: number) {
-    e.preventDefault();
-    activeDropdownId.value = id;
-    showDropdownRef.value = false;
-    nextTick().then(() => {
-        showDropdownRef.value = true;
-        xRef.value = e.clientX;
-        yRef.value = e.clientY;
-    });
-}
+// function handleContextMenu(e: MouseEvent, id: number) {
+//     e.preventDefault();
+//     activeDropdownId.value = id;
+//     showDropdownRef.value = false;
+//     nextTick().then(() => {
+//         showDropdownRef.value = true;
+//         xRef.value = e.clientX;
+//         yRef.value = e.clientY;
+//     });
+// }
 
 function onClickoutside() {
     showDropdownRef.value = false;
@@ -125,8 +147,12 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <NFlex vertical :size="0" class="bg-#F4F4F7 p-10px" justify="center" @contextmenu="(e) => 
-            {if (store.user?.username === props.messageFile.username) handleContextMenu(e, props.messageFile.message_id!)}">
+    <NFlex vertical :size="0" 
+            class="bg-#F4F4F7 p-10px" 
+            justify="center" 
+            @touchstart="(e) => {if (store.user?.username === props.messageFile.username) 
+                handleLongPress(e, props.messageFile.message_id!)}"
+            @touchend="cancelLongPress">
         <NDropdown
             placement="bottom-start"
             trigger="manual"

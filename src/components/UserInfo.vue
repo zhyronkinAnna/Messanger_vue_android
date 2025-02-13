@@ -138,9 +138,12 @@ function onCallButtonClick()
                                             </NText>
                                         </NGridItem>
                                         <NGridItem>
-                                            <NText 
+                                            <!-- <NText 
                                                 :class="{ 'text-#007AFF text-14px': store.selectedChat?.onlineStatus === 'Online' }">
                                                 {{ store.selectedChat?.onlineStatus ?? "" }}
+                                            </NText> -->
+                                            <NText>
+                                                12.02.2025
                                             </NText>
                                         </NGridItem>
                                     </NGrid>

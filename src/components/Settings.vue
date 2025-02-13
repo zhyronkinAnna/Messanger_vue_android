@@ -127,6 +127,7 @@ async function beforeUpload(data: { file: UploadFileInfo, fileList: UploadFileIn
                             <NText class="text-#007AFF text-12px">Bio</NText>
                         </template>
                         <NInput 
+                            :disabled="true"
                             :theme-overrides="{ 
                                 colorFocus: '#F4F4F7', 
                                 color: '#F4F4F7' 
@@ -142,6 +143,7 @@ async function beforeUpload(data: { file: UploadFileInfo, fileList: UploadFileIn
                     </NFormItemGi>
                     <NFormItemGi :span="24" label="Username">
                         <NInput 
+                            :disabled="true"
                             placeholder="ex. Don Juan" 
                             class="rounded-7px"
                             v-model:value="user.username"
@@ -149,24 +151,25 @@ async function beforeUpload(data: { file: UploadFileInfo, fileList: UploadFileIn
                     </NFormItemGi>
                     <NFormItemGi :span="24" label="Email">
                         <NInput 
+                            :disabled="true"
                             placeholder="example@email.com" 
                             class="rounded-7px"
                             v-model:value="user.email"
                         />
                     </NFormItemGi>
-                    <NFormItemGi :span="24" :show-label="false">
+                    <!-- <NFormItemGi :span="24" :show-label="false">
                         <NButton type="primary" block strong>
                             Save changes
                         </NButton>
-                    </NFormItemGi>
-                    <NFormItemGi :span="24" :show-feedback="false">
-                        <NButton text type="primary" text-color="#FF0000" size="large">
+                    </NFormItemGi> -->
+                    <!-- <NFormItemGi :span="24" :show-feedback="false">
+                         <NButton text type="primary" text-color="#FF0000" size="large">
                             <template #icon>
                                 <NIcon><PowerIcon/></NIcon>
                             </template>
                             Deactivate account
-                        </NButton>
-                    </NFormItemGi>
+                        </NButton> 
+                    </NFormItemGi>  -->
                 </NGrid>
             </NForm>
         </NCard>

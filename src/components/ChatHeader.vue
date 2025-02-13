@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { NAvatar, NButton, NFlex, NGrid, NGridItem, NIcon, NText } from 'naive-ui';
-import { PhoneIcon, InformationCircleIcon, ArrowLeftIcon} from '@heroicons/vue/24/outline';
+import { NAvatar, NButton, NFlex, NIcon, NText } from 'naive-ui';
+import { ArrowLeftIcon} from '@heroicons/vue/24/outline';
 import { useStore } from '../stores/store';
 import { ChatType, IGroupChat, IPrivateChat } from '../models';
 import { useRouter } from 'vue-router';
@@ -18,6 +17,7 @@ function onAvatarClick()
 
 function onGoBack(){
     router.push({name: 'Chats'});
+    store.selectedChat = null;
 }
 </script>
 
@@ -40,10 +40,13 @@ function onGoBack(){
                 ''
             }}
         </NText>
-        <NText depth="3" class="text-sm text-gray-500">
+        <!-- <NText depth="3" class="text-sm text-gray-500">
             {{
                 store.selectedChat?.onlineStatus ?? "lastSeenOnline"
             }}
+        </NText> -->
+        <NText depth="3" class="text-sm text-gray-500">
+            12.02.2025
         </NText>
     </NFlex>
         <NAvatar 
